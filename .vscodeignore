@@ -1,0 +1,13 @@
+.vscode/**
+.git/**
+node_modules/**
+src/**
+product/**
+!product/icons/kursor-256.png
+**/*.map
+**/*.ts
+**/*.tsx
+tsconfig*.json
+esbuild.mjs
+.gitignore
+docs/**

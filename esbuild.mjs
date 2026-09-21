@@ -23,17 +23,18 @@ const extensionConfig = {
 
 /** @type {esbuild.BuildOptions} */
 const webviewConfig = {
-  entryPoints: ['src/webview/main.tsx'],
+  entryPoints: { webview: 'src/webview/main.tsx', settings: 'src/webview-settings/main.tsx' },
   bundle: true,
-  outfile: 'dist/webview.js',
+  outdir: 'dist',
   platform: 'browser',
   format: 'iife',
   target: 'es2022',
   sourcemap: !production,
   minify: production,
   logLevel: 'info',
-  loader: { '.css': 'css' },
+  loader: { '.css': 'css', '.svg': 'dataurl', '.png': 'dataurl' },
   jsx: 'automatic',
+  define: { 'process.env.NODE_ENV': production ? '"production"' : '"development"' },
 };
 
 function copyStatic() {
