@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1b1d24"/>
+      <stop offset="1" stop-color="#0b0c10"/>
+    </linearGradient>
+    <linearGradient id="top" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f4f5fa"/>
+      <stop offset="1" stop-color="#c9cbd6"/>
+    </linearGradient>
+    <linearGradient id="left" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8f93a8"/>
+      <stop offset="1" stop-color="#5b5f73"/>
+    </linearGradient>
+    <linearGradient id="right" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#5a5e72"/>
+      <stop offset="1" stop-color="#2f3140"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#7c8cff"/>
+      <stop offset="1" stop-color="#b57cff"/>
+    </linearGradient>
+  </defs>
+  <rect width="256" height="256" rx="56" fill="url(#bg)"/>
+  <!-- isometric cube -->
+  <g transform="translate(128 132)">
+    <polygon points="0,-78 68,-39 68,39 0,78 -68,39 -68,-39" fill="none" stroke="#000" stroke-opacity=".35" stroke-width="10" stroke-linejoin="round"/>
+    <polygon points="0,-78 68,-39 0,0 -68,-39" fill="url(#top)"/>
+    <polygon points="-68,-39 0,0 0,78 -68,39" fill="url(#left)"/>
+    <polygon points="68,-39 68,39 0,78 0,0" fill="url(#right)"/>
+    <!-- glowing cursor bar on the right face -->
+    <rect x="22" y="-6" width="10" height="56" rx="3" fill="url(#accent)" transform="skewY(-30)"/>
+    <polygon points="0,-78 68,-39 0,0 -68,-39" fill="none" stroke="#ffffff" stroke-opacity=".5" stroke-width="2"/>
+  </g>
+</svg>
