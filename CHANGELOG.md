@@ -9,6 +9,7 @@ builds the extension and one bundle per platform from that tag.
 
 ### Changed
 - Kursor Dark is rebuilt from the brand palette by `scripts/build-theme.mjs`: ink window, surface panels, violet accent, orchid cursor, Keep / Undo / Warn for diffs and git status, and Kursor's own syntax colours instead of VS Code's Dark+.
+- Kursor's own workbench look by default: VS Code's Modern UI with floating rounded panels, the Inter-first UI font, layout toggles in the title bar, smooth cursor blinking and caret animation, no minimap. New installs also fold the menu bar into one button.
 
 ## [0.1.1] - 2026-10-03
 

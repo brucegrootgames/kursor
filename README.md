@@ -39,8 +39,9 @@ GUI flows and please report them.
 **The editor** — VSCodium 1.135.06055 (MIT, telemetry-free, Open VSX extension gallery), installed per user
 (`~/.local/opt/kursor`, `~/Applications/Kursor.app` or `%LOCALAPPDATA%\Programs\Kursor`) and rebranded as *Kursor*: its
 own user data directory, extensions directory (`~/.kursor/extensions`), `kursor` command, `kursor://` URL scheme,
-launcher entry / app bundle / Start Menu shortcut, icons and the **Kursor Dark** colour theme, built from the brand
-palette (ink window, surface panels, violet accent, orchid cursor, its own syntax colours; see
+launcher entry / app bundle / Start Menu shortcut, icons and its own look: the **Kursor Dark** colour theme built from
+the brand palette (ink window, floating surface panels, violet accent, orchid cursor, its own syntax colours), VS Code's
+Modern UI layout with rounded floating panels, the Inter-first UI font and a folded menu bar (see
 [docs/BRAND.md](docs/BRAND.md#in-the-app)). No root/admin rights, no files outside your own account (see
 [Files and locations](#files-and-locations)).
 
@@ -300,11 +301,16 @@ Extension settings (`kursor.*`, also editable in the **Kursor Settings** panel, 
 | `kursor.chat.showThinking` / `kursor.chat.toolCallDensity` | `true` / `balanced` | chat rendering |
 
 Editor settings seeded into `~/.config/Kursor/User/settings.json` on first install (yours to change): Kursor Dark theme,
-custom title bar with command center, activity bar on top, secondary side bar visible, no welcome page, Nerd/mono font
-fallback list, built-in Copilot chat UI off (`chat.disableAIFeatures`), ghost text on, auto-save after delay, workspace
-trust off, editor updates off (`update.mode: none` — the editor is updated by re-running the installer, extensions
-update from Open VSX), telemetry off. `keybindings.json` is seeded empty because the extension already contributes all
-Cursor-style shortcuts.
+custom title bar with command center, menu bar folded into one button (`window.menuBarVisibility: compact`), activity
+bar on top, secondary side bar visible, no welcome page, Nerd/mono font fallback list, built-in Copilot chat UI off
+(`chat.disableAIFeatures`), ghost text on, auto-save after delay, workspace trust off, editor updates off
+(`update.mode: none` — the editor is updated by re-running the installer, extensions update from Open VSX), telemetry
+off. `keybindings.json` is seeded empty because the extension already contributes all Cursor-style shortcuts.
+
+The extension contributes the rest of the look as defaults, so updates reach existing installs and anything you set
+yourself wins: Kursor Dark, Modern UI floating panels (`workbench.experimental.modernUI`), the brand UI font stack
+(`workbench.experimental.fontFamily`: Inter, Adwaita Sans, then the system sans), layout toggles in the title bar,
+smooth cursor blinking and caret animation, and no minimap.
 
 ## Files and locations
 

@@ -57,6 +57,11 @@ token, a lightness step of one, or one of them with alpha:
   strings `#8BDFA9`, numbers and constants `#EEBA6D`, types `#79CFEC`, tags `#FF8F9A`, comments `#6E768A` italic.
   Variables, properties and parameters stay in the text colour, operators and punctuation in Muted.
 
+The Kursor extension sets the workbench defaults that carry the look (`contributes.configurationDefaults` in
+`package.json`): VS Code's Modern UI (floating, rounded panels), the brand UI font stack (Inter, then Adwaita Sans,
+which is Inter-based, then the system sans), the smooth-blinking cursor and no minimap. The installer seeds the
+folded menu bar (`window.menuBarVisibility: compact`), which an extension cannot set.
+
 ## Type
 
 - UI and website: **Inter** (fallback: system sans). Headlines 700 with −0.02 em tracking, body 400/500.

@@ -886,8 +886,15 @@
       }
     },
     "configurationDefaults": {
+      "workbench.colorTheme": "Kursor Dark",
+      "workbench.experimental.modernUI": true,
+      "workbench.experimental.fontFamily": "Inter, \"Inter Variable\", \"Adwaita Sans\", -apple-system, BlinkMacSystemFont, \"Segoe UI Variable Text\", \"Segoe UI\", system-ui, Ubuntu, \"Noto Sans\", sans-serif",
       "workbench.activityBar.location": "top",
+      "workbench.layoutControl.type": "toggles",
       "workbench.secondarySideBar.defaultVisibility": "visible",
+      "editor.minimap.enabled": false,
+      "editor.cursorBlinking": "smooth",
+      "editor.cursorSmoothCaretAnimation": "on",
       "chat.disableAIFeatures": true,
       "editor.inlineSuggest.enabled": true,
       "editor.inlineSuggest.showToolbar": "onHover"

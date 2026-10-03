@@ -333,7 +333,8 @@ See vscodium.md §8 and omarchy.md §8 (recipes are verified against this machin
   `window.commandCenter true`, `workbench.activityBar.location top`, `workbench.secondarySideBar.defaultVisibility
   visible`, `workbench.startupEditor none`, `security.workspace.trust.enabled false`, `chat.disableAIFeatures true`,
   `editor.inlineSuggest.enabled true`, `workbench.colorTheme "Kursor Dark"`, `update.mode none`,
-  `extensions.autoCheckUpdates true`, `window.dialogStyle custom`, `editor.fontFamily` with a Nerd/mono fallback list),
+  `extensions.autoCheckUpdates true`, `window.dialogStyle custom`, `window.menuBarVisibility compact`, `editor.fontFamily`
+  with a Nerd/mono fallback list; the extension's `configurationDefaults` add Modern UI, the UI font and the editor look),
   install the extension from `dist/kursor.vsix` (`~/.local/opt/kursor/bin/kursor --install-extension … --force`),
   optionally `--with-icons PKief.material-icon-theme`; Omarchy: install `product/omarchy/kursor-theme.hook` via
   `omarchy hook install theme-set` (only if `omarchy` exists) and run it once; print next steps. Flags:

@@ -2,11 +2,14 @@
   // Kursor default user settings — seeded by the Kursor installer (product/install.mjs) only when this file does not exist yet.
   // Plain VS Code / VSCodium settings; change anything (Ctrl+, opens Settings, Ctrl+Shift+J the Kursor panel).
 
-  // Look & feel (Cursor-like layout: custom title bar with command center, activity bar on top,
-  // the Kursor chat in the secondary side bar, Kursor Dark theme)
+  // Look & feel: custom title bar with the command center and the menu folded into one button, activity bar
+  // on top, the Kursor chat in the secondary side bar, Kursor Dark theme. The Kursor extension supplies the
+  // rest as defaults (floating Modern UI panels, Inter UI font, smooth cursor, no minimap), so they follow
+  // future updates unless you set them here.
   "workbench.colorTheme": "Kursor Dark",
   "window.titleBarStyle": "custom",
   "window.commandCenter": true,
+  "window.menuBarVisibility": "compact",
   "window.dialogStyle": "custom",
   "workbench.activityBar.location": "top",
   "workbench.secondarySideBar.defaultVisibility": "visible",
