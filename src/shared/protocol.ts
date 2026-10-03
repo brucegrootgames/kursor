@@ -279,6 +279,8 @@ export type WebviewToHost =
   | { type: 'deleteSession'; sessionId: string }
   | { type: 'pickImage' }
   | { type: 'runCommand'; command: string; args?: unknown[] }
+  /** Keyboard focus entered/left the webview (lets `kursor.chat.open` toggle only when the chat is focused). */
+  | { type: 'focusChanged'; focused: boolean }
   | { type: 'log'; level: 'info' | 'warn' | 'error'; text: string };
 
 /** Persisted webview UI state (vscode.getState/setState) — never chat content. */

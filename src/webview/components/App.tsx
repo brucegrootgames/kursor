@@ -65,9 +65,19 @@ export function App() {
         hostLog('error', `failed to handle ${data.type}: ${err instanceof Error ? err.stack ?? err.message : String(err)}`);
       }
     };
+    // Tell the host whether keyboard focus is inside the chat (Ctrl+I toggles only when it is).
+    const onFocus = () => post({ type: 'focusChanged', focused: true });
+    const onBlur = () => post({ type: 'focusChanged', focused: false });
     window.addEventListener('message', onMessage);
+    window.addEventListener('focus', onFocus);
+    window.addEventListener('blur', onBlur);
     post({ type: 'ready' });
-    return () => window.removeEventListener('message', onMessage);
+    if (document.hasFocus()) post({ type: 'focusChanged', focused: true });
+    return () => {
+      window.removeEventListener('message', onMessage);
+      window.removeEventListener('focus', onFocus);
+      window.removeEventListener('blur', onBlur);
+    };
   }, []);
 
   if (!app) {

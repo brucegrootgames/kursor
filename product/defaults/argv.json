@@ -1,0 +1,6 @@
+// Permanent command-line arguments for Kursor (VSCodium's argv.json). Changing this file requires a restart.
+// Only a subset of arguments is supported here — see https://github.com/microsoft/vscode/wiki/argv.json
+{
+  // Store extension secrets in the GNOME keyring (what Omarchy ships) instead of a plaintext fallback.
+  "password-store": "gnome-libsecret"
+}

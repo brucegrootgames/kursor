@@ -6,7 +6,8 @@ view and in the "Open Chat in Editor" panel. The only contract is `src/shared/pr
 chat state and posts `AppState` / `ChatState` snapshots plus `textDelta`s; the UI posts `WebviewToHost` intents.
 Nothing here imports from `src/extension`.
 
-Typecheck: `npx tsc --noEmit -p src/webview/tsconfig.json`.
+Typecheck: `npx tsc --noEmit -p src/webview/tsconfig.json`. Tests (sanitizer, fence meta, mention helpers):
+`node src/webview/__tests__/markdown.test.mjs` (bundles the sources with esbuild, no DOM needed).
 
 ## Data flow
 
@@ -18,6 +19,7 @@ window 'message' ──▶ store.handleHostMessage()
    mentionResults → mentions.deliverMentionResults(requestId)
    history / showHistory / focusInput / insertText / addAttachment / toast
 components ──▶ vscode.post(WebviewToHost)
+window focus/blur ──▶ post({type:'focusChanged'}) (lets Ctrl+I toggle the pane only when the chat is focused)
 ```
 
 - `store.ts` — external store (`useSyncExternalStore`): `app`, `chats`, per-chat composer drafts + attachment

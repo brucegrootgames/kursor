@@ -1,0 +1,101 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "kursor: build",
+      "type": "shell",
+      "command": "node esbuild.mjs",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": {
+        "owner": "esbuild",
+        "fileLocation": [
+          "relative",
+          "${workspaceFolder}"
+        ],
+        "pattern": [
+          {
+            "regexp": "^[✘▲] \\[(ERROR|WARNING)\\] (.*)$",
+            "severity": 1,
+            "message": 2
+          },
+          {
+            "regexp": "^\\s+(.*):(\\d+):(\\d+):$",
+            "file": 1,
+            "line": 2,
+            "column": 3
+          }
+        ]
+      },
+      "presentation": {
+        "reveal": "silent",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "kursor: watch",
+      "type": "shell",
+      "command": "node esbuild.mjs --watch",
+      "isBackground": true,
+      "group": "build",
+      "problemMatcher": {
+        "owner": "esbuild",
+        "fileLocation": [
+          "relative",
+          "${workspaceFolder}"
+        ],
+        "pattern": [
+          {
+            "regexp": "^[✘▲] \\[(ERROR|WARNING)\\] (.*)$",
+            "severity": 1,
+            "message": 2
+          },
+          {
+            "regexp": "^\\s+(.*):(\\d+):(\\d+):$",
+            "file": 1,
+            "line": 2,
+            "column": 3
+          }
+        ],
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "^\\[watch\\] build started",
+          "endsPattern": "^(\\[watch\\] build finished|watching…)"
+        }
+      },
+      "presentation": {
+        "reveal": "never",
+        "panel": "dedicated"
+      }
+    },
+    {
+      "label": "kursor: typecheck",
+      "type": "shell",
+      "command": "npm run typecheck",
+      "group": "test",
+      "problemMatcher": "$tsc"
+    },
+    {
+      "label": "kursor: tests",
+      "type": "shell",
+      "command": "node src/extension/inline/__tests__/diffBlocks.test.mjs && node src/extension/chat/__tests__/runner.test.mjs && node src/webview/__tests__/markdown.test.mjs && node --test src/extension/ide/__tests__/*.test.mjs && node scripts/smoke-load.mjs",
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "kursor: package (.vsix)",
+      "type": "shell",
+      "command": "npm run package",
+      "problemMatcher": []
+    },
+    {
+      "label": "kursor: install (product/install.sh)",
+      "type": "shell",
+      "command": "bash product/install.sh",
+      "dependsOn": "kursor: package (.vsix)",
+      "problemMatcher": []
+    }
+  ]
+}

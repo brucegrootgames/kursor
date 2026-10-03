@@ -1,5 +1,6 @@
 /** Handles every WebviewToHost message (except `ready`, handled by the host). */
 import * as vscode from 'vscode';
+import * as fs from 'node:fs';
 import * as path from 'node:path';
 import type { Attachment, WebviewToHost } from '../../shared/protocol';
 import type { MentionSearch } from '../context/mentions';
@@ -25,7 +26,7 @@ function resolveFsPath(p: string, manager: ChatManager): vscode.Uri {
     if (folders.length === 1) return vscode.Uri.file(candidate);
     try {
       // multi-root: first folder that contains the file wins
-      require('node:fs').accessSync(candidate);
+      fs.accessSync(candidate);
       return vscode.Uri.file(candidate);
     } catch {
       /* try next */
@@ -54,7 +55,9 @@ async function runInTerminal(code: string): Promise<void> {
   if (!terminal || terminal.exitStatus) terminal = vscode.window.createTerminal({ name: 'Kursor' });
   terminal.show(false);
   const text = code.trim();
-  if (terminal.shellIntegration) {
+  if (!text) return;
+  // Shell integration gives us exit codes/output capture for single commands; multi-line scripts go through sendText.
+  if (terminal.shellIntegration && !text.includes('\n')) {
     terminal.shellIntegration.executeCommand(text);
   } else {
     terminal.sendText(text, true);
@@ -106,7 +109,8 @@ export async function handleWebviewMessage(ctx: MessageContext, msg: WebviewToHo
   const { manager, log } = ctx;
   switch (msg.type) {
     case 'ready':
-      return;
+    case 'focusChanged':
+      return; // handled by WebviewHost
     case 'send':
       await manager.send(msg.chatId, msg.text, msg.attachments ?? [], { sendNow: msg.sendNow });
       return;

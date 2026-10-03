@@ -5,7 +5,7 @@
  * `syncBlock` raises the buffer to the snapshot text when the snapshot is longer, and
  * `prune` drops buffers for blocks that are no longer streaming.
  */
-import { useSyncExternalStore } from 'react';
+import { useCallback, useSyncExternalStore } from 'react';
 
 const buffers = new Map<string, string>();
 const listeners = new Map<string, Set<() => void>>();
@@ -62,10 +62,9 @@ function subscribeTo(blockId: string): (cb: () => void) => () => void {
  * streamed buffer (both are prefixes of the same final string).
  */
 export function useStreamedText(blockId: string, base: string, streaming: boolean): string {
-  const buffered = useSyncExternalStore(
-    streaming ? subscribeTo(blockId) : noopSubscribe,
-    () => (streaming ? buffers.get(blockId) : undefined),
-  );
+  // Stable subscribe function per (block, streaming) so React does not resubscribe on every render.
+  const subscribe = useCallback((cb: () => void) => (streaming ? subscribeTo(blockId)(cb) : noopSubscribe()), [blockId, streaming]);
+  const buffered = useSyncExternalStore(subscribe, () => (streaming ? buffers.get(blockId) : undefined));
   if (!streaming || buffered === undefined) return base;
   return buffered.length > base.length ? buffered : base;
 }

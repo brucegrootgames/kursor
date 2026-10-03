@@ -18,6 +18,8 @@ export type MessageHandler = (msg: WebviewToHost, host: WebviewHost) => Promise<
 
 export class WebviewHost implements WebviewHostLike, vscode.Disposable {
   ready = false;
+  /** Keyboard focus is inside the webview (reported by the UI via `focusChanged`). */
+  focused = false;
   private readonly queue: HostToWebview[] = [];
   private readonly disposables: vscode.Disposable[] = [];
 
@@ -37,6 +39,10 @@ export class WebviewHost implements WebviewHostLike, vscode.Disposable {
           this.ready = true;
           manager.syncHost(this);
           for (const m of this.queue.splice(0)) this.post(m);
+          return;
+        }
+        if (msg.type === 'focusChanged') {
+          this.focused = !!msg.focused;
           return;
         }
         void Promise.resolve(onMessage(msg, this)).catch((err: unknown) => {
@@ -78,6 +84,9 @@ export class ChatViewProvider implements vscode.WebviewViewProvider, vscode.Disp
   private view: vscode.WebviewView | undefined;
   private host: WebviewHost | undefined;
   private badgeCount = 0;
+  private readonly visibilityEmitter = new vscode.EventEmitter<boolean>();
+  /** Fires with the new visibility whenever the side-bar view is shown or hidden. */
+  readonly onDidChangeVisibility = this.visibilityEmitter.event;
 
   constructor(
     private readonly extensionUri: vscode.Uri,
@@ -88,6 +97,11 @@ export class ChatViewProvider implements vscode.WebviewViewProvider, vscode.Disp
 
   get visible(): boolean {
     return this.view?.visible ?? false;
+  }
+
+  /** The view is visible and keyboard focus is inside its webview. */
+  get focused(): boolean {
+    return this.visible && (this.host?.focused ?? false);
   }
 
   get resolved(): boolean {
@@ -110,7 +124,8 @@ export class ChatViewProvider implements vscode.WebviewViewProvider, vscode.Disp
             active.unread = false;
             this.manager.postAppState();
           }
-        }
+        } else if (this.host) this.host.focused = false;
+        this.visibilityEmitter.fire(webviewView.visible);
       }),
     ];
     webviewView.onDidDispose(() => {
@@ -118,6 +133,7 @@ export class ChatViewProvider implements vscode.WebviewViewProvider, vscode.Disp
       this.host?.dispose();
       this.host = undefined;
       this.view = undefined;
+      this.visibilityEmitter.fire(false);
     });
   }
 
@@ -142,6 +158,7 @@ export class ChatViewProvider implements vscode.WebviewViewProvider, vscode.Disp
 
   dispose(): void {
     this.host?.dispose();
+    this.visibilityEmitter.dispose();
   }
 }
 

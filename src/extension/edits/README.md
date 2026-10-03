@@ -16,6 +16,10 @@ Claude Code applies edits to disk itself; the bridge snapshots each file before 
   the status bar item `$(diff-multiple) N files · Review`, review via `vscode.diff` / `vscode.changes`,
   persistence of pending snapshots in `workspaceState` (per-file ≤ 512 kB, total ≤ 4 MB).
 
+Events: `onDidChange` (any change to the pending set or a summary) and `onDidResolve` (`{path, status: 'kept' | 'undone'}`,
+fired before `onDidChange` whenever a file stops being pending — Keep/Undo per file/all/hunk, a manual revert back to
+base, a checkpoint restore via `clear()`, or an externally deleted new file) so the chat can label its tool rows.
+
 Semantics: consecutive changes to one file coalesce (base = first `before`); a file whose content
 returns to base (manual revert or agent re-edit) is dropped automatically; `undo` of a new file deletes it,
 of a deleted file recreates it; `keep` just forgets the snapshot.

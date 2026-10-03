@@ -99,6 +99,17 @@ export function nextUserWithoutUuid(chat: ChatState): UserMessage | undefined {
   return undefined;
 }
 
+/** Tool rows whose `edit` is still 'pending' but no longer tracked (e.g. after a reload) are marked kept. */
+export function reconcileEditStatuses(chat: ChatState, pending: { path: string }[]): void {
+  const live = new Set(pending.map((p) => p.path));
+  for (const m of chat.messages) {
+    if (m.kind !== 'assistant') continue;
+    for (const b of m.blocks) {
+      if (b.type === 'tool' && b.edit?.status === 'pending' && !live.has(b.edit.path)) b.edit = { ...b.edit, status: 'kept', hunks: 0 };
+    }
+  }
+}
+
 export function hasQueuedMessages(chat: ChatState): boolean {
   return chat.messages.some((m) => m.kind === 'user' && m.queued);
 }

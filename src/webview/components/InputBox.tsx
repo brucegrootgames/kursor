@@ -46,7 +46,8 @@ function findPendingPermission(chat: ChatState | undefined): string | undefined 
 }
 
 export function InputBox({ chat, app }: InputBoxProps) {
-  const chatKey = chat?.id ?? NO_CHAT_KEY;
+  // Key drafts by the host's active chat id (known from appState before the chatState snapshot arrives).
+  const chatKey = chat?.id ?? app.activeChatId ?? NO_CHAT_KEY;
   const composer = useComposer(chatKey);
   const text = composer.text;
   const ref = useRef<HTMLTextAreaElement>(null);

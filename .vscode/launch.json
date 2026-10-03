@@ -1,0 +1,51 @@
+{
+  // F5 targets. "Run Extension (code)" uses the `code` binary on PATH (VS Code / VSCodium);
+  // "Run Extension (kursor)" uses the rebranded binary installed by product/install.sh.
+  // Both load this folder as the extension (--extensionDevelopmentPath) and open ../ as the workspace.
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Run Extension (code)",
+      "type": "extensionHost",
+      "request": "launch",
+      "runtimeExecutable": "code",
+      "args": [
+        "--extensionDevelopmentPath=${workspaceFolder}",
+        "--disable-extensions",
+        "${workspaceFolder}"
+      ],
+      "outFiles": ["${workspaceFolder}/dist/**/*.js"],
+      "sourceMaps": true,
+      "preLaunchTask": "kursor: build",
+      "env": { "KURSOR_DEV": "1" }
+    },
+    {
+      "name": "Run Extension (kursor)",
+      "type": "extensionHost",
+      "request": "launch",
+      "runtimeExecutable": "${env:HOME}/.local/opt/kursor/bin/kursor",
+      "args": [
+        "--extensionDevelopmentPath=${workspaceFolder}",
+        "${workspaceFolder}"
+      ],
+      "outFiles": ["${workspaceFolder}/dist/**/*.js"],
+      "sourceMaps": true,
+      "preLaunchTask": "kursor: build",
+      "env": { "KURSOR_DEV": "1" }
+    },
+    {
+      "name": "Watch + Run Extension (code)",
+      "type": "extensionHost",
+      "request": "launch",
+      "runtimeExecutable": "code",
+      "args": [
+        "--extensionDevelopmentPath=${workspaceFolder}",
+        "--disable-extensions",
+        "${workspaceFolder}"
+      ],
+      "outFiles": ["${workspaceFolder}/dist/**/*.js"],
+      "sourceMaps": true,
+      "preLaunchTask": "kursor: watch"
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+// Kursor user keybindings — seeded by product/install.sh only when this file does not exist yet.
+//
+// Every Cursor-style shortcut (Ctrl+K inline edit, Ctrl+L / Ctrl+Shift+L add to chat, Ctrl+I toggle chat,
+// Ctrl+Shift+J settings, Tab completions, Ctrl+Enter / Ctrl+Backspace accept / reject, the Ctrl+R chords
+// that replace VS Code's Ctrl+K chords, …) is contributed by the Kursor extension itself, so nothing needs
+// to be seeded here. Add your own overrides below — Ctrl+R Ctrl+S opens the keyboard shortcuts editor.
+[]

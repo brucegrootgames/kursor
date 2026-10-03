@@ -34,6 +34,12 @@ export interface FileChange {
   toolUseId: string;
 }
 
+/** How a pending edit stopped being pending. */
+export interface EditResolution {
+  path: string;
+  status: 'kept' | 'undone';
+}
+
 export interface EditTracker extends vscode.Disposable {
   /** Record a change made by the agent. Consecutive changes to the same file are coalesced (base stays the first `before`). */
   recordChange(chatId: string, change: FileChange): void;
@@ -47,6 +53,8 @@ export interface EditTracker extends vscode.Disposable {
   /** Forget pending edits (e.g. after a checkpoint restore). */
   clear(chatId?: string): void;
   readonly onDidChange: vscode.Event<void>;
+  /** Optional: fires (before `onDidChange`) when a file stops being pending — kept, undone, or reverted by hand. */
+  readonly onDidResolve?: vscode.Event<EditResolution>;
 }
 
 export interface ChatController {

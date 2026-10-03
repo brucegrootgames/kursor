@@ -366,8 +366,10 @@ export function sendComposer(chatKey: string, sendNow?: boolean): boolean {
   const cur = state.composer[chatKey] ?? EMPTY_COMPOSER;
   const text = cur.text.trim();
   if (!text && cur.attachments.length === 0) return false;
+  // The host owns the active chat id; use it even if its ChatState snapshot has not arrived yet
+  // (otherwise `newChat` would reuse the same empty chat and the queued send would never flush).
   const chatId = state.app?.activeChatId ?? null;
-  if (!chatId || chatKey === NO_CHAT_KEY) {
+  if (!chatId) {
     pendingSend = { text, attachments: cur.attachments, sendNow };
     clearComposer(chatKey);
     post({ type: 'newChat' });

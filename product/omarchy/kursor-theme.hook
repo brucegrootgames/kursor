@@ -1,0 +1,172 @@
+#!/bin/bash
+# Omarchy theme-set hook for Kursor.
+# Installed by product/install.sh with `omarchy hook install theme-set product/omarchy/kursor-theme.hook`
+# into ~/.config/omarchy/hooks/theme-set.d/; Omarchy runs it after every `omarchy theme set <name>` with the
+# snake-cased theme name as $1 (the argument is informational — the current theme is read from
+# ~/.local/state/omarchy/current/theme like omarchy-theme-set-vscode does).
+#
+# Behaviour (same as omarchy-theme-set-vscode, parametrised for Kursor):
+#   * the theme ships vscode.json {name, extension}  → install that Open VSX extension into Kursor
+#                                                      (if missing) and select the named colour theme
+#   * else a generated vscode-theme.json exists      → expose it as the local "Omarchy" theme extension
+#                                                      under ~/.kursor/extensions and select it
+#   * neither                                        → select "Kursor Dark"
+#
+# Opt out without uninstalling:   touch ~/.local/state/omarchy/toggles/skip-kursor-theme-changes
+# Overrides: KURSOR_SETTINGS (settings.json path), KURSOR_EXTENSIONS (extensions dir), KURSOR_CLI (kursor binary).
+set -uo pipefail
+
+KURSOR_SETTINGS="${KURSOR_SETTINGS:-${XDG_CONFIG_HOME:-$HOME/.config}/Kursor/User/settings.json}"
+KURSOR_EXTENSIONS="${KURSOR_EXTENSIONS:-$HOME/.kursor/extensions}"
+KURSOR_DEFAULT_THEME="Kursor Dark"
+
+OMARCHY_THEME_DIR="$HOME/.local/state/omarchy/current/theme"
+VS_CODE_THEME_DESCRIPTOR="$OMARCHY_THEME_DIR/vscode.json"
+GENERATED_THEME="$OMARCHY_THEME_DIR/vscode-theme.json"
+GENERATED_EXTENSION_NAME="omarchy-theme"
+GENERATED_EXTENSION_ID="local.$GENERATED_EXTENSION_NAME"
+GENERATED_EXTENSION_VERSION="1.0.0"
+
+[[ -f "$HOME/.local/state/omarchy/toggles/skip-kursor-theme-changes" ]] && exit 0
+
+# Kursor's CLI: the installed tree first (headless, no launcher flags), then whatever is on PATH.
+if [[ -z ${KURSOR_CLI:-} ]]; then
+  if [[ -x "$HOME/.local/opt/kursor/bin/kursor" ]]; then
+    KURSOR_CLI="$HOME/.local/opt/kursor/bin/kursor"
+  elif [[ -x "$HOME/.local/bin/kursor" ]]; then
+    KURSOR_CLI="$HOME/.local/bin/kursor"
+  elif command -v kursor >/dev/null 2>&1; then
+    KURSOR_CLI=$(command -v kursor)
+  else
+    exit 0 # Kursor is not installed (any more) — nothing to theme
+  fi
+fi
+command -v jq >/dev/null 2>&1 || { echo "kursor-theme.hook: jq is required" >&2; exit 1; }
+
+# Register the generated extension in <extensions>/extensions.json so Kursor loads it without a restart prompt.
+register_generated_extension() {
+  local ext_dir="$1"
+  local ext_base extensions_file obsolete_file relative tmp
+
+  ext_base=$(dirname "$ext_dir")
+  extensions_file="$ext_base/extensions.json"
+  obsolete_file="$ext_base/.obsolete"
+  relative=$(basename "$ext_dir")
+
+  if [[ -f $obsolete_file ]]; then
+    tmp=$(mktemp)
+    if jq --arg key "$GENERATED_EXTENSION_ID-$GENERATED_EXTENSION_VERSION" 'del(.[$key])' "$obsolete_file" >"$tmp"; then
+      mv "$tmp" "$obsolete_file"
+      [[ $(jq 'length' "$obsolete_file") == "0" ]] && rm -f "$obsolete_file"
+    else
+      rm -f "$tmp"
+    fi
+  fi
+
+  [[ -f $extensions_file ]] || printf '[]\n' >"$extensions_file"
+
+  tmp=$(mktemp)
+  if jq \
+    --arg id "$GENERATED_EXTENSION_ID" \
+    --arg version "$GENERATED_EXTENSION_VERSION" \
+    --arg fs_path "$ext_dir" \
+    --arg external "file://$ext_dir" \
+    --arg relative "$relative" \
+    'map(select(.identifier.id != $id)) + [{
+      identifier: { id: $id },
+      version: $version,
+      location: {
+        "$mid": 1,
+        fsPath: $fs_path,
+        external: $external,
+        path: $fs_path,
+        scheme: "file"
+      },
+      relativeLocation: $relative
+    }]' \
+    "$extensions_file" >"$tmp"; then
+    mv "$tmp" "$extensions_file"
+  else
+    rm -f "$tmp"
+  fi
+}
+
+# The generated Omarchy theme as a local extension (VS Code only discovers colour themes through extensions).
+install_generated_extension() {
+  local ext_dir="$1"
+  local theme_type ui_theme
+
+  theme_type=$(jq -r '.type // "dark"' "$GENERATED_THEME")
+  if [[ $theme_type == "light" ]]; then ui_theme="vs"; else ui_theme="vs-dark"; fi
+
+  mkdir -p "$ext_dir/themes"
+  ln -sfn "$GENERATED_THEME" "$ext_dir/themes/omarchy-color-theme.json"
+
+  cat >"$ext_dir/package.json" <<PKG
+{
+    "name": "$GENERATED_EXTENSION_NAME",
+    "displayName": "Omarchy",
+    "description": "Omarchy color theme",
+    "publisher": "local",
+    "version": "$GENERATED_EXTENSION_VERSION",
+    "engines": { "vscode": "^1.70.0" },
+    "categories": ["Themes"],
+    "contributes": {
+        "themes": [{
+            "label": "Omarchy",
+            "uiTheme": "$ui_theme",
+            "path": "./themes/omarchy-color-theme.json"
+        }]
+    }
+}
+PKG
+
+  register_generated_extension "$ext_dir"
+}
+
+# Write "workbench.colorTheme" into settings.json. The file is JSONC (comments, trailing commas), so it is
+# edited in place with sed instead of being round-tripped through a strict JSON parser.
+write_color_theme() {
+  local theme_name="$1" escaped
+
+  mkdir -p "$(dirname "$KURSOR_SETTINGS")"
+  [[ -f $KURSOR_SETTINGS ]] || printf '{\n}\n' >"$KURSOR_SETTINGS"
+
+  escaped=${theme_name//&/\\&}
+  escaped=${escaped//|/\\|}
+
+  if ! grep -q '"workbench.colorTheme"' "$KURSOR_SETTINGS"; then
+    sed -i --follow-symlinks -E '0,/\{/{s/\{/{\n  "workbench.colorTheme": "",/}' "$KURSOR_SETTINGS"
+  fi
+
+  sed -i --follow-symlinks -E \
+    "s|(\"workbench.colorTheme\"[[:space:]]*:[[:space:]]*\")[^\"]*(\")|\1$escaped\2|" \
+    "$KURSOR_SETTINGS"
+}
+
+theme_name=""
+
+if [[ -f "$VS_CODE_THEME_DESCRIPTOR" ]]; then
+  # The theme names a third-party extension/theme pair. Both values come from the theme, so neither is
+  # trusted as a shell or sed argument.
+  theme_name=$(jq -r '.name // empty' "$VS_CODE_THEME_DESCRIPTOR")
+  extension=$(jq -r '.extension // empty' "$VS_CODE_THEME_DESCRIPTOR")
+
+  # A label with quotes, backslashes or control characters cannot be written as valid JSON: drop it.
+  [[ $theme_name =~ ^[^[:cntrl:]\"\\]+$ ]] || theme_name=""
+
+  # Only a well-formed publisher.name id is installed (from Open VSX, Kursor's gallery).
+  if [[ $extension =~ ^[a-zA-Z0-9._-]+$ ]] &&
+    ! "$KURSOR_CLI" --list-extensions 2>/dev/null | grep -Fxq "$extension"; then
+    "$KURSOR_CLI" --install-extension "$extension" >/dev/null 2>&1 ||
+      echo "kursor-theme.hook: could not install $extension from Open VSX (offline?) — the theme may be missing until it is installed" >&2
+  fi
+elif [[ -f "$GENERATED_THEME" ]]; then
+  install_generated_extension "$KURSOR_EXTENSIONS/$GENERATED_EXTENSION_NAME"
+  theme_name="Omarchy"
+fi
+
+# Nothing usable from Omarchy (or a rejected label) → Kursor's own theme.
+[[ -n $theme_name ]] || theme_name="$KURSOR_DEFAULT_THEME"
+
+write_color_theme "$theme_name"

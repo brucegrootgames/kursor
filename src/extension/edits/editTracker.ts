@@ -12,7 +12,7 @@
 import * as vscode from 'vscode';
 import * as path from 'node:path';
 import type { EditSummary } from '../../shared/protocol';
-import type { BaseDeps, EditTracker, FileChange } from '../services';
+import type { BaseDeps, EditResolution, EditTracker, FileChange } from '../services';
 import { EditDecorations } from './decorations';
 import { applyHunkForward, computeHunks, endsWithNewline, lineStats, minimalReplacement, revertHunk, type TrackedFile } from './model';
 import { ORIG_SCHEME, OrigContentProvider } from './origProvider';
@@ -29,7 +29,8 @@ export function createEditTracker(context: vscode.ExtensionContext, deps: BaseDe
   const { log } = deps;
   const files = new Map<string, TrackedFile>();
   const changeEmitter = new vscode.EventEmitter<void>();
-  const disposables: vscode.Disposable[] = [];
+  const resolveEmitter = new vscode.EventEmitter<EditResolution>();
+  const disposables: vscode.Disposable[] = [resolveEmitter];
   const lookup = (fsPath: string): TrackedFile | undefined => files.get(fsPath);
 
   const orig = new OrigContentProvider(lookup);
@@ -90,9 +91,11 @@ export function createEditTracker(context: vscode.ExtensionContext, deps: BaseDe
     changeEmitter.fire();
   };
 
-  const forget = (fsPath: string): void => {
-    files.delete(fsPath);
+  /** Stop tracking a file and tell listeners (chat tool rows) how it was resolved. */
+  const forget = (fsPath: string, status: EditResolution['status']): void => {
+    if (!files.delete(fsPath)) return;
     void closeReviewTabs(fsPath);
+    resolveEmitter.fire({ path: fsPath, status });
   };
 
   const summaryOf = (f: TrackedFile): EditSummary => {
@@ -118,7 +121,7 @@ export function createEditTracker(context: vscode.ExtensionContext, deps: BaseDe
     if (text === f.current) return;
     f.current = text;
     f.updatedAt = Date.now();
-    if (f.base !== null && text === f.base) forget(f.path);
+    if (f.base !== null && text === f.base) forget(f.path, 'undone');
     fire();
   }
 
@@ -161,7 +164,7 @@ export function createEditTracker(context: vscode.ExtensionContext, deps: BaseDe
     } else {
       await writeFile(f.path, f.base);
     }
-    forget(f.path);
+    forget(f.path, 'undone');
   }
 
   // ---- public API ---------------------------------------------------------------
@@ -174,7 +177,7 @@ export function createEditTracker(context: vscode.ExtensionContext, deps: BaseDe
         existing.updatedAt = Date.now();
         if (!existing.toolUseIds.includes(change.toolUseId)) existing.toolUseIds.push(change.toolUseId);
         existing.chatId = chatId;
-        if (existing.base !== null && existing.current === existing.base) forget(change.path);
+        if (existing.base !== null && existing.current === existing.base) forget(change.path, 'undone');
       } else {
         files.set(change.path, {
           path: change.path,
@@ -196,11 +199,8 @@ export function createEditTracker(context: vscode.ExtensionContext, deps: BaseDe
     },
 
     async keep(fsPath?: string): Promise<void> {
-      if (fsPath) {
-        if (files.has(fsPath)) forget(fsPath);
-      } else {
-        for (const p of [...files.keys()]) forget(p);
-      }
+      if (fsPath) forget(fsPath, 'kept');
+      else for (const p of [...files.keys()]) forget(p, 'kept');
       fire();
     },
 
@@ -252,11 +252,13 @@ export function createEditTracker(context: vscode.ExtensionContext, deps: BaseDe
     },
 
     clear(chatId?: string): void {
-      for (const f of [...files.values()]) if (!chatId || f.chatId === chatId) forget(f.path);
+      // Used after a checkpoint restore (files are back at base) and when a chat closes.
+      for (const f of [...files.values()]) if (!chatId || f.chatId === chatId) forget(f.path, 'undone');
       fire();
     },
 
     onDidChange: changeEmitter.event,
+    onDidResolve: resolveEmitter.event,
 
     dispose(): void {
       if (persistTimer) {
@@ -284,7 +286,7 @@ export function createEditTracker(context: vscode.ExtensionContext, deps: BaseDe
     f.version += 1;
     f.updatedAt = Date.now();
     orig.refresh(f);
-    if (newBase === current) forget(fsPath);
+    if (newBase === current) forget(fsPath, 'kept');
     fire();
   }
 
@@ -308,7 +310,7 @@ export function createEditTracker(context: vscode.ExtensionContext, deps: BaseDe
     }
     f.current = doc.getText();
     f.updatedAt = Date.now();
-    if (f.base !== null && f.current === f.base) forget(fsPath);
+    if (f.base !== null && f.current === f.base) forget(fsPath, 'undone');
     fire();
   }
 
@@ -368,7 +370,7 @@ export function createEditTracker(context: vscode.ExtensionContext, deps: BaseDe
           if (p === uri.fsPath || p.startsWith(uri.fsPath + path.sep)) {
             const f = files.get(p);
             if (f && f.base === null) {
-              files.delete(p);
+              forget(p, 'undone');
               changed = true;
             } else if (f) {
               f.current = null;

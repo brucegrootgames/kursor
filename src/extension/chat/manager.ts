@@ -17,7 +17,7 @@ import type { TerminalCapture } from '../context/terminalCapture';
 import { chatToMarkdown } from './export';
 import { composeTurn, type ActiveFileInfo } from './prompt';
 import { ChatRunner } from './runner';
-import { createChatState, DEFAULT_TITLE, findUserMessage, newId, systemNote, titleFromText } from './state';
+import { createChatState, DEFAULT_TITLE, findUserMessage, newId, reconcileEditStatuses, systemNote, titleFromText } from './state';
 import { ChatStore } from './store';
 
 export interface WebviewHostLike {
@@ -61,6 +61,10 @@ export class ChatManager implements vscode.Disposable {
       this.store,
       this.store.onDidChange(() => this.postAppState()),
       deps.edits.onDidChange(() => this.onEditsChanged()),
+      // Keep/Undo from the editor (CodeLens, title buttons, keybindings) must update the chat's tool rows too.
+      deps.edits.onDidResolve?.((r) => {
+        for (const runner of this.runners.values()) runner.markEdits([r.path], r.status);
+      }) ?? new vscode.Disposable(() => undefined),
       deps.rules.onDidChange(() => {
         for (const r of this.runners.values()) r.invalidateSession();
       }),
@@ -80,7 +84,11 @@ export class ChatManager implements vscode.Disposable {
       },
       (err: unknown) => deps.log.warn('status failed', err),
     );
-    for (const chat of this.store.all()) chat.pendingEdits = deps.edits.pending(chat.id);
+    for (const chat of this.store.all()) {
+      chat.pendingEdits = deps.edits.pending(chat.id);
+      // Tool rows restored with a stale 'pending' edit (the tracker no longer knows the file) are shown as kept.
+      reconcileEditStatuses(chat, chat.pendingEdits);
+    }
     this.updateRunningContext();
   }
 
@@ -356,6 +364,7 @@ export class ChatManager implements vscode.Disposable {
     if (chat.title === DEFAULT_TITLE) chat.title = titleFromText(text || resolved.map((a) => a.label).join(', '));
     chat.updatedAt = Date.now();
     chat.unread = false;
+    this.postChatState(chat.id);
     try {
       await this.runnerFor(chat).send(composed.turn, user, composed.contextPaths, !!options?.sendNow);
     } catch (err) {
@@ -419,8 +428,9 @@ export class ChatManager implements vscode.Disposable {
     if (decision === 'build') {
       runner.respond(requestId, { behavior: 'allow' }, 'allow');
       chat.mode = 'agent';
-      // Claude Code leaves plan mode itself on approval; align the process with the configured agent permission mode.
-      setTimeout(() => void runner.setPermissionMode(chat.permissionMode).catch((err: unknown) => this.deps.log.debug('setPermissionMode after plan failed', err)), 300);
+      // Claude Code leaves plan mode itself on approval; align the process (session.setMode → configured
+      // agent permission mode) once the approval has been delivered.
+      setTimeout(() => void runner.syncSessionMode().catch((err: unknown) => this.deps.log.debug('syncSessionMode after plan failed', err)), 300);
     } else {
       runner.respond(requestId, { behavior: 'deny', message: feedback?.trim() ? `The user rejected the plan with this feedback: ${feedback.trim()}` : 'The user rejected the plan. Ask what should change before planning again.' }, 'deny');
     }

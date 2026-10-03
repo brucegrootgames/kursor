@@ -20,7 +20,7 @@ import type { Logger } from '../util/log';
 import { relPathOf } from '../context/providers';
 import { lineStats } from '../edits/model';
 import { KURSOR_SYSTEM_NOTE } from './prompt';
-import { capOutput, findToolBlock, hasQueuedMessages, lastAssistant, newId, nextUserWithoutUuid, systemNote } from './state';
+import { capOutput, findToolBlock, hasQueuedMessages, lastAssistant, newId, systemNote } from './state';
 
 type ToolBlock = Extract<Block, { type: 'tool' }>;
 type TextBlock = Extract<Block, { type: 'text' }>;
@@ -90,8 +90,11 @@ export class ChatRunner implements vscode.Disposable {
   private readonly confirmed = new Map<string, number>();
   private readonly subagentMessages = new Set<string>();
   private readonly pendingRequests = new Map<string, PermissionRequest>();
+  /** User messages sent through this runner that have not received their Claude Code uuid yet (FIFO). */
+  private readonly awaitingUuid: UserMessage[] = [];
   private sessionMode: ChatMode | undefined;
   private restartOnIdle = false;
+  private interrupted = false;
   private disposed = false;
   private resolvedModel: string | undefined;
 
@@ -160,6 +163,7 @@ export class ChatRunner implements vscode.Disposable {
     this.session = undefined;
     for (const id of this.pendingRequests.keys()) this.resolveRequestBlock(id, 'deny');
     this.pendingRequests.clear();
+    this.awaitingUuid.length = 0;
     try {
       s?.dispose();
     } catch (err) {
@@ -189,13 +193,26 @@ export class ChatRunner implements vscode.Disposable {
       this.chat.status = this.chat.sessionId ? 'running' : 'starting';
       this.chat.error = undefined;
     }
+    this.awaitingUuid.push(user);
     this.chat.updatedAt = Date.now();
     this.deps.notify();
     session.send(turn);
   }
 
+  /** Attach Claude Code's uuid for a user turn to the oldest message still waiting for one. */
+  private assignUuid(uuid: string): UserMessage | undefined {
+    const u = this.awaitingUuid.shift();
+    if (!u) return undefined;
+    u.uuid = uuid;
+    u.canRestore = true;
+    return u;
+  }
+
   async interrupt(): Promise<void> {
     if (!this.session) return;
+    const wasRunning = this.running;
+    if (!wasRunning && !this.session.running) return; // nothing to stop
+    this.interrupted = true;
     try {
       await this.session.interrupt();
     } catch (err) {
@@ -206,7 +223,19 @@ export class ChatRunner implements vscode.Disposable {
       this.resolveRequestBlock(id, 'deny');
     }
     this.pendingRequests.clear();
-    this.finishTurn(undefined);
+    // Queued follow-ups are dropped by the CLI on interrupt.
+    for (const m of this.chat.messages) if (m.kind === 'user' && m.queued) m.queued = false;
+    this.awaitingUuid.length = 0;
+    if (wasRunning) {
+      const a = this.assistant ?? lastAssistant(this.chat);
+      for (const b of a?.blocks ?? []) {
+        if (b.type === 'tool' && b.status === 'running') {
+          b.status = 'error';
+          b.output = b.output || 'Interrupted';
+        }
+      }
+      this.finishTurn({ isError: false });
+    }
   }
 
   respond(requestId: string, decision: PermissionDecision, uiDecision?: 'allow' | 'deny' | 'always'): void {
@@ -228,8 +257,14 @@ export class ChatRunner implements vscode.Disposable {
   }
 
   async setMode(mode: ChatMode): Promise<void> {
-    const prev = this.chat.mode;
     this.chat.mode = mode;
+    await this.syncSessionMode();
+  }
+
+  /** Push `chat.mode` to the live session (no-op without a session or when it already matches). */
+  async syncSessionMode(): Promise<void> {
+    const mode = this.chat.mode;
+    const prev = this.sessionMode;
     if (!this.session || prev === mode) return;
     if (this.session.setMode) {
       try {
@@ -254,19 +289,31 @@ export class ChatRunner implements vscode.Disposable {
     }
   }
 
+  /** Control calls can fail on a process that just died; the new value is applied on respawn anyway. */
+  private async control(what: string, fn: () => Promise<void>): Promise<void> {
+    try {
+      await fn();
+    } catch (err) {
+      this.deps.log.warn(`${what} failed (applied on the next session start)`, err);
+    }
+  }
+
   async setModel(model: string): Promise<void> {
     this.chat.model = model;
-    if (this.session) await this.session.setModel(model);
+    const s = this.session;
+    if (s && !this.restartOnIdle) await this.control('setModel', () => s.setModel(model));
   }
 
   async setEffort(effort: EffortLevel): Promise<void> {
     this.chat.effort = effort;
-    if (this.session) await this.session.setEffort(effort);
+    const s = this.session;
+    if (s && !this.restartOnIdle) await this.control('setEffort', () => s.setEffort(effort));
   }
 
   async setPermissionMode(mode: PermissionMode): Promise<void> {
     this.chat.permissionMode = mode;
-    if (this.session && this.chat.mode === 'agent') await this.session.setPermissionMode(mode);
+    const s = this.session;
+    if (s && !this.restartOnIdle && this.chat.mode === 'agent') await this.control('setPermissionMode', () => s.setPermissionMode(mode));
   }
 
   async rewindFiles(uuid: string): Promise<{ canRewind: boolean; filesChanged?: string[]; error?: string }> {
@@ -337,23 +384,17 @@ export class ChatRunner implements vscode.Disposable {
         break;
       }
       case 'status':
-        if (e.detail) {
-          const a = this.assistant;
-          if (a && !a.result) {
-            a.result = undefined;
-          }
-          this.deps.log.info(`status: ${e.status} ${e.detail}`);
-        }
+        // API retries / compaction progress: informational only (the UI keeps its spinner).
+        if (e.detail) this.deps.log.info(`status: ${e.status} ${e.detail}`);
         break;
       case 'userReplay': {
-        const u = nextUserWithoutUuid(chat);
+        const u = this.assignUuid(e.uuid);
         if (u) {
-          u.uuid = e.uuid;
-          u.canRestore = true;
           if (u.queued) {
+            // The queued turn is now being processed. `finishTurn` of the previous turn (which may
+            // arrive before or after this echo) resets the assistant message; do not do it here.
             u.queued = false;
-            this.assistant = undefined;
-            chat.status = 'running';
+            if (chat.status === 'idle') chat.status = 'running';
           }
           this.deps.notify();
         }
@@ -534,13 +575,9 @@ export class ChatRunner implements vscode.Disposable {
 
   private onAssistantBlock(e: Extract<SessionEvent, { type: 'assistantBlock' }>): void {
     const chat = this.chat;
-    if (e.userMessageUuid) {
-      const u = nextUserWithoutUuid(chat);
-      if (u) {
-        u.uuid = e.userMessageUuid;
-        u.canRestore = true;
-        u.queued = false;
-      }
+    if (e.userMessageUuid && this.awaitingUuid.length && this.awaitingUuid[0].uuid === undefined) {
+      const u = this.assignUuid(e.userMessageUuid);
+      if (u) u.queued = false;
     }
     if (e.error) {
       chat.error = e.error;
@@ -744,13 +781,23 @@ export class ChatRunner implements vscode.Disposable {
 
   private onResult(e: Extract<SessionEvent, { type: 'result' }>): void {
     const chat = this.chat;
-    const errorText = e.isError ? (e.errors?.join('\n') || e.result || `Turn ended with ${e.subtype}`) : undefined;
     chat.totalCostUsd = (chat.totalCostUsd ?? 0) + (e.costUsd || 0);
+    // The bridge updates `session.running` (pending-turn counter, fed by queued_turn_count) before emitting.
+    const moreTurns = !!this.session?.running || hasQueuedMessages(chat);
+    const interrupted = this.interrupted;
+    if (interrupted) {
+      this.interrupted = false;
+      // Late result of the turn the user stopped (interrupt() already finished it). Keep the cost only —
+      // unless the CLI reports nothing pending while we started a new turn, in which case this is the
+      // new turn's result (or the UI self-heals on the next streamStart).
+      if (!this.running || moreTurns) return;
+    }
+    const errorText = e.isError && !interrupted ? (e.errors?.join('\n') || e.result || `Turn ended with ${e.subtype}`) : undefined;
     chat.error = errorText;
     if (errorText) chat.messages.push(systemNote(errorText, 'error'));
-    const stillQueued = (e.queuedTurnCount ?? 0) > 0 || hasQueuedMessages(chat);
-    this.finishTurn({ costUsd: e.costUsd, durationMs: e.durationMs, numTurns: e.numTurns, isError: e.isError, errorText });
-    if (stillQueued && !this.restartOnIdle) {
+    this.finishTurn({ costUsd: e.costUsd, durationMs: e.durationMs, numTurns: e.numTurns, isError: !!errorText, errorText });
+    if (moreTurns && !this.restartOnIdle) {
+      // A queued follow-up is next: stay "running" (its userReplay/streamStart continue the chat).
       chat.status = 'running';
       this.deps.notify();
     }

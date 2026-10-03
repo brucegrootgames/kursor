@@ -48,8 +48,8 @@ export function registerChat(context: vscode.ExtensionContext, deps: ChatDeps): 
   };
   // Reset the badge counter whenever the view becomes visible (the view clears the badge itself).
   context.subscriptions.push(
-    vscode.window.onDidChangeVisibleTextEditors(() => {
-      if (view.visible) pendingAttention = 0;
+    view.onDidChangeVisibility((visible) => {
+      if (visible) pendingAttention = 0;
     }),
   );
 

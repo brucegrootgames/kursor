@@ -46,8 +46,9 @@ export function registerChatCommands(context: vscode.ExtensionContext, deps: Com
       }
     });
 
+  // Toggle (Ctrl+I): close the secondary side bar when the chat is visible AND focused; otherwise reveal + focus.
   const openChat = async (): Promise<void> => {
-    if (view.visible) {
+    if (view.focused) {
       await vscode.commands.executeCommand('workbench.action.closeAuxiliaryBar');
     } else {
       await view.reveal(true);

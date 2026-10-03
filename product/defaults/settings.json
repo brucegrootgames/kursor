@@ -1,0 +1,30 @@
+{
+  // Kursor default user settings — seeded by product/install.sh only when this file does not exist yet.
+  // Plain VS Code / VSCodium settings; change anything (Ctrl+, opens Settings, Ctrl+Shift+J the Kursor panel).
+
+  // Look & feel (Cursor-like layout: custom title bar with command center, activity bar on top,
+  // the Kursor chat in the secondary side bar, Kursor Dark theme)
+  "workbench.colorTheme": "Kursor Dark",
+  "window.titleBarStyle": "custom",
+  "window.commandCenter": true,
+  "window.dialogStyle": "custom",
+  "workbench.activityBar.location": "top",
+  "workbench.secondarySideBar.defaultVisibility": "visible",
+  "workbench.startupEditor": "none",
+  "workbench.tips.enabled": false,
+  "editor.fontFamily": "'JetBrainsMono Nerd Font', 'CaskaydiaMono Nerd Font', 'CaskaydiaCove Nerd Font', 'Cascadia Code', 'JetBrains Mono', 'Fira Code', 'Hack Nerd Font', 'Noto Sans Mono', 'DejaVu Sans Mono', monospace",
+
+  // AI: Kursor provides chat, inline edits and completions through the Claude Code CLI on this machine.
+  // Keep VS Code's built-in Copilot chat UI off and ghost-text completions on.
+  "chat.disableAIFeatures": true,
+  "chat.commandCenter.enabled": false,
+  "editor.inlineSuggest.enabled": true,
+
+  // Behaviour
+  "files.autoSave": "afterDelay",
+  "security.workspace.trust.enabled": false,
+  "update.mode": "none",
+  "extensions.autoCheckUpdates": true,
+  "telemetry.telemetryLevel": "off",
+  "workbench.enableExperiments": false
+}
