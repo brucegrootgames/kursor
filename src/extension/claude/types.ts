@@ -52,7 +52,7 @@ export type PermissionDecision =
 
 export type SessionEvent =
   | { type: 'init'; sessionId: string; model: string; tools: string[]; permissionMode: PermissionMode; claudeVersion?: string }
-  | { type: 'status'; status: 'requesting' | 'compacting' | 'idle' }
+  | { type: 'status'; status: 'requesting' | 'compacting' | 'idle'; /** e.g. "Retrying (2/10) after HTTP 529 in 3 s" for system/api_retry */ detail?: string }
   /** Echo of a user turn with the uuid Claude Code assigned (for checkpoints / rewind). */
   | { type: 'userReplay'; uuid: string; text: string }
   | { type: 'streamStart'; messageId: string; parentToolUseId: string | null }
@@ -91,6 +91,8 @@ export type SessionEvent =
       numTurns: number;
       permissionDenials: { toolName: string; toolUseId: string }[];
       terminalReason?: string;
+      /** Turns still queued behind this one (Claude Code `queued_turn_count`); `running` stays true while > 0. */
+      queuedTurnCount?: number;
     }
   | { type: 'rateLimit'; status: string; fiveHour?: number; sevenDay?: number; resetsAt?: number }
   | { type: 'error'; message: string; fatal: boolean }
@@ -117,6 +119,12 @@ export interface ClaudeSession extends vscode.Disposable {
   setModel(model: string): Promise<void>;
   setEffort(effort: EffortLevel): Promise<void>;
   setPermissionMode(mode: PermissionMode): Promise<void>;
+  /**
+   * Switch the chat mode of a live session: 'ask' denies Edit/Write/NotebookEdit (hook + canUseTool) and uses
+   * permission mode `default`; 'plan' uses permission mode `plan`; 'agent' restores the configured permission mode.
+   * A session spawned in 'ask' mode is transparently re-spawned (with resume) on the next send after leaving 'ask'.
+   */
+  setMode?(mode: ChatMode): Promise<void>;
   /** Restore files to their state before the given user message (Claude Code file checkpointing). */
   rewindFiles(userMessageUuid: string, dryRun?: boolean): Promise<RewindResult>;
   contextUsage(): Promise<{ usedTokens: number; maxTokens: number; breakdown?: { label: string; tokens: number }[] } | undefined>;
@@ -137,6 +145,8 @@ export interface OneShotRequest {
   effort?: EffortLevel;
   /** Tool names to allow; default none (pure text generation). */
   allowTools?: string[];
+  /** Keep the model's extended thinking on. Default false (`--thinking disabled`: faster, cheaper for completions/edits). */
+  thinking?: boolean;
 }
 
 export interface ClaudeStatus {

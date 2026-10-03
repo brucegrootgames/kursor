@@ -56,6 +56,10 @@
       { "command": "kursor.inlineEdit.acceptBlock", "title": "Accept Inline Edit Block", "category": "Kursor" },
       { "command": "kursor.inlineEdit.rejectBlock", "title": "Reject Inline Edit Block", "category": "Kursor" },
       { "command": "kursor.inlineEdit.quickQuestion", "title": "Quick Question about Selection", "category": "Kursor" },
+      { "command": "kursor.inlineEdit.applyCode", "title": "Apply Code Block to File", "category": "Kursor" },
+      { "command": "kursor.inlineEdit.insertAtCursor", "title": "Insert Code Block at Cursor", "category": "Kursor" },
+      { "command": "kursor.inlineEdit.cancel", "title": "Cancel Inline Edit", "category": "Kursor" },
+      { "command": "kursor.inlineEdit.submit", "title": "Submit Inline Edit Prompt", "category": "Kursor" },
       { "command": "kursor.tab.toggle", "title": "Toggle Tab Completions", "category": "Kursor" },
       { "command": "kursor.tab.snooze", "title": "Snooze Tab Completions", "category": "Kursor" },
       { "command": "kursor.tab.trigger", "title": "Trigger Tab Completion", "category": "Kursor" },
@@ -66,7 +70,10 @@
       { "command": "kursor.rules.new", "title": "New Kursor Rule", "category": "Kursor" },
       { "command": "kursor.claude.login", "title": "Sign in to Claude Code", "category": "Kursor" },
       { "command": "kursor.claude.status", "title": "Claude Code Status", "category": "Kursor" },
-      { "command": "kursor.showLogs", "title": "Show Kursor Logs", "category": "Kursor" }
+      { "command": "kursor.showLogs", "title": "Show Kursor Logs", "category": "Kursor" },
+      { "command": "kursor.ide.acceptDiff", "title": "Accept Proposed Changes", "category": "Kursor", "icon": "$(check)", "enablement": "kursor.ide.viewingDiff" },
+      { "command": "kursor.ide.rejectDiff", "title": "Reject Proposed Changes", "category": "Kursor", "icon": "$(close)", "enablement": "kursor.ide.viewingDiff" },
+      { "command": "kursor.ide.insertAtMention", "title": "Insert @-mention into Terminal Session", "category": "Kursor" }
     ],
     "keybindings": [
       { "command": "kursor.chat.open", "key": "ctrl+i", "when": "!terminalFocus" },
@@ -86,6 +93,10 @@
       { "command": "kursor.inlineEdit.rejectAll", "key": "ctrl+z", "when": "editorTextFocus && kursor.inlineDiffVisible" },
       { "command": "kursor.inlineEdit.acceptBlock", "key": "ctrl+alt+y", "when": "editorTextFocus && kursor.inlineDiffVisible" },
       { "command": "kursor.inlineEdit.rejectBlock", "key": "ctrl+alt+n", "when": "editorTextFocus && kursor.inlineDiffVisible" },
+      { "command": "kursor.inlineEdit.cancel", "key": "escape", "when": "kursor.inlineEditRunning && editorTextFocus" },
+      { "command": "kursor.inlineEdit.submit", "key": "alt+enter", "args": { "action": "question" }, "when": "kursor.inlineEditInputFocus && inQuickOpen" },
+      { "command": "kursor.inlineEdit.submit", "key": "ctrl+shift+enter", "args": { "action": "wholeFile" }, "when": "kursor.inlineEditInputFocus && inQuickOpen" },
+      { "command": "kursor.inlineEdit.submit", "key": "ctrl+l", "args": { "action": "sendToChat" }, "when": "kursor.inlineEditInputFocus && inQuickOpen" },
       { "command": "kursor.terminal.generate", "key": "ctrl+k", "when": "terminalFocus" },
       { "command": "kursor.settings.open", "key": "ctrl+shift+j" },
       { "command": "kursor.tab.trigger", "key": "alt+\\", "when": "editorTextFocus" },
@@ -120,7 +131,9 @@
         { "command": "kursor.inlineEdit.rejectAll", "when": "kursor.inlineDiffVisible && kursor.inlineDiffResource == resourcePath", "group": "navigation@2" },
         { "command": "kursor.edits.keepFile", "when": "kursor.hasPendingEdits && resourceScheme == file && !kursor.inlineDiffVisible", "group": "navigation@3" },
         { "command": "kursor.edits.undoFile", "when": "kursor.hasPendingEdits && resourceScheme == file && !kursor.inlineDiffVisible", "group": "navigation@4" },
-        { "command": "kursor.edits.reviewFile", "when": "kursor.hasPendingEdits && resourceScheme == file && !kursor.inlineDiffVisible", "group": "navigation@5" }
+        { "command": "kursor.edits.reviewFile", "when": "kursor.hasPendingEdits && resourceScheme == file && !kursor.inlineDiffVisible", "group": "navigation@5" },
+        { "command": "kursor.ide.acceptDiff", "when": "kursor.ide.viewingDiff && resourceScheme == kursor-ide-right", "group": "navigation@1" },
+        { "command": "kursor.ide.rejectDiff", "when": "kursor.ide.viewingDiff && resourceScheme == kursor-ide-right", "group": "navigation@2" }
       ],
       "explorer/context": [
         { "command": "kursor.chat.addFileToChat", "when": "!explorerResourceIsFolder", "group": "kursor@1" }
@@ -136,10 +149,16 @@
       "commandPalette": [
         { "command": "kursor.inlineEdit.acceptBlock", "when": "false" },
         { "command": "kursor.inlineEdit.rejectBlock", "when": "false" },
+        { "command": "kursor.inlineEdit.applyCode", "when": "false" },
+        { "command": "kursor.inlineEdit.insertAtCursor", "when": "false" },
+        { "command": "kursor.inlineEdit.cancel", "when": "false" },
+        { "command": "kursor.inlineEdit.submit", "when": "false" },
         { "command": "kursor.edits.keepHunk", "when": "false" },
         { "command": "kursor.edits.undoHunk", "when": "false" },
         { "command": "kursor.chat.fixDiagnostic", "when": "false" },
-        { "command": "kursor.tab.statusMenu", "when": "false" }
+        { "command": "kursor.tab.statusMenu", "when": "false" },
+        { "command": "kursor.ide.acceptDiff", "when": "kursor.ide.viewingDiff" },
+        { "command": "kursor.ide.rejectDiff", "when": "kursor.ide.viewingDiff" }
       ]
     },
     "configuration": {
