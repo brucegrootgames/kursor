@@ -64,7 +64,15 @@ export function registerInlineEdit(context: vscode.ExtensionContext, deps: Inlin
     controller,
     vscode.languages.registerCodeLensProvider('*', codeLens),
 
-    command('kursor.inlineEdit.open', () => controller.open()),
+    command('kursor.inlineEdit.open', () => {
+      if (!vscode.workspace.isTrusted) {
+        void vscode.window.showWarningMessage('Kursor: trust this workspace to use inline edits.', 'Manage Workspace Trust').then((pick) => {
+          if (pick) void vscode.commands.executeCommand('workbench.trust.manage');
+        });
+        return undefined;
+      }
+      return controller.open();
+    }),
     command('kursor.inlineEdit.quickQuestion', () => controller.quickQuestionCommand()),
     command('kursor.inlineEdit.submit', (args) => {
       const action = (args as { action?: unknown } | undefined)?.action;

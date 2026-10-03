@@ -13,6 +13,13 @@
   "main": "./dist/extension.js",
   "activationEvents": ["onStartupFinished"],
   "extensionKind": ["workspace"],
+  "capabilities": {
+    "virtualWorkspaces": false,
+    "untrustedWorkspaces": {
+      "supported": "limited",
+      "description": "Chat and settings work in Restricted Mode; the agent, Ctrl+K edits and Tab completions wait until the workspace is trusted because they read, edit and run code in it."
+    }
+  },
   "contributes": {
     "viewsContainers": {
       "secondarySidebar": [

@@ -330,6 +330,18 @@ export class ChatManager implements vscode.Disposable {
 
   async send(chatId: string | undefined, text: string, attachments: Attachment[], options?: { sendNow?: boolean; mode?: ChatMode }): Promise<ChatState> {
     const chat = (chatId && this.store.get(chatId)) || this.activeOrNew();
+    if (!vscode.workspace.isTrusted) {
+      // Restricted Mode: the agent reads, edits and runs code in the workspace, so it waits for trust.
+      chat.messages.push(
+        systemNote('This workspace is in Restricted Mode. Trust it to let Kursor read, edit and run code here.', 'warning', {
+          label: 'Manage Workspace Trust',
+          command: 'workbench.trust.manage',
+        }),
+      );
+      chat.updatedAt = Date.now();
+      this.postChatState(chat.id);
+      return chat;
+    }
     if (options?.mode && options.mode !== chat.mode) await this.setMode(chat.id, options.mode);
     const cfg = vscode.workspace.getConfiguration('kursor');
     if (cfg.get<boolean>('agent.autoSave', true)) {

@@ -243,7 +243,9 @@ kbd {
 .tool-subject { color: var(--k-fg); background: none; padding: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; flex: 1 1 auto; }
 .tool-subject .path-dir { color: var(--k-muted); }
 /* Keep the file name readable before the stats/actions take the remaining width. */
-.tool-head .tool-subject { min-width: 48px; }
+.tool-head .tool-subject { min-width: 32px; }
+.tool-head { overflow: hidden; }
+.tool-head .edit-status, .tool-head .edit-stats, .tool-head .edit-actions { flex: 0 0 auto; }
 .tool-head .spacer { flex: 0 1 8px; }
 .tool-subject.clickable:hover { text-decoration: underline; color: var(--k-link); }
 .tool-meta { color: var(--k-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 11px; max-width: 40%; }
@@ -492,3 +494,8 @@ body.vscode-light .hljs-tag .hljs-name { color: #800000; }
 body.vscode-light .hljs-tag .hljs-attr { color: #e50000; }
 body.vscode-light .hljs-selector-class, body.vscode-light .hljs-selector-id, body.vscode-light .hljs-selector-attr, body.vscode-light .hljs-selector-pseudo { color: #800000; }
 body.vscode-light .tab-dot.waiting { background: #d18616; }
+
+/* Narrow panes: let card titles wrap instead of clipping the status badge. */
+.card-title { flex-wrap: wrap; row-gap: 4px; }
+.card-title > span:not(.badge):not(.spacer) { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.badge { flex: 0 0 auto; white-space: nowrap; }

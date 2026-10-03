@@ -189,3 +189,17 @@ dist/kursor.vsix --force`.
    `omarchy theme set`, Open VSX gallery reachable from the rebranded `product.json`.
 10. **Process hygiene**: Claude Code child processes exit on window close / chat close / `deactivate`; no stale
     `~/.claude/ide/*.lock` after quitting; Tab aborts outstanding one-shots on cancel.
+
+## Verified live on Omarchy (2026-10-03)
+
+Driven through Chrome DevTools Protocol against the installed, rebranded build (`kursor --remote-debugging-port=9222`):
+
+- Install: `product/install.sh` → `~/.local/opt/kursor`, wrapper, desktop entries, icons, Omarchy theme hook; window class/app_id `kursor`; Help › About shows Kursor 1.135.06055.
+- Activation: extension activates in ~130 ms, finds the mise `claude` via the login shell, reports signed in (Max), IDE bridge lock file written to `~/.claude/ide/`.
+- Chat: agent turn with Read + Edit tools streamed into the pane; Edited row with +N/−M and Review/Undo/Keep; review bar and status-bar "1 file · Review"; **Undo All** reverted the file and marked the row "Undone"; chat persisted and restored across a restart; history view lists sessions.
+- Permissions: a non-read-only shell command produced the "Needs approval" card (Run Ctrl+⏎ / Skip / Always allow ▾); Run executed it and the output + reply rendered. Read-only commands such as `ls` are auto-approved by Claude Code itself (no card).
+- Ctrl+K: QuickPick prompt ("Edit math.ts:1"), status-bar spinner, green/red vertical diff with ✓ Accept / ✗ Reject CodeLens, Ctrl+Enter accepted.
+- Tab: ghost text appeared ~5 s after typing a function header (Haiku); Tab accepted it.
+- Settings: Ctrl+Shift+J opens the Kursor Settings tab (account card, editor shortcuts, theme).
+
+Fixed from these runs: first-launch blank chat pane (ready watchdog reloads the webview HTML once), narrow-pane layout (tool rows, review bar, permission badge), editor-title Keep/Undo only on files with pending edits (`resourcePath in kursor.pendingEditPaths`), workspace-trust support (`capabilities.untrustedWorkspaces: limited`; agent/Ctrl+K/Tab wait for trust), `sharedDataFolderName` rebrand.

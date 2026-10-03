@@ -65,6 +65,7 @@ export class TabCompletionProvider implements vscode.InlineCompletionItemProvide
     context: vscode.InlineCompletionContext,
     token: vscode.CancellationToken,
   ): Promise<vscode.InlineCompletionList | undefined> {
+    if (!vscode.workspace.isTrusted) return undefined; // Restricted Mode: never send workspace code anywhere
     try {
       return await this.provide(document, position, context, token);
     } catch (e) {
