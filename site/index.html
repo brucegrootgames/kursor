@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kursor — a Cursor-style editor powered by your own Claude Code</title>
+<meta name="description" content="Kursor is an open-source, Cursor-style AI code editor: agent chat, Ctrl+K inline edits and Tab completions, driven by the Claude Code CLI already installed on your machine. Linux, macOS and Windows.">
+<meta property="og:title" content="Kursor">
+<meta property="og:description" content="A Cursor-style editor that runs on the Claude Code you already have.">
+<meta property="og:image" content="https://brucegrootgames.github.io/kursor/img/overview.png">
+<link rel="icon" type="image/png" href="img/favicon.png">
+<style>
+  :root {
+    --bg: #0f1014; --bg-2: #15171d; --card: #1a1d25; --border: #262a35; --fg: #e6e8ee; --muted: #8b91a1;
+    --accent: #7c8cff; --accent-2: #b57cff; --green: #5fd38a; --red: #ff6b78; --mono: ui-monospace, "JetBrains Mono", "Cascadia Code", Menlo, Consolas, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, Ubuntu, "Helvetica Neue", Arial, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.6 var(--sans); }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  code, kbd, pre { font-family: var(--mono); }
+  kbd { display: inline-block; padding: 1px 6px; border: 1px solid var(--border); border-bottom-width: 2px; border-radius: 5px; background: var(--bg-2); font-size: 12px; color: var(--fg); }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+  header { position: sticky; top: 0; z-index: 10; backdrop-filter: blur(10px); background: rgba(15,16,20,.8); border-bottom: 1px solid var(--border); }
+  nav { display: flex; align-items: center; gap: 22px; height: 58px; }
+  nav .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 18px; color: var(--fg); }
+  nav .brand img { width: 28px; height: 28px; border-radius: 7px; }
+  nav .links { margin-left: auto; display: flex; gap: 18px; font-size: 14px; }
+  nav .links a { color: var(--muted); }
+  nav .links a:hover { color: var(--fg); text-decoration: none; }
+  .btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 9px; border: 1px solid var(--border); background: var(--card); color: var(--fg); font-weight: 600; font-size: 14px; }
+  .btn:hover { text-decoration: none; border-color: #3a4052; }
+  .btn.primary { background: linear-gradient(135deg, var(--accent), var(--accent-2)); border: none; color: #0b0c10; }
+  .hero { padding: 72px 0 40px; display: grid; grid-template-columns: 1.05fr 1fr; gap: 40px; align-items: center; }
+  .hero h1 { font-size: 46px; line-height: 1.1; margin: 0 0 16px; letter-spacing: -0.02em; }
+  .hero h1 span { background: linear-gradient(135deg, var(--accent), var(--accent-2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .hero p.lead { font-size: 18px; color: var(--muted); margin: 0 0 24px; }
+  .hero .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 18px; }
+  .hero .fine { font-size: 13px; color: var(--muted); }
+  .shot { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: var(--bg-2); box-shadow: 0 30px 80px rgba(0,0,0,.45); }
+  .shot img { display: block; width: 100%; height: auto; }
+  section { padding: 56px 0; border-top: 1px solid var(--border); }
+  section h2 { font-size: 30px; margin: 0 0 8px; letter-spacing: -0.01em; }
+  section p.sub { color: var(--muted); margin: 0 0 28px; max-width: 720px; }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+  .card h3 { margin: 0 0 6px; font-size: 16px; display: flex; align-items: center; gap: 8px; }
+  .card p { margin: 0; color: var(--muted); font-size: 14px; }
+  .card .k { margin-top: 10px; }
+  .feature-row { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; align-items: center; margin-top: 36px; }
+  .feature-row.flip > .text { order: 2; }
+  .feature-row h3 { font-size: 22px; margin: 0 0 8px; }
+  .feature-row p { color: var(--muted); margin: 0 0 10px; }
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .tabs { display: flex; gap: 6px; margin-bottom: 12px; }
+  .tabs button { background: var(--bg-2); border: 1px solid var(--border); color: var(--muted); padding: 7px 14px; border-radius: 8px; cursor: pointer; font: 600 13px var(--sans); }
+  .tabs button[aria-selected="true"] { color: var(--fg); border-color: var(--accent); }
+  .panel { display: none; }
+  .panel[data-active] { display: block; }
+  pre { margin: 0 0 12px; padding: 14px 16px; background: #0a0b0e; border: 1px solid var(--border); border-radius: 10px; overflow-x: auto; font-size: 13.5px; line-height: 1.55; }
+  pre .c { color: var(--muted); }
+  ol.steps { margin: 0; padding-left: 20px; color: var(--muted); font-size: 14.5px; }
+  ol.steps li { margin: 6px 0; }
+  ol.steps strong { color: var(--fg); }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { color: var(--muted); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; }
+  td.k { white-space: nowrap; }
+  .note { background: linear-gradient(180deg, rgba(124,140,255,.08), rgba(181,124,255,.04)); border: 1px solid #2e3350; border-radius: 12px; padding: 18px 20px; font-size: 14.5px; color: #c9cde0; }
+  .note strong { color: var(--fg); }
+  details { border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; margin-bottom: 8px; background: var(--card); }
+  summary { cursor: pointer; font-weight: 600; }
+  details p { color: var(--muted); font-size: 14.5px; margin: 8px 0 0; }
+  footer { border-top: 1px solid var(--border); padding: 32px 0 48px; color: var(--muted); font-size: 13px; }
+  footer .row { display: flex; flex-wrap: wrap; gap: 18px; justify-content: space-between; }
+  @media (max-width: 860px) {
+    .hero { grid-template-columns: 1fr; padding-top: 44px; }
+    .hero h1 { font-size: 36px; }
+    .grid, .feature-row, .pair { grid-template-columns: 1fr; }
+    .feature-row.flip > .text { order: 0; }
+    nav .links a:not(.btn) { display: none; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <nav>
+      <a class="brand" href="#"><img src="img/kursor.svg" alt=""> Kursor</a>
+      <div class="links">
+        <a href="#features">Features</a>
+        <a href="#how">How it works</a>
+        <a href="#install">Install</a>
+        <a href="#shortcuts">Shortcuts</a>
+        <a href="#faq">FAQ</a>
+        <a class="btn" href="https://github.com/brucegrootgames/kursor">GitHub</a>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="hero">
+    <div>
+      <h1>The Cursor experience,<br>on <span>your own Claude Code</span>.</h1>
+      <p class="lead">Kursor is an open-source, Cursor-style AI editor built on VS Code (VSCodium). Agent chat, <kbd>Ctrl</kbd>+<kbd>K</kbd> inline edits and Tab completions, all powered by the Claude Code CLI already installed and signed in on your machine. No new account, no API keys, no middleman.</p>
+      <div class="actions">
+        <a class="btn primary" href="#install">Install for Linux, macOS, Windows</a>
+        <a class="btn" href="https://github.com/brucegrootgames/kursor/releases/latest">Download a release</a>
+      </div>
+      <p class="fine">MIT licensed. Usage runs on your own Claude plan. Not affiliated with Anthropic or Anysphere (Cursor).</p>
+    </div>
+    <div class="shot"><img src="img/overview.png" alt="Kursor: editor with the agent chat in the right side bar showing tool calls, an edited file with Review / Undo / Keep, and a terminal command result" width="941" height="1030"></div>
+  </div>
+
+  <section id="features">
+    <h2>Everything you reach for in Cursor</h2>
+    <p class="sub">The same muscle memory, the same panes, the same review flow. Kursor's extension reimplements the Cursor UI on top of the Claude Code agent loop.</p>
+    <div class="grid">
+      <div class="card"><h3>Agent chat</h3><p>Agent, Ask and Plan modes in the secondary side bar. Streaming replies, tool rows for Read / Search / Run / Edit, @-mentions for files, folders, problems, terminal and git, slash commands, image attachments.</p><p class="k"><kbd>Ctrl</kbd>+<kbd>I</kbd> toggle · <kbd>Ctrl</kbd>+<kbd>L</kbd> add selection</p></div>
+      <div class="card"><h3>Review every edit</h3><p>Agent edits land in your files with Keep / Undo / Review per file and per hunk, a review bar for the whole turn, and checkpoints to restore files to the state before any message.</p><p class="k"><kbd>Ctrl</kbd>+<kbd>Enter</kbd> keep all · <kbd>Ctrl</kbd>+<kbd>⇧</kbd>+<kbd>⌫</kbd> undo all</p></div>
+      <div class="card"><h3>Ctrl+K inline edit</h3><p>Describe a change over a selection; Kursor shows a red/green diff in place with Accept / Reject per block. Quick question, whole-file edit and send-to-chat from the same prompt.</p><p class="k"><kbd>Ctrl</kbd>+<kbd>K</kbd> · <kbd>Ctrl</kbd>+<kbd>Enter</kbd> / <kbd>Ctrl</kbd>+<kbd>⌫</kbd></p></div>
+      <div class="card"><h3>Tab completions</h3><p>Ghost-text completions from a fast model, debounced so they stay cheap. Toggle, snooze or disable per language from the status bar.</p><p class="k"><kbd>Tab</kbd> accept · <kbd>Alt</kbd>+<kbd>\</kbd> trigger</p></div>
+      <div class="card"><h3>Terminal and commits</h3><p><kbd>Ctrl</kbd>+<kbd>K</kbd> in the terminal turns a sentence into a command (Run / Insert / Edit). The sparkle in Source Control writes a commit message from your staged diff.</p></div>
+      <div class="card"><h3>Permissions you control</h3><p>Shell commands stop at a Run / Skip / Always-allow card, exactly like Cursor's terminal approvals. Edits auto-apply or ask, per your setting. Plan mode shows a plan with Build / Reject.</p></div>
+      <div class="card"><h3>Rules</h3><p>Reads <code>.cursor/rules/*.mdc</code> (always, auto-attached, agent-requested, manual), <code>.cursorrules</code>, <code>AGENTS.md</code> and your User Rules; <code>CLAUDE.md</code> keeps working through Claude Code itself.</p></div>
+      <div class="card"><h3>Fix in Chat</h3><p>Lightbulb actions on diagnostics and selections: Fix in Chat, Add to Chat, Explain, Edit with Kursor. Terminal context menu: add selection, debug last command.</p></div>
+      <div class="card"><h3>Omarchy-native on Linux</h3><p>Follows your Omarchy theme automatically, registers in the launcher, optional <kbd>SUPER</kbd>+<kbd>⇧</kbd>+<kbd>K</kbd> binding and default-editor hookup. Plain Linux, macOS and Windows get the native integration too.</p></div>
+    </div>
+
+    <div class="feature-row">
+      <div class="text">
+        <h3>Inline edits that stay in your editor</h3>
+        <p>Select code, press <kbd>Ctrl</kbd>+<kbd>K</kbd>, type what you want. The result is rendered as an in-place vertical diff: removed lines in red, new lines in green, with Accept and Reject lenses on every block. Nothing is written until you accept, and <kbd>Ctrl</kbd>+<kbd>Z</kbd> rejects everything.</p>
+      </div>
+      <div class="shot"><img src="img/inline-edit.png" alt="Ctrl+K inline edit showing a green inserted JSDoc block with Accept and Reject CodeLens" width="700" height="420"></div>
+    </div>
+    <div class="feature-row flip">
+      <div class="text">
+        <h3>Approve commands, review edits</h3>
+        <p>When the agent wants to run something that isn't read-only, you get a card with the exact command, a one-line explanation and Run / Skip / Always allow. File edits show up as rows with +/− counts and Review, Undo and Keep buttons, and a review bar tracks the whole turn.</p>
+      </div>
+      <div class="pair">
+        <div class="shot"><img src="img/permission.png" alt="Permission card: Run node -e ... with Run, Skip and Always allow buttons" width="245" height="430"></div>
+        <div class="shot"><img src="img/review.png" alt="Chat transcript with a Read row and an Edited row showing +9 −1 and Review, Undo, Keep" width="245" height="330"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="how">
+    <h2>How it works</h2>
+    <p class="sub">Kursor is two pieces: a rebranded VSCodium build and a VS Code extension. The extension never talks to Anthropic directly.</p>
+    <div class="grid">
+      <div class="card"><h3>1 · Your Claude Code</h3><p>Kursor finds the <code>claude</code> binary you already installed (mise, npm, Homebrew, the native installer) and spawns it unmodified with the Claude Agent SDK's streaming protocol. It signs in with <em>its</em> login; Kursor never reads, stores or forwards credentials.</p></div>
+      <div class="card"><h3>2 · The editor</h3><p>A stock VSCodium release, renamed to Kursor with its own icon, data folders and <code>kursor://</code> scheme. Open VSX for extensions. The Kursor extension adds the chat pane, inline edits, completions and the Cursor keymap.</p></div>
+      <div class="card"><h3>3 · Your machine, your plan</h3><p>Every chat turn, inline edit and completion is a Claude Code call under your own Pro, Max, Team or Console account, at normal Claude Code rates. Nothing leaves your machine except what Claude Code itself sends.</p></div>
+    </div>
+    <p class="note" style="margin-top:20px"><strong>Trademark and terms.</strong> Kursor is an independent open-source project. It is not affiliated with, endorsed by, or built by Anthropic or Anysphere. "Claude" and "Claude Code" are trademarks of Anthropic; "Cursor" is a trademark of Anysphere. Kursor runs the unmodified Claude Code binary that you install and sign into yourself; your use of Claude Code is governed by Anthropic's terms.</p>
+  </section>
+
+  <section id="install">
+    <h2>Install</h2>
+    <p class="sub">Two prerequisites on every platform: the <a href="https://code.claude.com/docs/en/setup">Claude Code CLI</a> installed and signed in (<code>claude auth login</code>), and Node.js 18+ to run the installer (not needed afterwards). Then pick your OS.</p>
+    <div class="tabs" role="tablist">
+      <button role="tab" aria-selected="true" data-tab="linux">Linux</button>
+      <button role="tab" aria-selected="false" data-tab="mac">macOS</button>
+      <button role="tab" aria-selected="false" data-tab="win">Windows</button>
+    </div>
+    <div class="panel" data-active id="tab-linux">
+<pre><span class="c"># from a release bundle (Kursor-linux-x64-&lt;version&gt;.tar.gz)</span>
+tar -xzf Kursor-linux-x64-*.tar.gz &amp;&amp; cd Kursor-linux-x64-*/
+bash install.sh                 <span class="c"># add --hypr-bind --default-editor on Omarchy</span>
+
+<span class="c"># or from source</span>
+git clone https://github.com/brucegrootgames/kursor.git &amp;&amp; cd kursor
+npm install &amp;&amp; npm run package &amp;&amp; bash product/install.sh</pre>
+      <ol class="steps"><li>Installs to <strong>~/.local/opt/kursor</strong>, command <strong>kursor</strong>, a launcher entry and icons. No root.</li><li>On Omarchy it also installs a theme hook so Kursor follows <code>omarchy theme set</code>.</li><li>Launch with <code>kursor</code> or from your app launcher.</li></ol>
+    </div>
+    <div class="panel" id="tab-mac">
+<pre><span class="c"># from a release bundle (Kursor-darwin-arm64 or darwin-x64)</span>
+tar -xzf Kursor-darwin-arm64-*.tar.gz &amp;&amp; cd Kursor-darwin-arm64-*/
+bash install.sh                 <span class="c"># --system for /Applications</span>
+
+<span class="c"># or from source</span>
+git clone https://github.com/brucegrootgames/kursor.git &amp;&amp; cd kursor
+npm install &amp;&amp; npm run package &amp;&amp; bash product/install.sh</pre>
+      <ol class="steps"><li>Installs <strong>~/Applications/Kursor.app</strong> and a <strong>kursor</strong> command in ~/.local/bin.</li><li>The app is re-signed ad hoc after rebranding; the first launch may need right-click → Open.</li><li>All shortcuts use <kbd>⌘</kbd> instead of <kbd>Ctrl</kbd>.</li></ol>
+    </div>
+    <div class="panel" id="tab-win">
+<pre><span class="c"># from a release bundle (Kursor-win32-x64-&lt;version&gt;.zip), in PowerShell</span>
+Expand-Archive Kursor-win32-x64-*.zip -DestinationPath . ; cd Kursor-win32-x64-*
+.\install.cmd                   <span class="c"># --desktop-shortcut, --system for Program Files</span>
+
+<span class="c"># or from source</span>
+git clone https://github.com/brucegrootgames/kursor.git ; cd kursor
+npm install ; npm run package ; product\install.cmd</pre>
+      <ol class="steps"><li>Installs to <strong>%LOCALAPPDATA%\Programs\Kursor</strong> with a Start Menu shortcut, <strong>kursor</strong> on your user PATH and the <code>kursor://</code> protocol.</li><li>Open a new terminal afterwards for <code>kursor</code> to be found.</li></ol>
+    </div>
+    <p class="fine" style="color:var(--muted);font-size:13px">Re-running the installer upgrades in place and never overwrites your settings. <code>uninstall.sh</code> / <code>uninstall.cmd</code> remove everything (<code>--purge</code> also deletes settings).</p>
+  </section>
+
+  <section id="shortcuts">
+    <h2>Keyboard shortcuts</h2>
+    <p class="sub">Cursor's defaults. On macOS replace <kbd>Ctrl</kbd> with <kbd>⌘</kbd>. VS Code's <kbd>Ctrl</kbd>+<kbd>K</kbd> chords move to <kbd>Ctrl</kbd>+<kbd>R</kbd>, as in Cursor.</p>
+    <table>
+      <thead><tr><th>Shortcut</th><th>Action</th><th>Where</th></tr></thead>
+      <tbody>
+        <tr><td class="k"><kbd>Ctrl</kbd>+<kbd>I</kbd></td><td>Toggle the agent chat</td><td>anywhere</td></tr>
+        <tr><td class="k"><kbd>Ctrl</kbd>+<kbd>L</kbd></td><td>New chat with the current selection</td><td>editor</td></tr>
+        <tr><td class="k"><kbd>Ctrl</kbd>+<kbd>⇧</kbd>+<kbd>L</kbd></td><td>Add selection to the current chat</td><td>editor</td></tr>
+        <tr><td class="k"><kbd>Ctrl</kbd>+<kbd>K</kbd></td><td>Inline edit prompt</td><td>editor</td></tr>
+        <tr><td class="k"><kbd>Ctrl</kbd>+<kbd>Enter</kbd> / <kbd>Ctrl</kbd>+<kbd>⌫</kbd></td><td>Accept / reject the inline edit</td><td>editor with a diff</td></tr>
+        <tr><td class="k"><kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>Y</kbd> / <kbd>N</kbd></td><td>Accept / reject one block</td><td>editor with a diff</td></tr>
+        <tr><td class="k"><kbd>Tab</kbd> · <kbd>Alt</kbd>+<kbd>\</kbd></td><td>Accept · trigger a completion</td><td>editor</td></tr>
+        <tr><td class="k"><kbd>Ctrl</kbd>+<kbd>K</kbd></td><td>Generate a command</td><td>terminal</td></tr>
+        <tr><td class="k"><kbd>Enter</kbd> · <kbd>⇧</kbd>+<kbd>Enter</kbd> · <kbd>Ctrl</kbd>+<kbd>Enter</kbd></td><td>Send · newline · send now (skip the queue)</td><td>chat input</td></tr>
+        <tr><td class="k"><kbd>Ctrl</kbd>+<kbd>.</kbd> · <kbd>Ctrl</kbd>+<kbd>/</kbd></td><td>Cycle mode (Agent / Ask / Plan) · cycle model</td><td>chat input</td></tr>
+        <tr><td class="k"><kbd>Ctrl</kbd>+<kbd>Enter</kbd> / <kbd>Ctrl</kbd>+<kbd>⇧</kbd>+<kbd>⌫</kbd></td><td>Keep all / undo all agent edits</td><td>chat</td></tr>
+        <tr><td class="k"><kbd>Ctrl</kbd>+<kbd>N</kbd> · <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>'</kbd></td><td>New chat · chat history</td><td>chat</td></tr>
+        <tr><td class="k"><kbd>Ctrl</kbd>+<kbd>⇧</kbd>+<kbd>J</kbd></td><td>Kursor Settings</td><td>anywhere</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="faq">
+    <h2>FAQ</h2>
+    <details open><summary>Do I need an Anthropic API key?</summary><p>No. Kursor uses the Claude Code CLI on your machine, signed in with your own Claude account (Pro, Max, Team or Enterprise) or Console key. Sign in once with <code>claude auth login</code>.</p></details>
+    <details><summary>What does it cost?</summary><p>Kursor is free and MIT licensed. Chat turns, inline edits and Tab completions are regular Claude Code requests under your plan. Tab completions use a fast model and are debounced; turn them off from the status bar if you'd rather not spend quota on them.</p></details>
+    <details><summary>Does Kursor send my code anywhere?</summary><p>Only to Claude Code, which sends it to Anthropic as any Claude Code session would. The extension has no server, no telemetry and no analytics. Workspaces in Restricted Mode are never read until you trust them.</p></details>
+    <details><summary>Can I keep using my VS Code extensions?</summary><p>Yes. Kursor is VSCodium with the Open VSX gallery, so most extensions install normally. Your existing VS Code settings are not touched; Kursor keeps its own profile.</p></details>
+    <details><summary>Is Tab as good as Cursor's?</summary><p>Not yet. Cursor trains a dedicated model for next-edit prediction; Kursor asks a general fast model for a short continuation, with a ~1 s pause and a ~2.5 s round trip. It is useful for boilerplate, not for keystroke-level prediction.</p></details>
+    <details><summary>How do updates work?</summary><p>Every release ships bundles for all platforms. Download the new one and run its installer, or <code>git pull</code> and re-run <code>product/install.sh</code> / <code>install.cmd</code>: the app directory is replaced, your settings and chats stay.</p></details>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap row">
+    <span>© Kursor contributors · MIT License · <a href="https://github.com/brucegrootgames/kursor">Source</a> · <a href="https://github.com/brucegrootgames/kursor/issues">Issues</a> · <a href="https://github.com/brucegrootgames/kursor/blob/main/CHANGELOG.md">Changelog</a></span>
+    <span>Built on <a href="https://vscodium.com">VSCodium</a> and the <a href="https://code.claude.com/docs/en/agent-sdk/overview">Claude Agent SDK</a>. Not affiliated with Anthropic or Anysphere.</span>
+  </div>
+</footer>
+
+<script>
+  const tabs = document.querySelectorAll('.tabs [role=tab]');
+  const panels = { linux: 'tab-linux', mac: 'tab-mac', win: 'tab-win' };
+  function select(name) {
+    tabs.forEach((t) => t.setAttribute('aria-selected', String(t.dataset.tab === name)));
+    Object.entries(panels).forEach(([k, id]) => { const el = document.getElementById(id); if (k === name) el.setAttribute('data-active', ''); else el.removeAttribute('data-active'); });
+  }
+  tabs.forEach((t) => t.addEventListener('click', () => select(t.dataset.tab)));
+  const ua = navigator.userAgent;
+  if (/Mac/.test(ua)) select('mac'); else if (/Win/.test(ua)) select('win');
+</script>
+</body>
+</html>

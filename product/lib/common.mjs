@@ -22,7 +22,7 @@ export const PINNED_SHA256 = {
   'linux-x64': 'c09d8ac8dd7f52b09ee159ee24b440541dfd8f937a0f6f88cc428c78e48ee1f2',
 };
 // Optional https URL of this repository: when set, Help › Report Issue / Documentation point at it.
-export const REPO_URL = process.env.KURSOR_REPO_URL || '';
+export const REPO_URL = process.env.KURSOR_REPO_URL || 'https://github.com/brucegrootgames/kursor';
 
 export const PLATFORMS = ['linux', 'darwin', 'win32'];
 export const ARCHES = ['x64', 'arm64'];

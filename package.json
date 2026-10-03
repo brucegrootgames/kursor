@@ -7,12 +7,30 @@
   "private": true,
   "license": "MIT",
   "icon": "product/icons/kursor-256.png",
-  "engines": { "vscode": "^1.106.0", "node": ">=20" },
-  "categories": ["AI", "Chat", "Programming Languages", "Other"],
-  "keywords": ["cursor", "claude", "ai", "agent", "copilot"],
+  "engines": {
+    "vscode": "^1.106.0",
+    "node": ">=20"
+  },
+  "categories": [
+    "AI",
+    "Chat",
+    "Programming Languages",
+    "Other"
+  ],
+  "keywords": [
+    "cursor",
+    "claude",
+    "ai",
+    "agent",
+    "copilot"
+  ],
   "main": "./dist/extension.js",
-  "activationEvents": ["onStartupFinished"],
-  "extensionKind": ["workspace"],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "extensionKind": [
+    "workspace"
+  ],
   "capabilities": {
     "virtualWorkspaces": false,
     "untrustedWorkspaces": {
@@ -23,178 +41,848 @@
   "contributes": {
     "viewsContainers": {
       "secondarySidebar": [
-        { "id": "kursor", "title": "Kursor", "icon": "media/kursor-activity.svg" }
+        {
+          "id": "kursor",
+          "title": "Kursor",
+          "icon": "media/kursor-activity.svg"
+        }
       ]
     },
     "views": {
       "kursor": [
-        { "type": "webview", "id": "kursor.chat", "name": "Chat", "icon": "media/kursor-activity.svg", "contextualTitle": "Kursor" }
+        {
+          "type": "webview",
+          "id": "kursor.chat",
+          "name": "Chat",
+          "icon": "media/kursor-activity.svg",
+          "contextualTitle": "Kursor"
+        }
       ]
     },
     "themes": [
-      { "label": "Kursor Dark", "uiTheme": "vs-dark", "path": "./media/themes/kursor-dark.json" }
+      {
+        "label": "Kursor Dark",
+        "uiTheme": "vs-dark",
+        "path": "./media/themes/kursor-dark.json"
+      }
     ],
     "commands": [
-      { "command": "kursor.chat.open", "title": "Toggle Chat", "category": "Kursor", "icon": "$(comment-discussion)" },
-      { "command": "kursor.chat.newChat", "title": "New Chat", "category": "Kursor", "icon": "$(add)" },
-      { "command": "kursor.chat.history", "title": "Chat History", "category": "Kursor", "icon": "$(history)" },
-      { "command": "kursor.chat.openInEditor", "title": "Open Chat in Editor", "category": "Kursor", "icon": "$(link-external)" },
-      { "command": "kursor.chat.addSelectionToNewChat", "title": "Add Selection to New Chat", "category": "Kursor" },
-      { "command": "kursor.chat.addSelectionToChat", "title": "Add Selection to Chat", "category": "Kursor" },
-      { "command": "kursor.chat.addFileToChat", "title": "Add File to Chat", "category": "Kursor" },
-      { "command": "kursor.chat.explainSelection", "title": "Explain with Kursor", "category": "Kursor" },
-      { "command": "kursor.chat.fixDiagnostic", "title": "Fix in Chat", "category": "Kursor" },
-      { "command": "kursor.chat.addTerminalSelection", "title": "Add Terminal Selection to Chat", "category": "Kursor" },
-      { "command": "kursor.chat.debugTerminal", "title": "Debug Terminal Output with Kursor", "category": "Kursor" },
-      { "command": "kursor.chat.exportChat", "title": "Export Chat as Markdown", "category": "Kursor", "icon": "$(export)" },
-      { "command": "kursor.chat.stop", "title": "Stop Generation", "category": "Kursor" },
-      { "command": "kursor.chat.focusInput", "title": "Focus Chat Input", "category": "Kursor" },
-      { "command": "kursor.edits.keepAll", "title": "Keep All Agent Edits", "category": "Kursor", "icon": "$(check-all)" },
-      { "command": "kursor.edits.undoAll", "title": "Undo All Agent Edits", "category": "Kursor", "icon": "$(discard)" },
-      { "command": "kursor.edits.reviewAll", "title": "Review Agent Edits", "category": "Kursor", "icon": "$(diff-multiple)" },
-      { "command": "kursor.edits.keepFile", "title": "Keep Agent Edits in This File", "category": "Kursor", "icon": "$(check)" },
-      { "command": "kursor.edits.undoFile", "title": "Undo Agent Edits in This File", "category": "Kursor", "icon": "$(discard)" },
-      { "command": "kursor.edits.reviewFile", "title": "Review Agent Edits in This File", "category": "Kursor", "icon": "$(diff)" },
-      { "command": "kursor.edits.keepHunk", "title": "Keep This Change", "category": "Kursor" },
-      { "command": "kursor.edits.undoHunk", "title": "Undo This Change", "category": "Kursor" },
-      { "command": "kursor.inlineEdit.open", "title": "Edit with Kursor (Ctrl+K)", "category": "Kursor", "icon": "$(sparkle)" },
-      { "command": "kursor.inlineEdit.acceptAll", "title": "Accept Inline Edit", "category": "Kursor", "icon": "$(check)" },
-      { "command": "kursor.inlineEdit.rejectAll", "title": "Reject Inline Edit", "category": "Kursor", "icon": "$(close)" },
-      { "command": "kursor.inlineEdit.acceptBlock", "title": "Accept Inline Edit Block", "category": "Kursor" },
-      { "command": "kursor.inlineEdit.rejectBlock", "title": "Reject Inline Edit Block", "category": "Kursor" },
-      { "command": "kursor.inlineEdit.quickQuestion", "title": "Quick Question about Selection", "category": "Kursor" },
-      { "command": "kursor.inlineEdit.applyCode", "title": "Apply Code Block to File", "category": "Kursor" },
-      { "command": "kursor.inlineEdit.insertAtCursor", "title": "Insert Code Block at Cursor", "category": "Kursor" },
-      { "command": "kursor.inlineEdit.cancel", "title": "Cancel Inline Edit", "category": "Kursor" },
-      { "command": "kursor.inlineEdit.submit", "title": "Submit Inline Edit Prompt", "category": "Kursor" },
-      { "command": "kursor.tab.toggle", "title": "Toggle Tab Completions", "category": "Kursor" },
-      { "command": "kursor.tab.snooze", "title": "Snooze Tab Completions", "category": "Kursor" },
-      { "command": "kursor.tab.trigger", "title": "Trigger Tab Completion", "category": "Kursor" },
-      { "command": "kursor.tab.statusMenu", "title": "Kursor Tab Menu", "category": "Kursor" },
-      { "command": "kursor.tab.accepted", "title": "Kursor Tab: Completion Accepted", "category": "Kursor" },
-      { "command": "kursor.terminal.generate", "title": "Generate Terminal Command (Ctrl+K)", "category": "Kursor" },
-      { "command": "kursor.scm.generateCommitMessage", "title": "Generate Commit Message with Kursor", "category": "Kursor", "icon": "$(sparkle)", "enablement": "!operationInProgress" },
-      { "command": "kursor.settings.open", "title": "Kursor Settings", "category": "Kursor", "icon": "$(settings-gear)" },
-      { "command": "kursor.rules.new", "title": "New Kursor Rule", "category": "Kursor" },
-      { "command": "kursor.claude.login", "title": "Sign in to Claude Code", "category": "Kursor" },
-      { "command": "kursor.claude.status", "title": "Claude Code Status", "category": "Kursor" },
-      { "command": "kursor.showLogs", "title": "Show Kursor Logs", "category": "Kursor" },
-      { "command": "kursor.ide.acceptDiff", "title": "Accept Proposed Changes", "category": "Kursor", "icon": "$(check)", "enablement": "kursor.ide.viewingDiff" },
-      { "command": "kursor.ide.rejectDiff", "title": "Reject Proposed Changes", "category": "Kursor", "icon": "$(close)", "enablement": "kursor.ide.viewingDiff" },
-      { "command": "kursor.ide.insertAtMention", "title": "Insert @-mention into Terminal Session", "category": "Kursor" }
+      {
+        "command": "kursor.chat.open",
+        "title": "Toggle Chat",
+        "category": "Kursor",
+        "icon": "$(comment-discussion)"
+      },
+      {
+        "command": "kursor.chat.newChat",
+        "title": "New Chat",
+        "category": "Kursor",
+        "icon": "$(add)"
+      },
+      {
+        "command": "kursor.chat.history",
+        "title": "Chat History",
+        "category": "Kursor",
+        "icon": "$(history)"
+      },
+      {
+        "command": "kursor.chat.openInEditor",
+        "title": "Open Chat in Editor",
+        "category": "Kursor",
+        "icon": "$(link-external)"
+      },
+      {
+        "command": "kursor.chat.addSelectionToNewChat",
+        "title": "Add Selection to New Chat",
+        "category": "Kursor"
+      },
+      {
+        "command": "kursor.chat.addSelectionToChat",
+        "title": "Add Selection to Chat",
+        "category": "Kursor"
+      },
+      {
+        "command": "kursor.chat.addFileToChat",
+        "title": "Add File to Chat",
+        "category": "Kursor"
+      },
+      {
+        "command": "kursor.chat.explainSelection",
+        "title": "Explain with Kursor",
+        "category": "Kursor"
+      },
+      {
+        "command": "kursor.chat.fixDiagnostic",
+        "title": "Fix in Chat",
+        "category": "Kursor"
+      },
+      {
+        "command": "kursor.chat.addTerminalSelection",
+        "title": "Add Terminal Selection to Chat",
+        "category": "Kursor"
+      },
+      {
+        "command": "kursor.chat.debugTerminal",
+        "title": "Debug Terminal Output with Kursor",
+        "category": "Kursor"
+      },
+      {
+        "command": "kursor.chat.exportChat",
+        "title": "Export Chat as Markdown",
+        "category": "Kursor",
+        "icon": "$(export)"
+      },
+      {
+        "command": "kursor.chat.stop",
+        "title": "Stop Generation",
+        "category": "Kursor"
+      },
+      {
+        "command": "kursor.chat.focusInput",
+        "title": "Focus Chat Input",
+        "category": "Kursor"
+      },
+      {
+        "command": "kursor.edits.keepAll",
+        "title": "Keep All Agent Edits",
+        "category": "Kursor",
+        "icon": "$(check-all)"
+      },
+      {
+        "command": "kursor.edits.undoAll",
+        "title": "Undo All Agent Edits",
+        "category": "Kursor",
+        "icon": "$(discard)"
+      },
+      {
+        "command": "kursor.edits.reviewAll",
+        "title": "Review Agent Edits",
+        "category": "Kursor",
+        "icon": "$(diff-multiple)"
+      },
+      {
+        "command": "kursor.edits.keepFile",
+        "title": "Keep Agent Edits in This File",
+        "category": "Kursor",
+        "icon": "$(check)"
+      },
+      {
+        "command": "kursor.edits.undoFile",
+        "title": "Undo Agent Edits in This File",
+        "category": "Kursor",
+        "icon": "$(discard)"
+      },
+      {
+        "command": "kursor.edits.reviewFile",
+        "title": "Review Agent Edits in This File",
+        "category": "Kursor",
+        "icon": "$(diff)"
+      },
+      {
+        "command": "kursor.edits.keepHunk",
+        "title": "Keep This Change",
+        "category": "Kursor"
+      },
+      {
+        "command": "kursor.edits.undoHunk",
+        "title": "Undo This Change",
+        "category": "Kursor"
+      },
+      {
+        "command": "kursor.inlineEdit.open",
+        "title": "Edit with Kursor (Ctrl+K)",
+        "category": "Kursor",
+        "icon": "$(sparkle)"
+      },
+      {
+        "command": "kursor.inlineEdit.acceptAll",
+        "title": "Accept Inline Edit",
+        "category": "Kursor",
+        "icon": "$(check)"
+      },
+      {
+        "command": "kursor.inlineEdit.rejectAll",
+        "title": "Reject Inline Edit",
+        "category": "Kursor",
+        "icon": "$(close)"
+      },
+      {
+        "command": "kursor.inlineEdit.acceptBlock",
+        "title": "Accept Inline Edit Block",
+        "category": "Kursor"
+      },
+      {
+        "command": "kursor.inlineEdit.rejectBlock",
+        "title": "Reject Inline Edit Block",
+        "category": "Kursor"
+      },
+      {
+        "command": "kursor.inlineEdit.quickQuestion",
+        "title": "Quick Question about Selection",
+        "category": "Kursor"
+      },
+      {
+        "command": "kursor.inlineEdit.applyCode",
+        "title": "Apply Code Block to File",
+        "category": "Kursor"
+      },
+      {
+        "command": "kursor.inlineEdit.insertAtCursor",
+        "title": "Insert Code Block at Cursor",
+        "category": "Kursor"
+      },
+      {
+        "command": "kursor.inlineEdit.cancel",
+        "title": "Cancel Inline Edit",
+        "category": "Kursor"
+      },
+      {
+        "command": "kursor.inlineEdit.submit",
+        "title": "Submit Inline Edit Prompt",
+        "category": "Kursor"
+      },
+      {
+        "command": "kursor.tab.toggle",
+        "title": "Toggle Tab Completions",
+        "category": "Kursor"
+      },
+      {
+        "command": "kursor.tab.snooze",
+        "title": "Snooze Tab Completions",
+        "category": "Kursor"
+      },
+      {
+        "command": "kursor.tab.trigger",
+        "title": "Trigger Tab Completion",
+        "category": "Kursor"
+      },
+      {
+        "command": "kursor.tab.statusMenu",
+        "title": "Kursor Tab Menu",
+        "category": "Kursor"
+      },
+      {
+        "command": "kursor.tab.accepted",
+        "title": "Kursor Tab: Completion Accepted",
+        "category": "Kursor"
+      },
+      {
+        "command": "kursor.terminal.generate",
+        "title": "Generate Terminal Command (Ctrl+K)",
+        "category": "Kursor"
+      },
+      {
+        "command": "kursor.scm.generateCommitMessage",
+        "title": "Generate Commit Message with Kursor",
+        "category": "Kursor",
+        "icon": "$(sparkle)",
+        "enablement": "!operationInProgress"
+      },
+      {
+        "command": "kursor.settings.open",
+        "title": "Kursor Settings",
+        "category": "Kursor",
+        "icon": "$(settings-gear)"
+      },
+      {
+        "command": "kursor.rules.new",
+        "title": "New Kursor Rule",
+        "category": "Kursor"
+      },
+      {
+        "command": "kursor.claude.login",
+        "title": "Sign in to Claude Code",
+        "category": "Kursor"
+      },
+      {
+        "command": "kursor.claude.status",
+        "title": "Claude Code Status",
+        "category": "Kursor"
+      },
+      {
+        "command": "kursor.showLogs",
+        "title": "Show Kursor Logs",
+        "category": "Kursor"
+      },
+      {
+        "command": "kursor.ide.acceptDiff",
+        "title": "Accept Proposed Changes",
+        "category": "Kursor",
+        "icon": "$(check)",
+        "enablement": "kursor.ide.viewingDiff"
+      },
+      {
+        "command": "kursor.ide.rejectDiff",
+        "title": "Reject Proposed Changes",
+        "category": "Kursor",
+        "icon": "$(close)",
+        "enablement": "kursor.ide.viewingDiff"
+      },
+      {
+        "command": "kursor.ide.insertAtMention",
+        "title": "Insert @-mention into Terminal Session",
+        "category": "Kursor"
+      }
     ],
     "keybindings": [
-      { "command": "kursor.chat.open", "key": "ctrl+i", "mac": "cmd+i", "when": "!terminalFocus" },
-      { "command": "kursor.chat.addSelectionToNewChat", "key": "ctrl+l", "mac": "cmd+l", "when": "!terminalFocus && !kursor.inlineEditInputFocus" },
-      { "command": "kursor.chat.addSelectionToChat", "key": "ctrl+shift+l", "mac": "cmd+shift+l", "when": "editorTextFocus" },
-      { "command": "kursor.chat.newChat", "key": "ctrl+n", "mac": "cmd+n", "when": "focusedView == kursor.chat" },
-      { "command": "kursor.chat.newChat", "key": "ctrl+t", "mac": "cmd+t", "when": "focusedView == kursor.chat" },
-      { "command": "kursor.chat.history", "key": "ctrl+alt+'", "mac": "cmd+alt+'", "when": "focusedView == kursor.chat" },
-      { "command": "kursor.chat.stop", "key": "ctrl+shift+backspace", "mac": "cmd+shift+backspace", "when": "focusedView == kursor.chat && kursor.chatRunning" },
-      { "command": "kursor.edits.keepAll", "key": "ctrl+enter", "mac": "cmd+enter", "when": "focusedView == kursor.chat && kursor.hasPendingEdits && !kursor.chatRunning" },
-      { "command": "kursor.edits.undoAll", "key": "ctrl+shift+backspace", "mac": "cmd+shift+backspace", "when": "focusedView == kursor.chat && kursor.hasPendingEdits && !kursor.chatRunning" },
-      { "command": "kursor.inlineEdit.open", "key": "ctrl+k", "mac": "cmd+k", "when": "editorTextFocus && !editorReadonly && !kursor.inlineDiffVisible" },
-      { "command": "kursor.inlineEdit.open", "key": "ctrl+k", "mac": "cmd+k", "when": "editorTextFocus && kursor.inlineDiffVisible" },
-      { "command": "kursor.inlineEdit.acceptAll", "key": "ctrl+enter", "mac": "cmd+enter", "when": "editorTextFocus && kursor.inlineDiffVisible" },
-      { "command": "kursor.inlineEdit.rejectAll", "key": "ctrl+backspace", "mac": "cmd+backspace", "when": "editorTextFocus && kursor.inlineDiffVisible" },
-      { "command": "kursor.inlineEdit.rejectAll", "key": "ctrl+shift+backspace", "mac": "cmd+shift+backspace", "when": "editorTextFocus && kursor.inlineDiffVisible" },
-      { "command": "kursor.inlineEdit.rejectAll", "key": "ctrl+z", "mac": "cmd+z", "when": "editorTextFocus && kursor.inlineDiffVisible" },
-      { "command": "kursor.inlineEdit.acceptBlock", "key": "ctrl+alt+y", "mac": "cmd+alt+y", "when": "editorTextFocus && kursor.inlineDiffVisible" },
-      { "command": "kursor.inlineEdit.rejectBlock", "key": "ctrl+alt+n", "mac": "cmd+alt+n", "when": "editorTextFocus && kursor.inlineDiffVisible" },
-      { "command": "kursor.inlineEdit.cancel", "key": "escape", "when": "kursor.inlineEditRunning && editorTextFocus" },
-      { "command": "kursor.inlineEdit.submit", "key": "alt+enter", "args": { "action": "question" }, "when": "kursor.inlineEditInputFocus && inQuickOpen" },
-      { "command": "kursor.inlineEdit.submit", "key": "ctrl+shift+enter", "mac": "cmd+shift+enter", "args": { "action": "wholeFile" }, "when": "kursor.inlineEditInputFocus && inQuickOpen" },
-      { "command": "kursor.inlineEdit.submit", "key": "ctrl+l", "mac": "cmd+l", "args": { "action": "sendToChat" }, "when": "kursor.inlineEditInputFocus && inQuickOpen" },
-      { "command": "kursor.terminal.generate", "key": "ctrl+k", "mac": "cmd+k", "when": "terminalFocus" },
-      { "command": "kursor.settings.open", "key": "ctrl+shift+j", "mac": "cmd+shift+j" },
-      { "command": "kursor.tab.trigger", "key": "alt+\\", "when": "editorTextFocus" },
-      { "command": "workbench.action.openGlobalKeybindings", "key": "ctrl+r ctrl+s", "mac": "cmd+r cmd+s" },
-      { "command": "workbench.action.files.openFolder", "key": "ctrl+r ctrl+o", "mac": "cmd+r cmd+o", "when": "openFolderWorkspaceSupport" },
-      { "command": "workbench.action.selectTheme", "key": "ctrl+r ctrl+t", "mac": "cmd+r cmd+t" },
-      { "command": "workbench.action.closeAllEditors", "key": "ctrl+r ctrl+w", "mac": "cmd+r cmd+w" },
-      { "command": "workbench.action.toggleZenMode", "key": "ctrl+r z", "mac": "cmd+r z", "when": "!isAuxiliaryWindowFocusedContext" },
-      { "command": "editor.action.addCommentLine", "key": "ctrl+r ctrl+c", "mac": "cmd+r cmd+c", "when": "editorTextFocus && !editorReadonly" },
-      { "command": "editor.action.removeCommentLine", "key": "ctrl+r ctrl+u", "mac": "cmd+r cmd+u", "when": "editorTextFocus && !editorReadonly" },
-      { "command": "editor.action.formatDocument", "key": "ctrl+r ctrl+f", "mac": "cmd+r cmd+f", "when": "editorHasDocumentFormattingProvider && editorTextFocus && !editorReadonly" },
-      { "command": "workbench.action.keepEditor", "key": "ctrl+r enter", "mac": "cmd+r enter", "when": "!editorTextFocus" },
-      { "command": "editor.foldAll", "key": "ctrl+r ctrl+0", "mac": "cmd+r cmd+0", "when": "editorTextFocus && foldingEnabled" },
-      { "command": "editor.unfoldAll", "key": "ctrl+r ctrl+j", "mac": "cmd+r cmd+j", "when": "editorTextFocus && foldingEnabled" }
+      {
+        "command": "kursor.chat.open",
+        "key": "ctrl+i",
+        "mac": "cmd+i",
+        "when": "!terminalFocus"
+      },
+      {
+        "command": "kursor.chat.addSelectionToNewChat",
+        "key": "ctrl+l",
+        "mac": "cmd+l",
+        "when": "!terminalFocus && !kursor.inlineEditInputFocus"
+      },
+      {
+        "command": "kursor.chat.addSelectionToChat",
+        "key": "ctrl+shift+l",
+        "mac": "cmd+shift+l",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "kursor.chat.newChat",
+        "key": "ctrl+n",
+        "mac": "cmd+n",
+        "when": "focusedView == kursor.chat"
+      },
+      {
+        "command": "kursor.chat.newChat",
+        "key": "ctrl+t",
+        "mac": "cmd+t",
+        "when": "focusedView == kursor.chat"
+      },
+      {
+        "command": "kursor.chat.history",
+        "key": "ctrl+alt+'",
+        "mac": "cmd+alt+'",
+        "when": "focusedView == kursor.chat"
+      },
+      {
+        "command": "kursor.chat.stop",
+        "key": "ctrl+shift+backspace",
+        "mac": "cmd+shift+backspace",
+        "when": "focusedView == kursor.chat && kursor.chatRunning"
+      },
+      {
+        "command": "kursor.edits.keepAll",
+        "key": "ctrl+enter",
+        "mac": "cmd+enter",
+        "when": "focusedView == kursor.chat && kursor.hasPendingEdits && !kursor.chatRunning"
+      },
+      {
+        "command": "kursor.edits.undoAll",
+        "key": "ctrl+shift+backspace",
+        "mac": "cmd+shift+backspace",
+        "when": "focusedView == kursor.chat && kursor.hasPendingEdits && !kursor.chatRunning"
+      },
+      {
+        "command": "kursor.inlineEdit.open",
+        "key": "ctrl+k",
+        "mac": "cmd+k",
+        "when": "editorTextFocus && !editorReadonly && !kursor.inlineDiffVisible"
+      },
+      {
+        "command": "kursor.inlineEdit.open",
+        "key": "ctrl+k",
+        "mac": "cmd+k",
+        "when": "editorTextFocus && kursor.inlineDiffVisible"
+      },
+      {
+        "command": "kursor.inlineEdit.acceptAll",
+        "key": "ctrl+enter",
+        "mac": "cmd+enter",
+        "when": "editorTextFocus && kursor.inlineDiffVisible"
+      },
+      {
+        "command": "kursor.inlineEdit.rejectAll",
+        "key": "ctrl+backspace",
+        "mac": "cmd+backspace",
+        "when": "editorTextFocus && kursor.inlineDiffVisible"
+      },
+      {
+        "command": "kursor.inlineEdit.rejectAll",
+        "key": "ctrl+shift+backspace",
+        "mac": "cmd+shift+backspace",
+        "when": "editorTextFocus && kursor.inlineDiffVisible"
+      },
+      {
+        "command": "kursor.inlineEdit.rejectAll",
+        "key": "ctrl+z",
+        "mac": "cmd+z",
+        "when": "editorTextFocus && kursor.inlineDiffVisible"
+      },
+      {
+        "command": "kursor.inlineEdit.acceptBlock",
+        "key": "ctrl+alt+y",
+        "mac": "cmd+alt+y",
+        "when": "editorTextFocus && kursor.inlineDiffVisible"
+      },
+      {
+        "command": "kursor.inlineEdit.rejectBlock",
+        "key": "ctrl+alt+n",
+        "mac": "cmd+alt+n",
+        "when": "editorTextFocus && kursor.inlineDiffVisible"
+      },
+      {
+        "command": "kursor.inlineEdit.cancel",
+        "key": "escape",
+        "when": "kursor.inlineEditRunning && editorTextFocus"
+      },
+      {
+        "command": "kursor.inlineEdit.submit",
+        "key": "alt+enter",
+        "args": {
+          "action": "question"
+        },
+        "when": "kursor.inlineEditInputFocus && inQuickOpen"
+      },
+      {
+        "command": "kursor.inlineEdit.submit",
+        "key": "ctrl+shift+enter",
+        "mac": "cmd+shift+enter",
+        "args": {
+          "action": "wholeFile"
+        },
+        "when": "kursor.inlineEditInputFocus && inQuickOpen"
+      },
+      {
+        "command": "kursor.inlineEdit.submit",
+        "key": "ctrl+l",
+        "mac": "cmd+l",
+        "args": {
+          "action": "sendToChat"
+        },
+        "when": "kursor.inlineEditInputFocus && inQuickOpen"
+      },
+      {
+        "command": "kursor.terminal.generate",
+        "key": "ctrl+k",
+        "mac": "cmd+k",
+        "when": "terminalFocus"
+      },
+      {
+        "command": "kursor.settings.open",
+        "key": "ctrl+shift+j",
+        "mac": "cmd+shift+j"
+      },
+      {
+        "command": "kursor.tab.trigger",
+        "key": "alt+\\",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "workbench.action.openGlobalKeybindings",
+        "key": "ctrl+r ctrl+s",
+        "mac": "cmd+r cmd+s"
+      },
+      {
+        "command": "workbench.action.files.openFolder",
+        "key": "ctrl+r ctrl+o",
+        "mac": "cmd+r cmd+o",
+        "when": "openFolderWorkspaceSupport"
+      },
+      {
+        "command": "workbench.action.selectTheme",
+        "key": "ctrl+r ctrl+t",
+        "mac": "cmd+r cmd+t"
+      },
+      {
+        "command": "workbench.action.closeAllEditors",
+        "key": "ctrl+r ctrl+w",
+        "mac": "cmd+r cmd+w"
+      },
+      {
+        "command": "workbench.action.toggleZenMode",
+        "key": "ctrl+r z",
+        "mac": "cmd+r z",
+        "when": "!isAuxiliaryWindowFocusedContext"
+      },
+      {
+        "command": "editor.action.addCommentLine",
+        "key": "ctrl+r ctrl+c",
+        "mac": "cmd+r cmd+c",
+        "when": "editorTextFocus && !editorReadonly"
+      },
+      {
+        "command": "editor.action.removeCommentLine",
+        "key": "ctrl+r ctrl+u",
+        "mac": "cmd+r cmd+u",
+        "when": "editorTextFocus && !editorReadonly"
+      },
+      {
+        "command": "editor.action.formatDocument",
+        "key": "ctrl+r ctrl+f",
+        "mac": "cmd+r cmd+f",
+        "when": "editorHasDocumentFormattingProvider && editorTextFocus && !editorReadonly"
+      },
+      {
+        "command": "workbench.action.keepEditor",
+        "key": "ctrl+r enter",
+        "mac": "cmd+r enter",
+        "when": "!editorTextFocus"
+      },
+      {
+        "command": "editor.foldAll",
+        "key": "ctrl+r ctrl+0",
+        "mac": "cmd+r cmd+0",
+        "when": "editorTextFocus && foldingEnabled"
+      },
+      {
+        "command": "editor.unfoldAll",
+        "key": "ctrl+r ctrl+j",
+        "mac": "cmd+r cmd+j",
+        "when": "editorTextFocus && foldingEnabled"
+      }
     ],
     "menus": {
       "view/title": [
-        { "command": "kursor.chat.newChat", "when": "view == kursor.chat", "group": "navigation@1" },
-        { "command": "kursor.chat.history", "when": "view == kursor.chat", "group": "navigation@2" },
-        { "command": "kursor.chat.openInEditor", "when": "view == kursor.chat", "group": "navigation@3" },
-        { "command": "kursor.settings.open", "when": "view == kursor.chat", "group": "navigation@4" },
-        { "command": "kursor.chat.exportChat", "when": "view == kursor.chat", "group": "1_actions@1" },
-        { "command": "kursor.showLogs", "when": "view == kursor.chat", "group": "9_misc@1" }
+        {
+          "command": "kursor.chat.newChat",
+          "when": "view == kursor.chat",
+          "group": "navigation@1"
+        },
+        {
+          "command": "kursor.chat.history",
+          "when": "view == kursor.chat",
+          "group": "navigation@2"
+        },
+        {
+          "command": "kursor.chat.openInEditor",
+          "when": "view == kursor.chat",
+          "group": "navigation@3"
+        },
+        {
+          "command": "kursor.settings.open",
+          "when": "view == kursor.chat",
+          "group": "navigation@4"
+        },
+        {
+          "command": "kursor.chat.exportChat",
+          "when": "view == kursor.chat",
+          "group": "1_actions@1"
+        },
+        {
+          "command": "kursor.showLogs",
+          "when": "view == kursor.chat",
+          "group": "9_misc@1"
+        }
       ],
       "editor/context": [
-        { "command": "kursor.chat.addSelectionToChat", "when": "editorHasSelection", "group": "kursor@1" },
-        { "command": "kursor.inlineEdit.open", "when": "!editorReadonly", "group": "kursor@2" },
-        { "command": "kursor.chat.explainSelection", "when": "editorHasSelection", "group": "kursor@3" }
+        {
+          "command": "kursor.chat.addSelectionToChat",
+          "when": "editorHasSelection",
+          "group": "kursor@1"
+        },
+        {
+          "command": "kursor.inlineEdit.open",
+          "when": "!editorReadonly",
+          "group": "kursor@2"
+        },
+        {
+          "command": "kursor.chat.explainSelection",
+          "when": "editorHasSelection",
+          "group": "kursor@3"
+        }
       ],
       "editor/title": [
-        { "command": "kursor.inlineEdit.acceptAll", "when": "kursor.inlineDiffVisible && kursor.inlineDiffResource == resourcePath", "group": "navigation@1" },
-        { "command": "kursor.inlineEdit.rejectAll", "when": "kursor.inlineDiffVisible && kursor.inlineDiffResource == resourcePath", "group": "navigation@2" },
-        { "command": "kursor.edits.keepFile", "when": "kursor.hasPendingEdits && resourceScheme == file && resourcePath in kursor.pendingEditPaths && !kursor.inlineDiffVisible", "group": "navigation@3" },
-        { "command": "kursor.edits.undoFile", "when": "kursor.hasPendingEdits && resourceScheme == file && resourcePath in kursor.pendingEditPaths && !kursor.inlineDiffVisible", "group": "navigation@4" },
-        { "command": "kursor.edits.reviewFile", "when": "kursor.hasPendingEdits && resourceScheme == file && resourcePath in kursor.pendingEditPaths && !kursor.inlineDiffVisible", "group": "navigation@5" },
-        { "command": "kursor.ide.acceptDiff", "when": "kursor.ide.viewingDiff && resourceScheme == kursor-ide-right", "group": "navigation@1" },
-        { "command": "kursor.ide.rejectDiff", "when": "kursor.ide.viewingDiff && resourceScheme == kursor-ide-right", "group": "navigation@2" }
+        {
+          "command": "kursor.inlineEdit.acceptAll",
+          "when": "kursor.inlineDiffVisible && kursor.inlineDiffResource == resourcePath",
+          "group": "navigation@1"
+        },
+        {
+          "command": "kursor.inlineEdit.rejectAll",
+          "when": "kursor.inlineDiffVisible && kursor.inlineDiffResource == resourcePath",
+          "group": "navigation@2"
+        },
+        {
+          "command": "kursor.edits.keepFile",
+          "when": "kursor.hasPendingEdits && resourceScheme == file && resourcePath in kursor.pendingEditPaths && !kursor.inlineDiffVisible",
+          "group": "navigation@3"
+        },
+        {
+          "command": "kursor.edits.undoFile",
+          "when": "kursor.hasPendingEdits && resourceScheme == file && resourcePath in kursor.pendingEditPaths && !kursor.inlineDiffVisible",
+          "group": "navigation@4"
+        },
+        {
+          "command": "kursor.edits.reviewFile",
+          "when": "kursor.hasPendingEdits && resourceScheme == file && resourcePath in kursor.pendingEditPaths && !kursor.inlineDiffVisible",
+          "group": "navigation@5"
+        },
+        {
+          "command": "kursor.ide.acceptDiff",
+          "when": "kursor.ide.viewingDiff && resourceScheme == kursor-ide-right",
+          "group": "navigation@1"
+        },
+        {
+          "command": "kursor.ide.rejectDiff",
+          "when": "kursor.ide.viewingDiff && resourceScheme == kursor-ide-right",
+          "group": "navigation@2"
+        }
       ],
       "explorer/context": [
-        { "command": "kursor.chat.addFileToChat", "when": "!explorerResourceIsFolder", "group": "kursor@1" }
+        {
+          "command": "kursor.chat.addFileToChat",
+          "when": "!explorerResourceIsFolder",
+          "group": "kursor@1"
+        }
       ],
       "terminal/context": [
-        { "command": "kursor.chat.addTerminalSelection", "group": "kursor@1" },
-        { "command": "kursor.chat.debugTerminal", "group": "kursor@2" },
-        { "command": "kursor.terminal.generate", "group": "kursor@3" }
+        {
+          "command": "kursor.chat.addTerminalSelection",
+          "group": "kursor@1"
+        },
+        {
+          "command": "kursor.chat.debugTerminal",
+          "group": "kursor@2"
+        },
+        {
+          "command": "kursor.terminal.generate",
+          "group": "kursor@3"
+        }
       ],
       "scm/title": [
-        { "command": "kursor.scm.generateCommitMessage", "group": "navigation@1", "when": "scmProvider == git" }
+        {
+          "command": "kursor.scm.generateCommitMessage",
+          "group": "navigation@1",
+          "when": "scmProvider == git"
+        }
       ],
       "commandPalette": [
-        { "command": "kursor.inlineEdit.acceptBlock", "when": "false" },
-        { "command": "kursor.inlineEdit.rejectBlock", "when": "false" },
-        { "command": "kursor.inlineEdit.applyCode", "when": "false" },
-        { "command": "kursor.inlineEdit.insertAtCursor", "when": "false" },
-        { "command": "kursor.inlineEdit.cancel", "when": "false" },
-        { "command": "kursor.inlineEdit.submit", "when": "false" },
-        { "command": "kursor.edits.keepHunk", "when": "false" },
-        { "command": "kursor.edits.undoHunk", "when": "false" },
-        { "command": "kursor.chat.fixDiagnostic", "when": "false" },
-        { "command": "kursor.tab.statusMenu", "when": "false" },
-        { "command": "kursor.tab.accepted", "when": "false" },
-        { "command": "kursor.ide.acceptDiff", "when": "kursor.ide.viewingDiff" },
-        { "command": "kursor.ide.rejectDiff", "when": "kursor.ide.viewingDiff" }
+        {
+          "command": "kursor.inlineEdit.acceptBlock",
+          "when": "false"
+        },
+        {
+          "command": "kursor.inlineEdit.rejectBlock",
+          "when": "false"
+        },
+        {
+          "command": "kursor.inlineEdit.applyCode",
+          "when": "false"
+        },
+        {
+          "command": "kursor.inlineEdit.insertAtCursor",
+          "when": "false"
+        },
+        {
+          "command": "kursor.inlineEdit.cancel",
+          "when": "false"
+        },
+        {
+          "command": "kursor.inlineEdit.submit",
+          "when": "false"
+        },
+        {
+          "command": "kursor.edits.keepHunk",
+          "when": "false"
+        },
+        {
+          "command": "kursor.edits.undoHunk",
+          "when": "false"
+        },
+        {
+          "command": "kursor.chat.fixDiagnostic",
+          "when": "false"
+        },
+        {
+          "command": "kursor.tab.statusMenu",
+          "when": "false"
+        },
+        {
+          "command": "kursor.tab.accepted",
+          "when": "false"
+        },
+        {
+          "command": "kursor.ide.acceptDiff",
+          "when": "kursor.ide.viewingDiff"
+        },
+        {
+          "command": "kursor.ide.rejectDiff",
+          "when": "kursor.ide.viewingDiff"
+        }
       ]
     },
     "configuration": {
       "title": "Kursor",
       "properties": {
-        "kursor.claude.path": { "type": "string", "default": "", "order": 1, "markdownDescription": "Path to the `claude` executable (Claude Code CLI). Leave empty to auto-detect from your login shell `PATH` (`~/.local/bin/claude`, mise shims, etc.)." },
-        "kursor.claude.model": { "type": "string", "default": "", "order": 2, "markdownDescription": "Default model for the chat/agent (`opus`, `sonnet`, `fable`, `haiku`, or a full model id). Empty = Claude Code's default." },
-        "kursor.claude.effort": { "type": "string", "enum": ["", "low", "medium", "high", "xhigh", "max"], "default": "", "order": 3, "description": "Effort level for the chat/agent. Empty = Claude Code's default." },
-        "kursor.agent.defaultMode": { "type": "string", "enum": ["agent", "ask", "plan"], "default": "agent", "order": 10, "description": "Mode new chats start in." },
-        "kursor.agent.permissionMode": { "type": "string", "enum": ["acceptEdits", "default", "auto", "bypassPermissions"], "enumDescriptions": ["Apply file edits automatically; ask before running terminal commands (Cursor default).", "Ask before every edit and command.", "Let Claude Code's auto-mode classifier approve routine actions.", "Run everything without asking (Cursor \"Run Everything\")."], "default": "acceptEdits", "order": 11, "description": "How agent-mode tool calls are approved." },
-        "kursor.agent.inlineDiffs": { "type": "boolean", "default": true, "order": 12, "description": "Highlight agent edits in the editor with Keep/Undo actions (Cursor \"Inline Diffs\")." },
-        "kursor.agent.autoSave": { "type": "boolean", "default": true, "order": 13, "description": "Save dirty editors before the agent reads or writes files." },
-        "kursor.agent.attachOpenFile": { "type": "boolean", "default": true, "order": 14, "description": "Tell the agent which file is active and what is selected when you send a message." },
-        "kursor.agent.notifyOnPermission": { "type": "boolean", "default": true, "order": 15, "description": "Show a desktop notification when the agent is waiting for approval and the chat is not visible." },
-        "kursor.tab.enabled": { "type": "boolean", "default": true, "order": 20, "description": "Enable Kursor Tab ghost-text completions." },
-        "kursor.tab.debounceMs": { "type": "number", "default": 900, "minimum": 150, "order": 21, "description": "Milliseconds of typing pause before requesting a Tab completion." },
-        "kursor.tab.model": { "type": "string", "default": "haiku", "order": 22, "description": "Model used for Tab completions (fast models recommended)." },
-        "kursor.tab.disabledLanguages": { "type": "array", "items": { "type": "string" }, "default": ["plaintext", "markdown", "log", "scminput"], "order": 23, "description": "Language ids where Tab completions are off." },
-        "kursor.tab.contextLines": { "type": "number", "default": 120, "order": 24, "description": "Lines of prefix/suffix context sent with each Tab request." },
-        "kursor.inlineEdit.model": { "type": "string", "default": "sonnet", "order": 30, "description": "Model used for Ctrl+K inline edits." },
-        "kursor.terminal.model": { "type": "string", "default": "sonnet", "order": 31, "description": "Model used for Ctrl+K terminal command generation." },
-        "kursor.commit.model": { "type": "string", "default": "sonnet", "order": 32, "description": "Model used for commit message generation." },
-        "kursor.rules.user": { "type": "string", "default": "", "editPresentation": "multilineText", "order": 40, "markdownDescription": "User rules: instructions applied to every chat (like Cursor's User Rules). Project rules are read from `.cursor/rules/*.mdc`, `.cursorrules` and `AGENTS.md`; `CLAUDE.md` is handled by Claude Code itself." },
-        "kursor.rules.useProjectRules": { "type": "boolean", "default": true, "order": 41, "markdownDescription": "Read `.cursor/rules/*.mdc`, `.cursorrules` and `AGENTS.md` from the workspace." },
-        "kursor.ide.enableServer": { "type": "boolean", "default": true, "order": 50, "markdownDescription": "Run the IDE bridge (lock file in `~/.claude/ide`) so a `claude` started in the integrated terminal can see your selection, diagnostics and open diffs in Kursor." },
-        "kursor.chat.showThinking": { "type": "boolean", "default": true, "order": 60, "description": "Show collapsible thinking indicators in chat." },
-        "kursor.chat.toolCallDensity": { "type": "string", "enum": ["compact", "balanced", "detailed"], "default": "balanced", "order": 61, "description": "How much detail tool call rows show in chat." }
+        "kursor.claude.path": {
+          "type": "string",
+          "default": "",
+          "order": 1,
+          "markdownDescription": "Path to the `claude` executable (Claude Code CLI). Leave empty to auto-detect from your login shell `PATH` (`~/.local/bin/claude`, mise shims, etc.)."
+        },
+        "kursor.claude.model": {
+          "type": "string",
+          "default": "",
+          "order": 2,
+          "markdownDescription": "Default model for the chat/agent (`opus`, `sonnet`, `fable`, `haiku`, or a full model id). Empty = Claude Code's default."
+        },
+        "kursor.claude.effort": {
+          "type": "string",
+          "enum": [
+            "",
+            "low",
+            "medium",
+            "high",
+            "xhigh",
+            "max"
+          ],
+          "default": "",
+          "order": 3,
+          "description": "Effort level for the chat/agent. Empty = Claude Code's default."
+        },
+        "kursor.agent.defaultMode": {
+          "type": "string",
+          "enum": [
+            "agent",
+            "ask",
+            "plan"
+          ],
+          "default": "agent",
+          "order": 10,
+          "description": "Mode new chats start in."
+        },
+        "kursor.agent.permissionMode": {
+          "type": "string",
+          "enum": [
+            "acceptEdits",
+            "default",
+            "auto",
+            "bypassPermissions"
+          ],
+          "enumDescriptions": [
+            "Apply file edits automatically; ask before running terminal commands (Cursor default).",
+            "Ask before every edit and command.",
+            "Let Claude Code's auto-mode classifier approve routine actions.",
+            "Run everything without asking (Cursor \"Run Everything\")."
+          ],
+          "default": "acceptEdits",
+          "order": 11,
+          "description": "How agent-mode tool calls are approved."
+        },
+        "kursor.agent.inlineDiffs": {
+          "type": "boolean",
+          "default": true,
+          "order": 12,
+          "description": "Highlight agent edits in the editor with Keep/Undo actions (Cursor \"Inline Diffs\")."
+        },
+        "kursor.agent.autoSave": {
+          "type": "boolean",
+          "default": true,
+          "order": 13,
+          "description": "Save dirty editors before the agent reads or writes files."
+        },
+        "kursor.agent.attachOpenFile": {
+          "type": "boolean",
+          "default": true,
+          "order": 14,
+          "description": "Tell the agent which file is active and what is selected when you send a message."
+        },
+        "kursor.agent.notifyOnPermission": {
+          "type": "boolean",
+          "default": true,
+          "order": 15,
+          "description": "Show a desktop notification when the agent is waiting for approval and the chat is not visible."
+        },
+        "kursor.tab.enabled": {
+          "type": "boolean",
+          "default": true,
+          "order": 20,
+          "description": "Enable Kursor Tab ghost-text completions."
+        },
+        "kursor.tab.debounceMs": {
+          "type": "number",
+          "default": 900,
+          "minimum": 150,
+          "order": 21,
+          "description": "Milliseconds of typing pause before requesting a Tab completion."
+        },
+        "kursor.tab.model": {
+          "type": "string",
+          "default": "haiku",
+          "order": 22,
+          "description": "Model used for Tab completions (fast models recommended)."
+        },
+        "kursor.tab.disabledLanguages": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "plaintext",
+            "markdown",
+            "log",
+            "scminput"
+          ],
+          "order": 23,
+          "description": "Language ids where Tab completions are off."
+        },
+        "kursor.tab.contextLines": {
+          "type": "number",
+          "default": 120,
+          "order": 24,
+          "description": "Lines of prefix/suffix context sent with each Tab request."
+        },
+        "kursor.inlineEdit.model": {
+          "type": "string",
+          "default": "sonnet",
+          "order": 30,
+          "description": "Model used for Ctrl+K inline edits."
+        },
+        "kursor.terminal.model": {
+          "type": "string",
+          "default": "sonnet",
+          "order": 31,
+          "description": "Model used for Ctrl+K terminal command generation."
+        },
+        "kursor.commit.model": {
+          "type": "string",
+          "default": "sonnet",
+          "order": 32,
+          "description": "Model used for commit message generation."
+        },
+        "kursor.rules.user": {
+          "type": "string",
+          "default": "",
+          "editPresentation": "multilineText",
+          "order": 40,
+          "markdownDescription": "User rules: instructions applied to every chat (like Cursor's User Rules). Project rules are read from `.cursor/rules/*.mdc`, `.cursorrules` and `AGENTS.md`; `CLAUDE.md` is handled by Claude Code itself."
+        },
+        "kursor.rules.useProjectRules": {
+          "type": "boolean",
+          "default": true,
+          "order": 41,
+          "markdownDescription": "Read `.cursor/rules/*.mdc`, `.cursorrules` and `AGENTS.md` from the workspace."
+        },
+        "kursor.ide.enableServer": {
+          "type": "boolean",
+          "default": true,
+          "order": 50,
+          "markdownDescription": "Run the IDE bridge (lock file in `~/.claude/ide`) so a `claude` started in the integrated terminal can see your selection, diagnostics and open diffs in Kursor."
+        },
+        "kursor.chat.showThinking": {
+          "type": "boolean",
+          "default": true,
+          "order": 60,
+          "description": "Show collapsible thinking indicators in chat."
+        },
+        "kursor.chat.toolCallDensity": {
+          "type": "string",
+          "enum": [
+            "compact",
+            "balanced",
+            "detailed"
+          ],
+          "default": "balanced",
+          "order": 61,
+          "description": "How much detail tool call rows show in chat."
+        }
       }
     },
     "configurationDefaults": {
@@ -205,8 +893,26 @@
       "editor.inlineSuggest.showToolbar": "onHover"
     },
     "colors": [
-      { "id": "kursor.addedLineBackground", "description": "Background of lines added by Kursor edits.", "defaults": { "dark": "#2ea04326", "light": "#2ea04326", "highContrast": "#2ea04340", "highContrastLight": "#2ea04340" } },
-      { "id": "kursor.removedLineBackground", "description": "Background of lines removed by Kursor edits.", "defaults": { "dark": "#f8514926", "light": "#f8514926", "highContrast": "#f8514940", "highContrastLight": "#f8514940" } }
+      {
+        "id": "kursor.addedLineBackground",
+        "description": "Background of lines added by Kursor edits.",
+        "defaults": {
+          "dark": "#2ea04326",
+          "light": "#2ea04326",
+          "highContrast": "#2ea04340",
+          "highContrastLight": "#2ea04340"
+        }
+      },
+      {
+        "id": "kursor.removedLineBackground",
+        "description": "Background of lines removed by Kursor edits.",
+        "defaults": {
+          "dark": "#f8514926",
+          "light": "#f8514926",
+          "highContrast": "#f8514940",
+          "highContrastLight": "#f8514940"
+        }
+      }
     ]
   },
   "scripts": {
@@ -214,7 +920,7 @@
     "build:prod": "node esbuild.mjs --production",
     "watch": "node esbuild.mjs --watch",
     "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p src/webview/tsconfig.json && tsc --noEmit -p src/webview-settings/tsconfig.json",
-    "package": "npm run typecheck && npm run build:prod && vsce package --no-dependencies --allow-missing-repository --skip-license --no-rewrite-relative-links -o dist/kursor.vsix",
+    "package": "npm run typecheck && npm run build:prod && vsce package --no-dependencies --skip-license --no-rewrite-relative-links -o dist/kursor.vsix",
     "install:kursor": "node product/install.mjs",
     "uninstall:kursor": "node product/uninstall.mjs",
     "bundle": "node product/build-bundle.mjs"
@@ -241,5 +947,13 @@
     "react-dom": "^18.3.1",
     "ws": "^8.19.0",
     "zod": "^4.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/brucegrootgames/kursor.git"
+  },
+  "homepage": "https://brucegrootgames.github.io/kursor/",
+  "bugs": {
+    "url": "https://github.com/brucegrootgames/kursor/issues"
   }
 }

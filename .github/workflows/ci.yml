@@ -1,0 +1,27 @@
+# Continuous integration: typecheck, build, unit tests, smoke-load and packaging on every push and PR.
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run build
+      - run: node --test src/extension/*/__tests__/*.test.mjs src/webview/__tests__/*.test.mjs
+      - run: node scripts/smoke-load.mjs
+      - run: npm run package
+      - uses: actions/upload-artifact@v4
+        with:
+          name: kursor-vsix
+          path: dist/kursor.vsix
