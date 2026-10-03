@@ -2,7 +2,7 @@
   "name": "kursor",
   "displayName": "Kursor",
   "description": "Cursor-style AI coding: agent chat, Ctrl+K inline edits, Tab completions, terminal and commit helpers. Powered by the Claude Code CLI installed on your machine.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "publisher": "kursor",
   "private": true,
   "license": "MIT",

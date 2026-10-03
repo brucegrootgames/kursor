@@ -7,6 +7,8 @@ builds the extension and one bundle per platform from that tag.
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-10-03
+
 ### Added
 - Brand identity: new Kursor mark (text cursor + code bracket), wordmark, palette and type guide (`docs/BRAND.md`); applied to app icons, the chat empty state, the Settings About tab, the Kursor Dark accent colours, the editor watermark, and the website (fonts, favicons, social card, Brand section).
 
@@ -31,5 +33,6 @@ First public release.
 ### Fixed
 - Installer and bundle builder use Windows' built-in `tar.exe` (bsdtar) instead of a GNU tar found on PATH, which misread `C:\` paths and cannot handle zip archives.
 
-[Unreleased]: https://github.com/brucegrootgames/kursor/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/brucegrootgames/kursor/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/brucegrootgames/kursor/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/brucegrootgames/kursor/releases/tag/v0.1.0
