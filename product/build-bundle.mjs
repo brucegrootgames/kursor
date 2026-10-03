@@ -61,8 +61,11 @@ function archive(platform, workDir, name, outFile) {
     if (r.status !== 0) die('zip failed');
     return 'zip';
   }
-  for (const tar of ['bsdtar', 'tar']) {
-    if (!have(tar)) continue;
+  // Windows: the built-in bsdtar (System32\tar.exe) — a GNU tar from Git for Windows on PATH reads
+  // "C:\…" as host:path and cannot write zip files.
+  const winTar = process.platform === 'win32' ? path.join(process.env.SystemRoot || 'C:\\Windows', 'System32', 'tar.exe') : null;
+  for (const tar of [winTar && fs.existsSync(winTar) ? winTar : null, 'bsdtar', 'tar'].filter(Boolean)) {
+    if (!(path.isAbsolute(tar) || have(tar))) continue;
     const r = spawnSync(tar, ['-C', workDir, '-a', '-cf', outFile, name], { stdio: 'inherit' });
     if (r.status === 0) return `${tar} -a`;
     rmrf(outFile);

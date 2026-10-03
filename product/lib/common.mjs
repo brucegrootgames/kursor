@@ -447,28 +447,37 @@ export async function ensureAsset(asset, cacheDir, { forceDownload = false } = {
 export function extractArchive(archive, dest) {
   ensureDir(dest);
   const host = process.platform;
+  // On Windows, use the built-in bsdtar explicitly: a GNU tar earlier on PATH (Git for Windows, MSYS)
+  // reads "C:\…" as host:path ("Cannot connect to C: resolve failed") and cannot read zip files.
+  const winTar = host === 'win32' ? path.join(process.env.SystemRoot || 'C:\\Windows', 'System32', 'tar.exe') : null;
+  const tar = winTar && fs.existsSync(winTar) ? winTar : 'tar';
   const attempts = [];
   if (archive.endsWith('.tar.gz')) {
-    attempts.push(['tar', ['-xzf', archive, '-C', dest]]);
+    attempts.push([tar, ['-xzf', archive, '-C', dest]]);
+    if (host !== 'win32') attempts.push(['bsdtar', ['-xzf', archive, '-C', dest]]);
   } else {
     if (host === 'darwin') attempts.push(['ditto', ['-x', '-k', archive, dest]]);
-    if (host === 'win32') attempts.push(['tar', ['-xf', archive, '-C', dest]]);
+    if (host === 'win32') attempts.push([tar, ['-xf', archive, '-C', dest]]);
     attempts.push(['bsdtar', ['-xf', archive, '-C', dest]]);
     attempts.push(['unzip', ['-q', '-o', archive, '-d', dest]]);
     if (host === 'win32') attempts.push(['__expand-archive__', []]);
   }
+  const failures = [];
   for (const [tool, args] of attempts) {
     if (tool === '__expand-archive__') {
       const r = powershell('Expand-Archive -LiteralPath $env:KURSOR_ZIP -DestinationPath $env:KURSOR_DEST -Force',
         { KURSOR_ZIP: archive, KURSOR_DEST: dest });
       if (r.ok) return 'Expand-Archive';
-      die(`Expand-Archive failed:\n${r.stderr}`);
+      failures.push(`Expand-Archive: ${r.stderr}`);
+      continue;
     }
-    if (!have(tool)) continue;
+    if (!(path.isAbsolute(tool) ? fs.existsSync(tool) : have(tool))) continue;
     const r = run(tool, args);
     if (r.ok) return tool;
-    die(`${tool} failed while extracting ${archive}:\n${r.stderr || r.stdout}`);
+    // Try the next tool; a half-extracted directory is discarded by the caller's staging logic.
+    failures.push(`${tool}: ${(r.stderr || r.stdout || '').trim().split(/\r?\n/)[0]}`);
   }
+  if (failures.length) die(`could not extract ${archive}:\n  ${failures.join('\n  ')}`);
   die(`no extraction tool found for ${archive} (need ${archive.endsWith('.tar.gz') ? 'tar' : 'unzip, bsdtar or ditto'})`);
 }
 

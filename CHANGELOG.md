@@ -25,5 +25,8 @@ First public release.
 - Omarchy integration on Linux: theme hook, launcher entry, optional SUPER+SHIFT+K binding and default-editor hookup.
 - "Kursor Dark" color theme.
 
+### Fixed
+- Installer and bundle builder use Windows' built-in `tar.exe` (bsdtar) instead of a GNU tar found on PATH, which misread `C:\` paths and cannot handle zip archives.
+
 [Unreleased]: https://github.com/brucegrootgames/kursor/compare/v0.1.0...HEAD
 [0.1.0]: https://github.com/brucegrootgames/kursor/releases/tag/v0.1.0
