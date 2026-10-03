@@ -70,8 +70,12 @@ export function Header({ app }: { app: AppState }) {
   const showHistory = useStore((s) => s.showHistory);
   const active = app.chats.find((c) => c.id === app.activeChatId);
   const multi = app.chats.length > 1;
+  // In the side bar the native title bar already reads "Kursor: <chat>" and carries New chat / History / Settings,
+  // so the webview adds only a tab strip for several chats (or the history header). The editor panel keeps all of it.
+  const inView = document.body.dataset.host !== 'panel';
+  if (inView && !showHistory && !multi) return null;
   return (
-    <div className="header">
+    <div className={cx('header', inView && 'header-view')}>
       {showHistory ? (
         <div className="header-title">
           <button type="button" className="icon-btn" onClick={closeHistory} title="Back to chat">
@@ -91,22 +95,24 @@ export function Header({ app }: { app: AppState }) {
           {app.workspaceName && <span className="header-ws">{app.workspaceName}</span>}
         </div>
       )}
-      <div className="header-actions">
-        <button type="button" className="icon-btn" onClick={() => post({ type: 'newChat' })} title="New chat (Ctrl+N)">
-          <Icon name="add" />
-        </button>
-        <button type="button" className={cx('icon-btn', showHistory && 'active')} onClick={() => (showHistory ? closeHistory() : openHistory())} title="Chat history">
-          <Icon name="history" />
-        </button>
-        {active && (
-          <button type="button" className="icon-btn" onClick={() => post({ type: 'exportChat', chatId: active.id })} title="Export chat as Markdown">
-            <Icon name="export" />
+      {!inView && (
+        <div className="header-actions">
+          <button type="button" className="icon-btn" onClick={() => post({ type: 'newChat' })} title="New chat (Ctrl+N)">
+            <Icon name="add" />
           </button>
-        )}
-        <button type="button" className="icon-btn" onClick={() => post({ type: 'openSettings' })} title="Kursor settings (Ctrl+Shift+J)">
-          <Icon name="settings-gear" />
-        </button>
-      </div>
+          <button type="button" className={cx('icon-btn', showHistory && 'active')} onClick={() => (showHistory ? closeHistory() : openHistory())} title="Chat history">
+            <Icon name="history" />
+          </button>
+          {active && (
+            <button type="button" className="icon-btn" onClick={() => post({ type: 'exportChat', chatId: active.id })} title="Export chat as Markdown">
+              <Icon name="export" />
+            </button>
+          )}
+          <button type="button" className="icon-btn" onClick={() => post({ type: 'openSettings' })} title="Kursor settings (Ctrl+Shift+J)">
+            <Icon name="settings-gear" />
+          </button>
+        </div>
+      )}
     </div>
   );
 }

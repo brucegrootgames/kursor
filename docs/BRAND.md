@@ -62,6 +62,10 @@ The Kursor extension sets the workbench defaults that carry the look (`contribut
 which is Inter-based, then the system sans), the smooth-blinking cursor and no minimap. The installer seeds the
 folded menu bar (`window.menuBarVisibility: compact`), which an extension cannot set.
 
+The chat and Settings webviews follow whatever theme the user runs through `--vscode-*` variables and use the same
+UI font stack. Their only fixed colours are the logo, the cursor bar (the streaming caret), the accent gradient on
+the send button and the code-block syntax palette (with a light counterpart).
+
 ## Type
 
 - UI and website: **Inter** (fallback: system sans). Headlines 700 with −0.02 em tracking, body 400/500.

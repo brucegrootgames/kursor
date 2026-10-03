@@ -203,6 +203,10 @@ otherwise), message list, sticky review bar, input box. Theme everything with `-
 background, foreground, editor font for code, `--vscode-textLink-foreground`, `--vscode-input-*`,
 `--vscode-button-*`, `--vscode-badge-*`, `--vscode-diffEditor-inserted/removedTextBackground`,
 `--vscode-focusBorder`); detect light/dark via `body.vscode-light`. Icons: codicons (`<i class="codicon codicon-…">`).
+UI text uses the brand font stack (`--k-ui-font`, injected from `workbench.experimental.fontFamily`); the only fixed
+colours are the brand marks listed in docs/BRAND.md (logo, cursor-bar caret, send-button gradient, code palette). In the
+side bar (`<body data-host="view">`) the native view title carries the chat title and actions, so the webview header
+only appears as a tab strip for several chats; the editor panel (`data-host="panel"`) keeps the full header.
 
 - User message: bubble with attachment pills, hover → "Restore checkpoint" (when `canRestore`) and copy; `queued` badge.
 - Assistant message: markdown (`marked` + `highlight.js`, sanitize: escape raw HTML), streaming cursor; code fences get

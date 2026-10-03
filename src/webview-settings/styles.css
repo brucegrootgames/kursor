@@ -1,7 +1,8 @@
-/* Kursor Settings panel — themed entirely through --vscode-* variables (Cursor-Settings-like layout). */
+/* Kursor Settings panel — colours from --vscode-* variables so it follows any theme; type follows the brand
+   (the workbench UI font, Inter first). The logo is the only fixed-colour element. */
 
 :root {
-  --k-font: var(--vscode-font-family, system-ui, sans-serif);
+  --k-font: var(--k-ui-font, Inter, "Inter Variable", "Adwaita Sans", var(--vscode-font-family, system-ui, sans-serif));
   --k-font-size: var(--vscode-font-size, 13px);
   --k-mono: var(--vscode-editor-font-family, ui-monospace, Menlo, monospace);
   --k-mono-size: calc(var(--vscode-editor-font-size, 13px) - 1px);
@@ -23,8 +24,8 @@
   --k-dropdown-bg: var(--vscode-dropdown-background, var(--k-input-bg));
   --k-dropdown-fg: var(--vscode-dropdown-foreground, var(--k-input-fg));
   --k-dropdown-border: var(--vscode-dropdown-border, var(--k-input-border));
-  --k-focus: var(--vscode-focusBorder, #3794ff);
-  --k-link: var(--vscode-textLink-foreground, #3794ff);
+  --k-focus: var(--vscode-focusBorder, #7c8cff);
+  --k-link: var(--vscode-textLink-foreground, #8f9bff);
   --k-btn-bg: var(--vscode-button-background);
   --k-btn-fg: var(--vscode-button-foreground);
   --k-btn-hover: var(--vscode-button-hoverBackground);
@@ -33,14 +34,14 @@
   --k-btn2-hover: var(--vscode-button-secondaryHoverBackground, rgba(128, 128, 128, 0.3));
   --k-badge-bg: var(--vscode-badge-background);
   --k-badge-fg: var(--vscode-badge-foreground);
-  --k-error: var(--vscode-errorForeground, #f14c4c);
-  --k-warn: var(--vscode-editorWarning-foreground, #cca700);
-  --k-info: var(--vscode-editorInfo-foreground, #3794ff);
-  --k-ok: var(--vscode-testing-iconPassed, var(--vscode-charts-green, #2ea043));
+  --k-error: var(--vscode-errorForeground, #ff6b78);
+  --k-warn: var(--vscode-editorWarning-foreground, #e8a33d);
+  --k-info: var(--vscode-editorInfo-foreground, #7c8cff);
+  --k-ok: var(--vscode-testing-iconPassed, var(--vscode-charts-green, #5fd38a));
   --k-shadow: var(--vscode-widget-shadow, rgba(0, 0, 0, 0.35));
   --k-switch-off: var(--vscode-checkbox-background, rgba(128, 128, 128, 0.35));
   --k-switch-border: var(--vscode-checkbox-border, var(--k-border));
-  --k-radius: 6px;
+  --k-radius: 10px;
   --k-nav-width: 200px;
 }
 
@@ -52,31 +53,32 @@ body {
   color: var(--k-fg);
   background: var(--k-bg);
   overflow: hidden;
-  line-height: 1.45;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
 }
 button { font-family: inherit; font-size: inherit; color: inherit; background: none; border: none; padding: 0; cursor: pointer; }
 button:disabled { cursor: default; opacity: 0.5; }
 button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible, [role='button']:focus-visible, [tabindex]:focus-visible { outline: 1px solid var(--k-focus); outline-offset: 1px; }
-code, pre, kbd { font-family: var(--k-mono); font-size: var(--k-mono-size); }
-code { background: var(--k-code-bg); padding: 0 4px; border-radius: 3px; word-break: break-all; }
+code, pre { font-family: var(--k-mono); font-size: var(--k-mono-size); }
+code { background: var(--k-code-bg); padding: 0 5px; border-radius: 4px; word-break: break-all; }
 a { color: var(--k-link); text-decoration: none; }
 a:hover { text-decoration: underline; }
 h1, h2, h3, p, dl, dd, ul { margin: 0; }
 ul { padding: 0; list-style: none; }
 ::-webkit-scrollbar { width: 10px; height: 10px; }
-::-webkit-scrollbar-thumb { background: var(--vscode-scrollbarSlider-background, rgba(128, 128, 128, 0.4)); }
-::-webkit-scrollbar-thumb:hover { background: var(--vscode-scrollbarSlider-hoverBackground, rgba(128, 128, 128, 0.6)); }
+::-webkit-scrollbar-thumb { background-color: var(--vscode-scrollbarSlider-background, rgba(128, 128, 128, 0.4)); border: 3px solid transparent; border-radius: 10px; background-clip: padding-box; }
+::-webkit-scrollbar-thumb:hover { background-color: var(--vscode-scrollbarSlider-hoverBackground, rgba(128, 128, 128, 0.6)); }
 ::-webkit-scrollbar-track { background: transparent; }
 
 .muted { color: var(--k-muted); }
 .dimmed { opacity: 0.55; }
 kbd {
-  display: inline-block; padding: 0 5px; font-size: 10.5px; line-height: 17px; border-radius: 3px; margin: 0 1px;
+  display: inline-flex; align-items: center; justify-content: center; min-width: 18px; height: 18px; padding: 0 5px; margin: 0 1px;
+  font-family: var(--k-font); font-size: 10.5px; font-weight: 500; line-height: 1; border-radius: 4px; vertical-align: middle;
   background: var(--vscode-keybindingLabel-background, rgba(128, 128, 128, 0.17));
   color: var(--vscode-keybindingLabel-foreground, inherit);
   border: 1px solid var(--vscode-keybindingLabel-border, rgba(128, 128, 128, 0.3));
   border-bottom-color: var(--vscode-keybindingLabel-bottomBorder, rgba(128, 128, 128, 0.5));
-  box-shadow: inset 0 -1px 0 var(--vscode-keybindingLabel-bottomBorder, rgba(128, 128, 128, 0.5));
 }
 
 /* ---------- layout ---------- */
@@ -94,7 +96,7 @@ kbd {
 .nav-logo svg { display: block; }
 .nav-list { display: flex; flex-direction: column; gap: 2px; }
 .nav-item {
-  display: flex; align-items: center; gap: 9px; width: 100%; padding: 6px 10px; border-radius: 5px; text-align: left; color: inherit; opacity: 0.85;
+  display: flex; align-items: center; gap: 9px; width: 100%; padding: 6px 10px; border-radius: 7px; text-align: left; color: inherit; opacity: 0.85;
 }
 .nav-item:hover { background: var(--k-nav-hover-bg); opacity: 1; }
 .nav-item.active { background: var(--k-nav-active-bg); color: var(--k-nav-active-fg); opacity: 1; }
@@ -104,7 +106,7 @@ kbd {
 .content { flex: 1 1 auto; height: 100%; overflow-y: auto; overflow-x: hidden; }
 .content-inner { max-width: 820px; margin: 0 auto; padding: 22px 32px 48px; }
 .page-header { margin-bottom: 18px; }
-.page-title { font-size: 20px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+.page-title { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; display: flex; align-items: center; gap: 8px; color: var(--vscode-settings-headerForeground, var(--k-fg)); }
 .page-title .codicon { font-size: 18px; color: var(--k-muted); }
 .page-hint { font-size: 12px; margin-top: 2px; }
 
@@ -112,7 +114,7 @@ kbd {
 .section { margin-bottom: 26px; }
 .section-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
 .section-heading { min-width: 0; }
-.section-title { font-size: 14px; font-weight: 600; }
+.section-title { font-size: 14px; font-weight: 600; letter-spacing: -0.01em; }
 .section-desc { font-size: 12px; color: var(--k-muted); margin-top: 2px; max-width: 640px; }
 .section-actions { display: flex; gap: 6px; flex: 0 0 auto; }
 .section-body { border: 1px solid var(--k-border); border-radius: var(--k-radius); background: var(--k-card); }
@@ -136,7 +138,7 @@ kbd {
 
 /* ---------- buttons ---------- */
 .btn {
-  display: inline-flex; align-items: center; gap: 5px; height: 26px; padding: 0 11px; border-radius: 4px;
+  display: inline-flex; align-items: center; gap: 5px; height: 26px; padding: 0 11px; border-radius: 6px; font-weight: 500;
   background: var(--k-btn2-bg); color: var(--k-btn2-fg); border: 1px solid transparent; white-space: nowrap;
 }
 .btn:hover:not(:disabled) { background: var(--k-btn2-hover); }
@@ -145,9 +147,9 @@ kbd {
 .btn.ghost { background: transparent; border-color: var(--k-border); }
 .btn.ghost:hover:not(:disabled) { background: var(--k-hover); }
 .btn.danger { color: var(--k-error); }
-.btn.small { height: 22px; padding: 0 8px; font-size: 11.5px; }
+.btn.small { height: 22px; padding: 0 8px; font-size: 11.5px; border-radius: 5px; }
 .btn .codicon { font-size: 13px; }
-.icon-btn { display: inline-flex; align-items: center; gap: 4px; height: 22px; padding: 0 4px; border-radius: 4px; color: var(--k-muted); }
+.icon-btn { display: inline-flex; align-items: center; gap: 4px; height: 24px; padding: 0 5px; border-radius: 6px; color: var(--k-muted); }
 .icon-btn:hover:not(:disabled) { background: var(--k-hover); color: var(--k-fg); }
 .icon-btn .codicon { font-size: 14px; }
 .link-btn { display: inline-flex; align-items: center; gap: 4px; color: var(--k-link); padding: 0 2px; border-radius: 3px; font-size: inherit; }
@@ -161,7 +163,7 @@ kbd {
 
 /* ---------- inputs ---------- */
 .input {
-  font: inherit; background: var(--k-input-bg); color: var(--k-input-fg); border: 1px solid var(--k-input-border); border-radius: 4px; padding: 4px 7px; height: 26px;
+  font: inherit; background: var(--k-input-bg); color: var(--k-input-fg); border: 1px solid var(--k-input-border); border-radius: 6px; padding: 4px 8px; height: 28px;
 }
 .input.mono { font-family: var(--k-mono); font-size: var(--k-mono-size); }
 .input.invalid { border-color: var(--vscode-inputValidation-errorBorder, var(--k-error)); }
@@ -176,7 +178,7 @@ kbd {
 
 .select-wrap { position: relative; display: inline-flex; }
 .select {
-  font: inherit; appearance: none; -webkit-appearance: none; height: 26px; padding: 0 26px 0 8px; border-radius: 4px; min-width: 150px;
+  font: inherit; appearance: none; -webkit-appearance: none; height: 28px; padding: 0 26px 0 9px; border-radius: 6px; min-width: 150px;
   background: var(--k-dropdown-bg); color: var(--k-dropdown-fg); border: 1px solid var(--k-dropdown-border); cursor: pointer;
 }
 .select-chevron { position: absolute; right: 7px; top: 50%; transform: translateY(-50%); pointer-events: none; font-size: 13px; color: var(--k-muted); }
@@ -191,7 +193,7 @@ kbd {
 
 .radios { display: flex; flex-direction: column; gap: 6px; }
 .radio {
-  position: relative; display: flex; align-items: flex-start; gap: 10px; padding: 9px 11px; border: 1px solid var(--k-border); border-radius: 5px; cursor: pointer; background: var(--k-bg);
+  position: relative; display: flex; align-items: flex-start; gap: 10px; padding: 9px 11px; border: 1px solid var(--k-border); border-radius: 8px; cursor: pointer; background: var(--k-bg);
 }
 .radio:hover { background: var(--k-hover); }
 .radio.selected { border-color: var(--k-focus); }
@@ -205,7 +207,7 @@ kbd {
 .radio-desc { font-size: 12px; color: var(--k-muted); }
 .radio.danger .radio-label { color: var(--k-error); }
 
-.taglist { display: flex; flex-wrap: wrap; gap: 5px; padding: 5px 6px; min-height: 32px; border: 1px solid var(--k-input-border); border-radius: 4px; background: var(--k-input-bg); cursor: text; }
+.taglist { display: flex; flex-wrap: wrap; gap: 5px; padding: 5px 6px; min-height: 32px; border: 1px solid var(--k-input-border); border-radius: 6px; background: var(--k-input-bg); cursor: text; }
 .taglist:focus-within { outline: 1px solid var(--k-focus); outline-offset: -1px; }
 .tag { display: inline-flex; align-items: center; gap: 2px; height: 20px; padding: 0 2px 0 6px; border-radius: 4px; background: var(--k-code-bg); }
 .tag code { background: none; padding: 0; }
@@ -233,9 +235,9 @@ kbd {
 .status-note { font-size: 11.5px; margin-top: 12px; }
 
 .about-card { display: flex; align-items: flex-start; gap: 16px; }
-.about-logo { display: block; flex: 0 0 auto; border-radius: 13px; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.28); }
+.about-logo { display: block; flex: 0 0 auto; } /* docs/BRAND.md: never add a drop shadow to the mark */
 .about-text { min-width: 0; }
-.about-title { display: flex; align-items: baseline; gap: 8px; font-size: 18px; font-weight: 600; letter-spacing: 0.01em; }
+.about-title { display: flex; align-items: baseline; gap: 8px; font-size: 20px; font-weight: 700; letter-spacing: -0.02em; }
 .about-version { font-size: 12px; font-weight: 400; }
 .about-sub { font-size: 12.5px; margin-top: 4px; }
 .about-links { display: flex; flex-wrap: wrap; gap: 4px 14px; margin-top: 10px; }
@@ -271,7 +273,7 @@ kbd {
 
 /* ---------- toasts ---------- */
 .toasts { position: absolute; top: 14px; right: 18px; z-index: 40; display: flex; flex-direction: column; gap: 6px; max-width: min(380px, calc(100% - 36px)); }
-.toast { display: flex; align-items: flex-start; gap: 8px; padding: 8px 10px; border-radius: 6px; background: var(--vscode-notifications-background, var(--k-card)); border: 1px solid var(--vscode-notifications-border, var(--k-border)); box-shadow: 0 4px 12px var(--k-shadow); font-size: 12px; }
+.toast { display: flex; align-items: flex-start; gap: 8px; padding: 9px 11px; border-radius: 10px; background: var(--vscode-notifications-background, var(--k-card)); border: 1px solid var(--vscode-notifications-border, var(--k-border)); box-shadow: 0 4px 12px var(--k-shadow); font-size: 12px; }
 .toast > .codicon { margin-top: 2px; }
 .toast-error > .codicon { color: var(--vscode-notificationsErrorIcon-foreground, var(--k-error)); }
 .toast-warning > .codicon { color: var(--vscode-notificationsWarningIcon-foreground, var(--k-warn)); }

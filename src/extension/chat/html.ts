@@ -1,9 +1,13 @@
-/** Webview HTML for the chat UI (nonce CSP, loads dist/webview.js + dist/codicon.css). */
+/**
+ * Webview HTML for the chat UI (nonce CSP, loads dist/webview.js + dist/codicon.css). `host` is stamped on
+ * <body data-host>: the side-bar view leaves the chat actions to its native title bar, the editor panel shows them.
+ */
 import * as vscode from 'vscode';
 import * as fs from 'node:fs';
 import { randomBytes } from 'node:crypto';
+import { uiFontRule } from '../util/uiFont';
 
-export function chatHtml(webview: vscode.Webview, extensionUri: vscode.Uri): string {
+export function chatHtml(webview: vscode.Webview, extensionUri: vscode.Uri, host: 'view' | 'panel'): string {
   const nonce = randomBytes(16).toString('base64url');
   const dist = vscode.Uri.joinPath(extensionUri, 'dist');
   const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(dist, 'webview.js'));
@@ -26,9 +30,9 @@ export function chatHtml(webview: vscode.Webview, extensionUri: vscode.Uri): str
 <link rel="stylesheet" href="${codiconUri}">
 ${cssLink}
 <title>Kursor</title>
-<style nonce="${nonce}">html,body,#root{height:100%;margin:0;padding:0}</style>
+<style nonce="${nonce}">html,body,#root{height:100%;margin:0;padding:0}${uiFontRule()}</style>
 </head>
-<body>
+<body data-host="${host}">
 <div id="root"></div>
 <script nonce="${nonce}" src="${scriptUri}"></script>
 </body>

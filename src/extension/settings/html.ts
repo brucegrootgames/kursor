@@ -2,6 +2,7 @@
 import * as vscode from 'vscode';
 import * as fs from 'node:fs';
 import { randomBytes } from 'node:crypto';
+import { uiFontRule } from '../util/uiFont';
 
 export function settingsHtml(webview: vscode.Webview, extensionUri: vscode.Uri): string {
   const nonce = randomBytes(16).toString('base64url');
@@ -26,7 +27,7 @@ export function settingsHtml(webview: vscode.Webview, extensionUri: vscode.Uri):
 <link rel="stylesheet" href="${codiconUri}">
 ${cssLink}
 <title>Kursor Settings</title>
-<style nonce="${nonce}">html,body,#root{height:100%;margin:0;padding:0}</style>
+<style nonce="${nonce}">html,body,#root{height:100%;margin:0;padding:0}${uiFontRule()}</style>
 </head>
 <body>
 <div id="root"></div>

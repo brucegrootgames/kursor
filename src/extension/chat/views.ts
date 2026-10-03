@@ -5,10 +5,11 @@
  * before a webview reports `ready` are queued (bounded) and flushed on ready.
  */
 import * as vscode from 'vscode';
-import type { HostToWebview, WebviewToHost } from '../../shared/protocol';
+import type { AppState, HostToWebview, WebviewToHost } from '../../shared/protocol';
 import type { Logger } from '../util/log';
 import { chatHtml } from './html';
 import type { ChatManager, WebviewHostLike } from './manager';
+import { DEFAULT_TITLE } from './state';
 
 export const VIEW_ID = 'kursor.chat';
 export const PANEL_VIEW_TYPE = 'kursor.chatPanel';
@@ -30,6 +31,8 @@ export class WebviewHost implements WebviewHostLike, vscode.Disposable {
     private readonly manager: ChatManager,
     private readonly onMessage: MessageHandler,
     private readonly log: Logger,
+    /** Sees every app state posted to this host, delivered or not (the side-bar view titles itself from it). */
+    private readonly onAppState?: (state: AppState) => void,
   ) {
     this.disposables.push(
       webview.onDidReceiveMessage((raw: unknown) => {
@@ -62,6 +65,7 @@ export class WebviewHost implements WebviewHostLike, vscode.Disposable {
   }
 
   post(msg: HostToWebview): void {
+    if (msg.type === 'appState') this.onAppState?.(msg.state);
     if (!this.ready) {
       if (msg.type === 'appState' || msg.type === 'chatState' || msg.type === 'textDelta') return; // synced on ready
       this.queue.push(msg);
@@ -142,12 +146,17 @@ export class ChatViewProvider implements vscode.WebviewViewProvider, vscode.Disp
   resolveWebviewView(webviewView: vscode.WebviewView): void {
     this.view = webviewView;
     webviewView.webview.options = { enableScripts: true, localResourceRoots: [vscode.Uri.joinPath(this.extensionUri, 'dist'), vscode.Uri.joinPath(this.extensionUri, 'media')] };
-    webviewView.webview.html = chatHtml(webviewView.webview, this.extensionUri);
-    webviewView.title = 'Chat';
+    webviewView.webview.html = chatHtml(webviewView.webview, this.extensionUri, 'view');
+    // The native title bar carries the chat title and actions ("Kursor: <chat>"); the webview adds a tab strip
+    // only when several chats are open.
+    webviewView.title = this.manager.store.active()?.title || DEFAULT_TITLE;
     this.host?.dispose();
-    this.host = new WebviewHost('view', webviewView.webview, () => webviewView.visible, this.manager, this.onMessage, this.log);
+    this.host = new WebviewHost('view', webviewView.webview, () => webviewView.visible, this.manager, this.onMessage, this.log, (state) => {
+      const title = state.chats.find((c) => c.id === state.activeChatId)?.title || DEFAULT_TITLE;
+      if (webviewView.title !== title) webviewView.title = title;
+    });
     this.host.armReadyWatchdog(() => {
-      webviewView.webview.html = chatHtml(webviewView.webview, this.extensionUri);
+      webviewView.webview.html = chatHtml(webviewView.webview, this.extensionUri, 'view');
     });
     const subs: vscode.Disposable[] = [
       webviewView.onDidChangeVisibility(() => {
@@ -238,11 +247,11 @@ export class ChatPanelController implements vscode.Disposable {
     this.panel = panel;
     panel.iconPath = vscode.Uri.joinPath(this.context.extensionUri, 'media', 'kursor-activity.svg');
     panel.webview.options = { enableScripts: true, localResourceRoots: [vscode.Uri.joinPath(this.context.extensionUri, 'dist'), vscode.Uri.joinPath(this.context.extensionUri, 'media')] };
-    panel.webview.html = chatHtml(panel.webview, this.context.extensionUri);
+    panel.webview.html = chatHtml(panel.webview, this.context.extensionUri, 'panel');
     this.host?.dispose();
     this.host = new WebviewHost('panel', panel.webview, () => panel.visible, this.manager, this.onMessage, this.log);
     this.host.armReadyWatchdog(() => {
-      panel.webview.html = chatHtml(panel.webview, this.context.extensionUri);
+      panel.webview.html = chatHtml(panel.webview, this.context.extensionUri, 'panel');
     });
     panel.onDidDispose(() => {
       this.host?.dispose();

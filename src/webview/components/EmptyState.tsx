@@ -47,40 +47,39 @@ export function SignInPanel({ claude }: { claude: AppState['claude'] }) {
   );
 }
 
+const HINTS: { label: string; keys: string[] }[] = [
+  { label: 'Edit code in place', keys: ['Ctrl', 'K'] },
+  { label: 'Accept a completion', keys: ['Tab'] },
+  { label: 'Add context', keys: ['@'] },
+  { label: 'Switch mode', keys: ['Ctrl', '.'] },
+];
+
 export function EmptyState({ app }: { app: AppState }) {
   const claude = app.claude;
   const needsAttention = !claude.ready || claude.loggedIn === false;
   return (
     <div className="empty">
       <div className="empty-inner">
-        <KursorMark className="logo" size={56} />
+        <KursorMark className="logo" size={48} />
         <div className="empty-title">Kursor</div>
         {needsAttention ? (
           <SignInPanel claude={claude} />
         ) : (
-          <div className="hints">
-            <div className="hint-row">
-              <kbd>Ctrl</kbd>
-              <kbd>K</kbd>
-              <span>to edit code</span>
-            </div>
-            <div className="hint-row">
-              <kbd>Tab</kbd>
-              <span>to complete</span>
-            </div>
-            <div className="hint-row">
-              <kbd>@</kbd>
-              <span>to add context</span>
-            </div>
-            <div className="hint-row">
-              <kbd>Ctrl</kbd>
-              <kbd>.</kbd>
-              <span>to switch mode</span>
-            </div>
-          </div>
+          <ul className="hints">
+            {HINTS.map((h) => (
+              <li key={h.label} className="hint-row">
+                <span>{h.label}</span>
+                <span className="hint-keys">
+                  {h.keys.map((k) => (
+                    <kbd key={k}>{k}</kbd>
+                  ))}
+                </span>
+              </li>
+            ))}
+          </ul>
         )}
         {claude.ready && claude.email && (
-          <div className="muted small">
+          <div className="empty-account">
             {claude.email}
             {claude.subscriptionType ? ` · ${claude.subscriptionType}` : ''}
           </div>
