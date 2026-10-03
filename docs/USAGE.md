@@ -1,8 +1,22 @@
 # Using Kursor
 
-A tour of the day-to-day workflow. Shortcuts are the Linux defaults; everything is also reachable from the command
-palette (Ctrl+Shift+P, category **Kursor**). Installation, Omarchy integration and troubleshooting are in the
-[README](../README.md).
+A tour of the day-to-day workflow. Shortcuts are written as on Linux/Windows; on macOS the Kursor shortcuts use the
+Control key as listed (they are not remapped to Cmd), while VS Code's own shortcuts follow the usual Cmd conventions.
+Everything is also reachable from the command palette (Ctrl+Shift+P / Cmd+Shift+P, category **Kursor**). Installation,
+Omarchy integration and troubleshooting are in the [README](../README.md).
+
+## Where things live
+
+| | Linux | macOS | Windows |
+|---|---|---|---|
+| start Kursor | `kursor [path]`, launcher entry, `SUPER + SHIFT + K` (Omarchy, `--hypr-bind`) | `kursor [path]`, Launchpad / Spotlight, `open -a Kursor` | `kursor [path]` (new terminal), Start Menu |
+| `settings.json`, `keybindings.json` | `~/.config/Kursor/User/` | `~/Library/Application Support/Kursor/User/` | `%APPDATA%\Kursor\User\` |
+| extensions, `argv.json` | `~/.kursor/` | `~/.kursor/` | `%USERPROFILE%\.kursor\` |
+| install a `.vsix` by hand | `kursor --install-extension file.vsix` | same | same |
+| extra Electron flags | `~/.config/kursor-flags.conf` | `~/.kursor/argv.json` | `%USERPROFILE%\.kursor\argv.json` |
+| upgrade / uninstall | `bash product/install.sh` / `bash product/uninstall.sh` | same | `product\install.cmd` / `product\uninstall.cmd` |
+
+Kursor's own settings panel (Ctrl+Shift+J) and VS Code's settings UI (Ctrl+, / Cmd+,) edit the same `settings.json`.
 
 ## Layout
 

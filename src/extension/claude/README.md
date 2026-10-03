@@ -13,18 +13,21 @@ login. No credentials are read, stored or forwarded.
 |---|---|---|
 | `types.ts` | yes | shared contract (additive changes only) |
 | `sdk.ts` | yes | lazy `import()` of the ESM-only SDK + type re-exports (`resolution-mode: import`), `BridgeAbortError`, `isAbortError` |
-| `env.ts` | yes | child environment: `process.env` minus `CLAUDECODE`, `CLAUDE_CODE_CHILD_SESSION`, `TRACEPARENT/STATE`, `ELECTRON_RUN_AS_NODE`; login-shell `PATH` merged in |
-| `resolvePath.ts` | yes | executable resolution: setting → `$SHELL -lic 'command -v claude'` (5 s, cached; also captures `$PATH`) → `~/.local/bin/claude` → mise shim → `PATH`; mise shims are unwrapped with `mise which claude` |
-| `status.ts` | yes | `claude --version` + `claude auth status --json` → `ClaudeStatus` |
+| `env.ts` | yes | child environment: `process.env` minus `CLAUDECODE`, `CLAUDE_CODE_CHILD_SESSION`, `TRACEPARENT/STATE`, `ELECTRON_RUN_AS_NODE`; login-shell `PATH` merged in (POSIX only; Windows env keys are case-insensitive — written through the existing `Path` key) |
+| `resolvePath.ts` | yes | executable resolution: setting → **Linux/macOS** `$SHELL -l -i -c 'command -v claude'` (5 s, cached; also captures `$PATH`; macOS also tries `/bin/zsh`, `/bin/bash`) / **Windows** `where.exe claude` (`.exe` preferred, npm `.cmd` shims unwrapped to their target) → well-known locations (`~/.local/bin`, `%USERPROFILE%\.local\bin\claude.exe`, Homebrew, WinGet, `~/.claude/local`, `%APPDATA%\npm`, mise shim) → `PATH` (+`PATHEXT`); mise shims are unwrapped with `mise which claude`. Platform/env/fs are injectable (`__tests__/platform.test.mjs`) |
+| `launch.ts` | yes | `shellPath`/`shellArgs` for the sign-in terminal (binary direct; `.cmd` via `%ComSpec% /d /c`; `.js` via `node`) — no shell quoting |
+| `status.ts` | yes | `claude --version` + `claude auth status --json` → `ClaudeStatus`; `spawnSpec()` runs `.cmd` shims through `cmd.exe /d /s /c` and `.js` entry points through `node` (the Agent SDK spawns the path directly, same rule for `.js`) |
 | `labels.ts` | yes | human labels for `PermissionUpdate` suggestions and default permission titles |
 | `translate.ts` | yes | `MessageTranslator`: every `SDKMessage` → `SessionEvent[]` |
 | `sdkClient.ts` | yes | `createSdkSession()` (streaming-input session, canUseTool, hooks) and `runOneShot()` |
-| `history.ts` | yes | `listSessions` / `getSessionTranscript` / `deleteSession` via SDK exports, fallback to `~/.claude/projects/<key>/*.jsonl` |
+| `history.ts` | yes | `listSessions` / `getSessionTranscript` / `deleteSession` via SDK exports, fallback to `<config>/projects/<key>/*.jsonl` where `<key>` = CLI rule: `realpath(cwd)` (NFC on macOS) with `[^a-zA-Z0-9]` → `-`, capped at 200 chars + base-36 hash (`C:\Users\x\p` → `C--Users-x-p`) |
 | `session.ts` | no | `ClaudeSessionImpl`: EventEmitter, `running`, transparent resume, runtime model/effort/mode changes, control calls with timeouts |
 | `bridge.ts` | no | `createClaudeBridge()`: executable + status cache (60 s), session registry, `oneShot`, history |
 
 `scripts/probe-bridge.mjs` bundles the vscode-free files with esbuild and runs one
 session turn plus one one-shot against the real CLI (2 model calls).
+`node --test src/extension/claude/__tests__/platform.test.mjs` exercises the Windows and
+macOS branches of resolution / env / status / history with injected platform values.
 
 ## Session design
 

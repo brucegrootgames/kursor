@@ -180,7 +180,7 @@ async function readRange(fsPath: string, range?: { startLine: number; endLine: n
     const open = vscode.workspace.textDocuments.find((d) => d.uri.fsPath === fsPath);
     const text = open ? open.getText() : Buffer.from(await vscode.workspace.fs.readFile(uri)).toString('utf8');
     if (!range) return truncateText(text);
-    const lines = text.split('\n');
+    const lines = text.split(/\r?\n/);
     const start = Math.max(1, range.startLine);
     const end = Math.min(lines.length, Math.max(start, range.endLine));
     return truncateText(lines.slice(start - 1, end).join('\n'));

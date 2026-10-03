@@ -1,0 +1,83 @@
+# Kursor release: on a v* tag, build the extension once, then one redistributable bundle per
+# platform/arch (product/build-bundle.mjs) on the native runner, and attach everything to a GitHub Release.
+name: release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  vsix:
+    name: extension (dist/kursor.vsix)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run package
+      - uses: actions/upload-artifact@v4
+        with:
+          name: kursor-vsix
+          path: dist/kursor.vsix
+          if-no-files-found: error
+
+  bundles:
+    name: bundles (${{ matrix.os }})
+    needs: vsix
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            targets: 'linux-x64 linux-arm64'
+          - os: macos-latest
+            targets: 'darwin-arm64 darwin-x64'
+          - os: windows-latest
+            targets: 'win32-x64 win32-arm64'
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/download-artifact@v4
+        with:
+          name: kursor-vsix
+          path: dist
+      - name: Build bundles
+        shell: bash
+        run: |
+          for target in ${{ matrix.targets }}; do
+            node product/build-bundle.mjs --platform "${target%-*}" --arch "${target#*-}" --vsix dist/kursor.vsix --out dist/bundles
+          done
+          ls -la dist/bundles
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bundles-${{ matrix.os }}
+          path: |
+            dist/bundles/*.tar.gz
+            dist/bundles/*.zip
+            dist/bundles/*.sha256
+          if-no-files-found: error
+
+  release:
+    name: GitHub Release
+    needs: bundles
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+      - run: find artifacts -type f | sort
+      - uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: |
+            artifacts/kursor-vsix/kursor.vsix
+            artifacts/bundles-*/*

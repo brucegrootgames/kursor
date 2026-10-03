@@ -3,13 +3,17 @@
  *
  * Primary path: the SDK's `listSessions` / `getSessionMessages` / `deleteSession`
  * (they read the local transcript store; no process is spawned).
- * Fallback: read `~/.claude/projects/<cwd with non-alphanumerics → '-'>/<id>.jsonl`
- * directly (same key function as the CLI: `cwd.replace(/[^a-zA-Z0-9]/g, '-')`,
- * honouring `CLAUDE_CONFIG_DIR`). vscode-free.
+ * Fallback: read `~/.claude/projects/<key>/<id>.jsonl` directly, where `<key>` is
+ * derived exactly like the CLI / SDK do it (verified in sdk.mjs 0.3.278):
+ * `realpath(resolve(cwd))`, NFC-normalised on macOS, every non-alphanumeric
+ * character → '-', capped at 200 characters plus a base-36 hash of the full path.
+ * Works for Windows paths too (`C:\Users\x\proj` → `C--Users-x-proj`).
+ * Honours `CLAUDE_CONFIG_DIR`. vscode-free.
  */
-import { promises as fs } from 'node:fs';
+import { promises as fs, realpathSync } from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
+import { expandHome, type Platform } from '../util/platform';
 import type { HistoryEntry } from '../../shared/protocol';
 import type { Logger } from '../util/log';
 import { errorMessage, loadSdk } from './sdk';
@@ -27,16 +31,41 @@ const isDict = (v: unknown): v is Dict => typeof v === 'object' && v !== null &&
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const MAX_TITLE = 120;
 
-export function claudeConfigDir(): string {
-  return process.env.CLAUDE_CONFIG_DIR || path.join(os.homedir(), '.claude');
+const MAX_PROJECT_KEY = 200;
+
+export function claudeConfigDir(env: NodeJS.ProcessEnv = process.env, home: string = os.homedir()): string {
+  const override = env.CLAUDE_CONFIG_DIR?.trim();
+  if (override) return path.resolve(expandHome(override, home));
+  return path.join(home, '.claude');
 }
 
+/** Same string hash as the CLI (`(h << 5) - h + charCode | 0`), rendered in base 36. */
+export function projectKeyHash(s: string): string {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = ((h << 5) - h + s.charCodeAt(i)) | 0;
+  return Math.abs(h).toString(36);
+}
+
+/** Directory name under `<config>/projects` for an already canonical cwd. */
 export function projectKey(cwd: string): string {
-  return cwd.replace(/[^a-zA-Z0-9]/g, '-');
+  const key = cwd.replace(/[^a-zA-Z0-9]/g, '-');
+  if (key.length <= MAX_PROJECT_KEY) return key;
+  return `${key.slice(0, MAX_PROJECT_KEY)}-${projectKeyHash(cwd)}`;
+}
+
+/** What the CLI keys sessions by: absolute, symlinks resolved, NFC on macOS. */
+export function canonicalCwd(cwd: string, platform: Platform = process.platform): string {
+  let p = path.resolve(cwd);
+  try {
+    p = realpathSync(p);
+  } catch {
+    /* keep the resolved path */
+  }
+  return platform === 'darwin' ? p.normalize('NFC') : p;
 }
 
 export function projectDir(cwd: string): string {
-  return path.join(claudeConfigDir(), 'projects', projectKey(cwd));
+  return path.join(claudeConfigDir(), 'projects', projectKey(canonicalCwd(cwd)));
 }
 
 function cleanTitle(text: string): string {
@@ -103,7 +132,7 @@ async function summarizeTranscript(file: string): Promise<RawSummary> {
   }
   let customTitle: string | undefined;
   let aiTitle: string | undefined;
-  for (const line of text.split('\n')) {
+  for (const line of text.split(/\r?\n/)) {
     if (!line) continue;
     let entry: unknown;
     try {
@@ -182,7 +211,7 @@ async function fallbackTranscript(sessionId: string, cwd: string): Promise<Trans
   const file = path.join(projectDir(cwd), `${sessionId}.jsonl`);
   const text = await fs.readFile(file, 'utf8');
   const out: TranscriptMessage[] = [];
-  for (const line of text.split('\n')) {
+  for (const line of text.split(/\r?\n/)) {
     if (!line) continue;
     let entry: unknown;
     try {

@@ -3,8 +3,10 @@
  * and the `.cursorignore` / `.gitignore` open-or-create actions.
  */
 import * as vscode from 'vscode';
+import * as os from 'node:os';
 import * as path from 'node:path';
 import type { WorkspaceInfo } from '../../shared/settingsProtocol';
+import { isInside, samePath } from '../util/platform';
 
 export const CURSORIGNORE_TEMPLATE = `# .cursorignore — files and folders Kursor should leave out of @-mention search and context.
 # Same syntax as .gitignore. Kursor also honours .gitignore automatically.
@@ -31,7 +33,7 @@ export function defaultCwd(): string | undefined {
 }
 
 export function isWorkspaceFolderPath(p: string): boolean {
-  return workspaceFolders().some((f) => f.path === p);
+  return workspaceFolders().some((f) => samePath(f.path, p));
 }
 
 async function fileExists(p: string): Promise<boolean> {
@@ -45,7 +47,7 @@ async function fileExists(p: string): Promise<boolean> {
 
 export async function readWorkspaceInfo(cwd: string | undefined): Promise<WorkspaceInfo> {
   const folders = workspaceFolders();
-  const effectiveCwd = cwd && folders.some((f) => f.path === cwd) ? cwd : defaultCwd();
+  const effectiveCwd = cwd && folders.some((f) => samePath(f.path, cwd)) ? cwd : defaultCwd();
   if (!effectiveCwd) return { folders, cwd: undefined, cursorignore: null, gitignore: null };
   const cursorignorePath = path.join(effectiveCwd, '.cursorignore');
   const gitignorePath = path.join(effectiveCwd, '.gitignore');
@@ -86,8 +88,8 @@ export async function openGitignore(cwd: string): Promise<void> {
 export async function openPathFromPanel(p: string): Promise<void> {
   if (!path.isAbsolute(p)) throw new Error(`Refusing to open a relative path: ${p}`);
   const resolved = path.resolve(p);
-  const allowedRoots = [...workspaceFolders().map((f) => f.path), process.env.HOME ?? ''].filter(Boolean);
-  const inside = allowedRoots.some((root) => resolved === root || resolved.startsWith(root.endsWith(path.sep) ? root : root + path.sep));
+  const allowedRoots = [...workspaceFolders().map((f) => f.path), os.homedir()].filter(Boolean);
+  const inside = allowedRoots.some((root) => isInside(resolved, root));
   if (!inside) throw new Error(`Refusing to open a path outside the workspace: ${p}`);
   const doc = await vscode.workspace.openTextDocument(vscode.Uri.file(resolved));
   await vscode.window.showTextDocument(doc, { preview: false });

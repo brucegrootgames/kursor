@@ -6,8 +6,12 @@
 import * as vscode from 'vscode';
 import * as cp from 'node:child_process';
 import * as fs from 'node:fs';
+import * as os from 'node:os';
 import * as path from 'node:path';
+import type { Readable } from 'node:stream';
 import type { Logger } from '../util/log';
+import { toSlashes } from '../util/platform';
+import { ripgrepCandidates } from './ripgrepCandidates';
 
 export const MAX_FILES = 25_000;
 
@@ -29,16 +33,12 @@ let cachedRg: string | null | undefined;
 
 export function resolveRipgrep(): string | null {
   if (cachedRg !== undefined) return cachedRg;
-  const candidates = [
-    path.join(vscode.env.appRoot, 'node_modules', '@vscode', 'ripgrep', 'bin', 'rg'),
-    path.join(vscode.env.appRoot, 'node_modules.asar.unpacked', '@vscode', 'ripgrep', 'bin', 'rg'),
-    '/usr/bin/rg',
-    '/usr/local/bin/rg',
-    path.join(process.env.HOME ?? '', '.local', 'bin', 'rg'),
-  ];
+  const candidates = ripgrepCandidates({ appRoot: vscode.env.appRoot, platform: process.platform, arch: process.arch, env: process.env, home: os.homedir() });
   for (const c of candidates) {
     try {
+      // X_OK degrades to F_OK on Windows; the candidate list only contains rg.exe there.
       fs.accessSync(c, fs.constants.X_OK);
+      if (!fs.statSync(c).isFile()) continue;
       cachedRg = c;
       return c;
     } catch {
@@ -47,6 +47,12 @@ export function resolveRipgrep(): string | null {
   }
   cachedRg = null;
   return null;
+}
+
+/** `./a/b`, `.\a\b`, `a\b` → `a/b` (what the index and the @-mention popover expect). */
+export function normalizeListedPath(line: string, platform: NodeJS.Platform = process.platform): string {
+  const slashed = toSlashes(line, platform);
+  return slashed.startsWith('./') ? slashed.slice(2) : slashed;
 }
 
 /** List files under `root` (relative paths, '/' separated). */
@@ -66,11 +72,18 @@ export async function listFiles(root: string, log: Logger, signal?: AbortSignal)
     let truncated = false;
     let rest = '';
     let done = false;
-    const child = cp.spawn(rg, args, { cwd: root, stdio: ['ignore', 'pipe', 'pipe'] });
+    let child: cp.ChildProcessByStdio<null, Readable, Readable>;
+    try {
+      child = cp.spawn(rg, args, { cwd: root, stdio: ['ignore', 'pipe', 'pipe'], windowsHide: true });
+    } catch (err) {
+      log.error('ripgrep failed to start', err);
+      resolve({ files, truncated });
+      return;
+    }
     const finish = (): void => {
       if (done) return;
       done = true;
-      if (rest && files.length < MAX_FILES) files.push(rest);
+      if (rest && files.length < MAX_FILES) files.push(normalizeListedPath(rest.replace(/\r$/, '')));
       resolve({ files, truncated });
     };
     child.stdout.setEncoding('utf8');
@@ -79,7 +92,8 @@ export async function listFiles(root: string, log: Logger, signal?: AbortSignal)
       const text = rest + chunk;
       const lines = text.split('\n');
       rest = lines.pop() ?? '';
-      for (const line of lines) {
+      for (const raw of lines) {
+        const line = raw.endsWith('\r') ? raw.slice(0, -1) : raw;
         if (!line) continue;
         if (files.length >= MAX_FILES) {
           truncated = true;
@@ -87,7 +101,7 @@ export async function listFiles(root: string, log: Logger, signal?: AbortSignal)
           finish();
           return;
         }
-        files.push(line.startsWith('./') ? line.slice(2) : line);
+        files.push(normalizeListedPath(line));
       }
     });
     let stderr = '';

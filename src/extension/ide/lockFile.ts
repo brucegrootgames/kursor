@@ -29,7 +29,7 @@ export const LOCK_FILE_SUFFIX = '.lock';
 
 function expandHome(p: string, home: string): string {
   if (p === '~') return home;
-  if (p.startsWith('~/')) return path.join(home, p.slice(2));
+  if (p.startsWith('~/') || (process.platform === 'win32' && p.startsWith('~\\'))) return path.join(home, p.slice(2));
   return p;
 }
 
@@ -114,7 +114,13 @@ export function writeLockFile(dir: string, port: number, payload: LockFilePayloa
   const tmp = path.join(dir, `.${port}.${process.pid}.${Date.now()}.tmp`);
   fs.writeFileSync(tmp, JSON.stringify(payload), { mode: 0o600 });
   try {
-    if (process.platform !== 'win32') fs.chmodSync(tmp, 0o600);
+    if (process.platform !== 'win32') {
+      try {
+        fs.chmodSync(tmp, 0o600);
+      } catch {
+        // best effort (e.g. file systems without POSIX modes)
+      }
+    }
     fs.renameSync(tmp, target);
   } catch (err) {
     try {

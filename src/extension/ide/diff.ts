@@ -11,6 +11,7 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as vscode from 'vscode';
+import { samePath } from '../util/platform';
 import type { EditTracker } from '../services';
 import type { Logger } from '../util/log';
 import { MemoryFileSystemProvider } from './memoryFs';
@@ -121,7 +122,7 @@ export class IdeDiffManager implements vscode.Disposable {
     this.right.createFile(rightUri, args.newFileContents);
 
     // A previous proposal for the same file is superseded (its request resolves DIFF_REJECTED).
-    const closedPrevious = await this.closeTabsWhere((tab) => isOurDiffTab(tab) && tab.input.modified.fsPath === newFilePath);
+    const closedPrevious = await this.closeTabsWhere((tab) => isOurDiffTab(tab) && samePath(tab.input.modified.fsPath, newFilePath));
     if (closedPrevious > 0) await delay(200);
 
     const session: DiffSession = {

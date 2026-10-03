@@ -1,4 +1,4 @@
-// Kursor user keybindings — seeded by product/install.sh only when this file does not exist yet.
+// Kursor user keybindings — seeded by the Kursor installer (product/install.mjs) only when this file does not exist yet.
 //
 // Every Cursor-style shortcut (Ctrl+K inline edit, Ctrl+L / Ctrl+Shift+L add to chat, Ctrl+I toggle chat,
 // Ctrl+Shift+J settings, Tab completions, Ctrl+Enter / Ctrl+Backspace accept / reject, the Ctrl+R chords

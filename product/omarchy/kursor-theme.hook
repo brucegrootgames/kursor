@@ -1,6 +1,6 @@
 #!/bin/bash
 # Omarchy theme-set hook for Kursor.
-# Installed by product/install.sh with `omarchy hook install theme-set product/omarchy/kursor-theme.hook`
+# Installed by product/install.mjs with `omarchy hook install theme-set product/omarchy/kursor-theme.hook`
 # into ~/.config/omarchy/hooks/theme-set.d/; Omarchy runs it after every `omarchy theme set <name>` with the
 # snake-cased theme name as $1 (the argument is informational — the current theme is read from
 # ~/.local/state/omarchy/current/theme like omarchy-theme-set-vscode does).

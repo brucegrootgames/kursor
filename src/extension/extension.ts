@@ -11,6 +11,7 @@ import { registerScm } from './scm';
 import { registerCodeActions } from './actions';
 import { registerSettings } from './settings';
 import { registerIdeServer } from './ide';
+import { terminalLaunchSpec } from './claude/launch';
 
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
   const log = createLogger(context);
@@ -44,10 +45,17 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
       }
     }),
     vscode.commands.registerCommand('kursor.claude.login', async () => {
-      const path = (await bridge.resolveClaudePath()) ?? 'claude';
-      const term = vscode.window.createTerminal({ name: 'Claude Code login' });
+      const claudePath = await bridge.resolveClaudePath();
+      let term: vscode.Terminal;
+      if (claudePath) {
+        // Run the binary as the terminal process: no shell-specific quoting (bash / zsh / PowerShell / cmd).
+        const spec = terminalLaunchSpec(claudePath, ['auth', 'login']);
+        term = vscode.window.createTerminal({ name: 'Claude Code login', shellPath: spec.shellPath, shellArgs: spec.shellArgs });
+      } else {
+        term = vscode.window.createTerminal({ name: 'Claude Code login' });
+        term.sendText('claude auth login', true);
+      }
       term.show();
-      term.sendText(`${JSON.stringify(path)} auth login`, true);
       const sub = vscode.window.onDidCloseTerminal((t) => {
         if (t === term) {
           sub.dispose();

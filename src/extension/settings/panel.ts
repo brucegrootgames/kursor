@@ -7,6 +7,8 @@
  * failures are logged and surfaced as a toast inside the panel.
  */
 import * as vscode from 'vscode';
+import * as os from 'node:os';
+import { tildify as tildifyPath } from '../util/platform';
 import * as path from 'node:path';
 import type { ClaudeStatus } from '../claude/types';
 import type { SettingsDeps } from '../services';
@@ -29,7 +31,6 @@ import { defaultCwd, isWorkspaceFolderPath, openGitignore, openOrCreateCursorign
 
 export const SETTINGS_VIEW_TYPE = 'kursor.settings';
 const SETTINGS_POST_THROTTLE_MS = 50;
-const HOME = process.env.HOME ?? '';
 
 const ABOUT_LINKS: AboutInfo['links'] = [
   { label: 'Claude Code documentation', url: 'https://docs.claude.com/en/docs/claude-code/overview', icon: 'book' },
@@ -446,6 +447,5 @@ function kindOrder(kind: RuleListItem['kind']): number {
 
 /** Render a path with `~` for the home directory (for logs / toasts). */
 export function tildify(p: string): string {
-  if (HOME && (p === HOME || p.startsWith(HOME + path.sep))) return '~' + p.slice(HOME.length);
-  return p;
+  return tildifyPath(p, os.homedir());
 }

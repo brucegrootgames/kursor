@@ -9,7 +9,9 @@
  * and feeds the previous command to the model for refinement.
  */
 import * as vscode from 'vscode';
+import * as os from 'node:os';
 import type { TerminalDeps } from '../services';
+import { tildify } from '../util/platform';
 import { gatherTerminalContext, TerminalContext } from './context';
 import { TERMINAL_SYSTEM_PROMPT, buildTerminalPrompt, sanitizeCommand } from './prompt';
 
@@ -165,9 +167,7 @@ function pickAction(request: string, command: string, ctx: TerminalContext): Pro
 }
 
 function shorten(p: string): string {
-  const home = process.env.HOME;
-  if (home && p.startsWith(home)) return `~${p.slice(home.length)}`;
-  return p;
+  return tildify(p, os.homedir());
 }
 
 function isAbortError(e: unknown): boolean {

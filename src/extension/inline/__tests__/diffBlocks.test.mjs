@@ -192,6 +192,26 @@ test('edit prompt contains region, context and instruction', () => {
   assert.ok(w.prompt.includes('complete new file'));
 });
 
+// ---------- CRLF (Windows documents) ----------
+test('splitLines normalises CRLF and lone CR so blocks never contain \\r', () => {
+  assert.deepEqual(db.splitLines('a\r\nb\r\n'), ['a', 'b', '']);
+  assert.deepEqual(db.splitLines('a\rb'), ['a', 'b']);
+  const plan = db.computeVerticalDiff(db.splitLines('a\r\nb\r\nc'), db.splitLines('a\r\nB\r\nc'));
+  assert.deepEqual(plan.blocks, [{ start: 1, numRed: 1, numGreen: 1, oldLines: ['b'] }]);
+  assert.ok(plan.lines.every((l) => !l.includes('\r')));
+});
+
+test('lineDeltaOfChange counts CRLF insertions as whole lines', () => {
+  assert.equal(db.lineDeltaOfChange(3, 3, 'x\r\ny\r\n'), 2);
+  assert.equal(db.lineDeltaOfChange(3, 5, ''), -2);
+});
+
+test('cleanModelOutput accepts CRLF model output and CRLF originals', () => {
+  const out = pp.cleanModelOutput('```ts\r\n  const a = 1;\r\n  const b = 2;\r\n```\r\n', { originalLines: ['  const a = 0;'], insertSpaces: true, tabSize: 2 });
+  assert.deepEqual(out, ['  const a = 1;', '  const b = 2;']);
+  assert.ok(out.every((l) => !l.includes('\r')));
+});
+
 rmSync(out, { recursive: true, force: true });
 if (process.exitCode) {
   console.log(`${passed} passed, some FAILED`);

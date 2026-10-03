@@ -2,6 +2,7 @@
  * Prompt + output cleanup for terminal command generation.
  */
 import type { TerminalContext } from './context';
+import { shellGuidance } from './shell';
 
 export const TERMINAL_SYSTEM_PROMPT = [
   'You generate shell commands for a developer working in an integrated terminal.',
@@ -9,7 +10,7 @@ export const TERMINAL_SYSTEM_PROMPT = [
   '',
   'Rules:',
   '- Output only the command line: no markdown, no code fences, no prompt symbol, no explanation before or after.',
-  '- Use syntax valid for the given shell and tools available on the given OS (GNU coreutils on Linux, BSD variants on macOS).',
+  '- Use syntax valid for the given shell (PowerShell, cmd.exe or a POSIX shell — the prompt names it) and tools available on the given OS.',
   '- If several steps are required, chain them on one line with && (or a pipeline).',
   '- Prefer safe, non-destructive commands; never add --force/-rf/sudo unless the request explicitly asks for it.',
   '- Quote paths and arguments that contain spaces or special characters.',
@@ -29,6 +30,7 @@ export function buildTerminalPrompt(input: TerminalPromptInput): string {
     `Shell: ${context.shell}`,
     `OS: ${context.os}`,
     `Working directory: ${context.cwd}`,
+    ...shellGuidance(context.shellFamily ?? 'unknown'),
   ];
   if (input.previous) {
     lines.push(
@@ -59,6 +61,7 @@ export function sanitizeCommand(raw: string): string {
   // Inline code / prompt markers.
   const inline = /^`([^`]+)`$/.exec(first);
   if (inline) first = inline[1];
-  first = first.replace(/^(\$|>|#|PS>)\s+/, '');
+  // "$ cmd", "> cmd", "PS> cmd", "PS C:\\Users\\me> cmd", "C:\\proj> cmd"
+  first = first.replace(/^(?:\$|>|#|PS>|PS [A-Za-z]:\\[^>]*>|[A-Za-z]:\\[^>]*>)\s+/, '');
   return first.trim();
 }

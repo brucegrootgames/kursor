@@ -1,5 +1,5 @@
 {
-  // Kursor default user settings — seeded by product/install.sh only when this file does not exist yet.
+  // Kursor default user settings — seeded by the Kursor installer (product/install.mjs) only when this file does not exist yet.
   // Plain VS Code / VSCodium settings; change anything (Ctrl+, opens Settings, Ctrl+Shift+J the Kursor panel).
 
   // Look & feel (Cursor-like layout: custom title bar with command center, activity bar on top,

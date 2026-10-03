@@ -25,13 +25,27 @@ function relPath(fsPath: string): string {
   return vscode.workspace.asRelativePath(fsPath, false).split(path.sep).join('/');
 }
 
+/**
+ * Canonical key for a file: the form `vscode.Uri.fsPath` produces (normalised separators,
+ * lower-case drive letter on Windows). Paths reported by the Claude Code hooks may differ from
+ * the editor's (`C:\Users\…` vs `c:\Users\…`), and the editor-title buttons compare
+ * `resourcePath` against `kursor.pendingEditPaths` as exact strings.
+ */
+function canonical(fsPath: string): string {
+  try {
+    return vscode.Uri.file(path.normalize(fsPath)).fsPath;
+  } catch {
+    return path.normalize(fsPath);
+  }
+}
+
 export function createEditTracker(context: vscode.ExtensionContext, deps: BaseDeps): EditTracker {
   const { log } = deps;
   const files = new Map<string, TrackedFile>();
   const changeEmitter = new vscode.EventEmitter<void>();
   const resolveEmitter = new vscode.EventEmitter<EditResolution>();
   const disposables: vscode.Disposable[] = [resolveEmitter];
-  const lookup = (fsPath: string): TrackedFile | undefined => files.get(fsPath);
+  const lookup = (fsPath: string): TrackedFile | undefined => files.get(canonical(fsPath));
 
   const orig = new OrigContentProvider(lookup);
   disposables.push(orig, vscode.workspace.registerTextDocumentContentProvider(ORIG_SCHEME, orig));
@@ -72,7 +86,10 @@ export function createEditTracker(context: vscode.ExtensionContext, deps: BaseDe
     const saved = context.workspaceState.get<TrackedFile[]>(STORAGE_KEY);
     if (!Array.isArray(saved)) return;
     for (const f of saved) {
-      if (f && typeof f.path === 'string' && typeof f.chatId === 'string') files.set(f.path, { ...f, toolUseIds: Array.isArray(f.toolUseIds) ? f.toolUseIds : [] });
+      if (f && typeof f.path === 'string' && typeof f.chatId === 'string') {
+        const key = canonical(f.path);
+        files.set(key, { ...f, path: key, toolUseIds: Array.isArray(f.toolUseIds) ? f.toolUseIds : [] });
+      }
     }
     if (files.size) log.info(`restored ${files.size} pending agent edit(s)`);
   };
@@ -94,7 +111,8 @@ export function createEditTracker(context: vscode.ExtensionContext, deps: BaseDe
   };
 
   /** Stop tracking a file and tell listeners (chat tool rows) how it was resolved. */
-  const forget = (fsPath: string, status: EditResolution['status']): void => {
+  const forget = (rawPath: string, status: EditResolution['status']): void => {
+    const fsPath = canonical(rawPath);
     if (!files.delete(fsPath)) return;
     void closeReviewTabs(fsPath);
     resolveEmitter.fire({ path: fsPath, status });
@@ -173,16 +191,17 @@ export function createEditTracker(context: vscode.ExtensionContext, deps: BaseDe
   const tracker: EditTracker = {
     recordChange(chatId: string, change: FileChange): void {
       if (change.before === change.after) return;
-      const existing = files.get(change.path);
+      const key = canonical(change.path);
+      const existing = files.get(key);
       if (existing) {
         existing.current = change.after;
         existing.updatedAt = Date.now();
         if (!existing.toolUseIds.includes(change.toolUseId)) existing.toolUseIds.push(change.toolUseId);
         existing.chatId = chatId;
-        if (existing.base !== null && existing.current === existing.base) forget(change.path, 'undone');
+        if (existing.base !== null && existing.current === existing.base) forget(key, 'undone');
       } else {
-        files.set(change.path, {
-          path: change.path,
+        files.set(key, {
+          path: key,
           base: change.before,
           current: change.after,
           chatId,
@@ -201,13 +220,13 @@ export function createEditTracker(context: vscode.ExtensionContext, deps: BaseDe
     },
 
     async keep(fsPath?: string): Promise<void> {
-      if (fsPath) forget(fsPath, 'kept');
+      if (fsPath) forget(canonical(fsPath), 'kept');
       else for (const p of [...files.keys()]) forget(p, 'kept');
       fire();
     },
 
     async undo(fsPath?: string): Promise<void> {
-      const targets = fsPath ? [files.get(fsPath)].filter((f): f is TrackedFile => !!f) : [...files.values()];
+      const targets = fsPath ? [files.get(canonical(fsPath))].filter((f): f is TrackedFile => !!f) : [...files.values()];
       const errors: string[] = [];
       for (const f of targets) {
         try {
@@ -223,7 +242,7 @@ export function createEditTracker(context: vscode.ExtensionContext, deps: BaseDe
 
     async review(fsPath?: string): Promise<void> {
       if (fsPath) {
-        const f = files.get(fsPath);
+        const f = files.get(canonical(fsPath));
         if (!f) {
           void vscode.window.showInformationMessage(`No pending Kursor edits in ${relPath(fsPath)}.`);
           return;
@@ -274,7 +293,8 @@ export function createEditTracker(context: vscode.ExtensionContext, deps: BaseDe
   };
 
   // ---- per-hunk commands ---------------------------------------------------------
-  async function keepHunk(fsPath: string, index: number): Promise<void> {
+  async function keepHunk(rawPath: string, index: number): Promise<void> {
+    const fsPath = canonical(rawPath);
     const f = files.get(fsPath);
     if (!f) return;
     const doc = vscode.workspace.textDocuments.find((d) => d.uri.scheme === 'file' && d.uri.fsPath === fsPath);
@@ -292,7 +312,8 @@ export function createEditTracker(context: vscode.ExtensionContext, deps: BaseDe
     fire();
   }
 
-  async function undoHunk(fsPath: string, index: number): Promise<void> {
+  async function undoHunk(rawPath: string, index: number): Promise<void> {
+    const fsPath = canonical(rawPath);
     const f = files.get(fsPath);
     if (!f) return;
     const uri = vscode.Uri.file(fsPath);
@@ -318,7 +339,7 @@ export function createEditTracker(context: vscode.ExtensionContext, deps: BaseDe
 
   const uriArg = (arg: unknown): string | undefined => {
     if (arg instanceof vscode.Uri) return arg.scheme === 'file' ? arg.fsPath : undefined;
-    if (typeof arg === 'string') return arg;
+    if (typeof arg === 'string') return canonical(arg);
     const ed = vscode.window.activeTextEditor;
     return ed && ed.document.uri.scheme === 'file' ? ed.document.uri.fsPath : undefined;
   };
@@ -368,8 +389,9 @@ export function createEditTracker(context: vscode.ExtensionContext, deps: BaseDe
     vscode.workspace.onDidDeleteFiles((e) => {
       let changed = false;
       for (const uri of e.files) {
+        const deleted = canonical(uri.fsPath);
         for (const p of [...files.keys()]) {
-          if (p === uri.fsPath || p.startsWith(uri.fsPath + path.sep)) {
+          if (p === deleted || p.startsWith(deleted.endsWith(path.sep) ? deleted : deleted + path.sep)) {
             const f = files.get(p);
             if (f && f.base === null) {
               forget(p, 'undone');

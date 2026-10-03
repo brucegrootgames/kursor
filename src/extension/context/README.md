@@ -10,3 +10,13 @@
 | `terminalCapture.ts` | Shell-integration capture: reads every `TerminalShellExecution`, strips ANSI, keeps 64 kB per terminal and the last 8 executions; `lastOutput()`. |
 
 The chat host injects `AppState.commands` into `search()` so the `/` popover lists Claude Code's slash commands.
+
+## Platform notes
+
+- `ripgrep.ts` resolves `rg` through `ripgrepCandidates.ts` (pure, tested): the editor's own
+  `node_modules.asar.unpacked/@vscode/ripgrep-universal/bin/<platform>-<arch>/rg[.exe]` (what
+  VSCodium ≥ 1.13x ships; verified on the installed build), the legacy `@vscode/ripgrep/bin/rg`,
+  then `PATH`, Homebrew / `/usr/bin` on POSIX and scoop / WinGet / Git-for-Windows on Windows.
+  `rg --files` output is normalised to `/`-separated relative paths on every platform, so the
+  @-mention index and `relPath` text never contain backslashes; absolute paths handed to tools
+  stay native.

@@ -1,9 +1,9 @@
 # Kursor
 
-Cursor-style AI coding on Linux: a rebranded [VSCodium](https://vscodium.com) plus the **Kursor** extension — agent chat,
+Cursor-style AI coding: a rebranded [VSCodium](https://vscodium.com) plus the **Kursor** extension — agent chat,
 Ctrl+K inline edits, Tab completions, terminal and commit helpers — all driven by the **Claude Code CLI that is already
-installed and signed in on your machine**. Built for [Omarchy](https://omarchy.org) (Arch Linux + Hyprland, Wayland);
-the editor and extension work on any Linux desktop, the Omarchy bits are optional.
+installed and signed in on your machine**. Runs on Linux, macOS and Windows (x64 and arm64). Built first for
+[Omarchy](https://omarchy.org) (Arch Linux + Hyprland, Wayland); the Omarchy bits are optional extras on Linux.
 
 Kursor is an independent project. It is not affiliated with, endorsed by, or sponsored by Anthropic (Claude, Claude Code)
 or Anysphere (Cursor). See [Compliance and licensing](#compliance-and-licensing).
@@ -32,11 +32,12 @@ GUI flows and please report them.
 
 ## What you get
 
-**The editor** — VSCodium 1.135.06055 (MIT, telemetry-free, Open VSX extension gallery), installed under
-`~/.local/opt/kursor` and rebranded as *Kursor*: its own user data directory (`~/.config/Kursor`), extensions directory
-(`~/.kursor/extensions`), `kursor` command, `kursor://` URL scheme, desktop entry, icons and the **Kursor Dark** colour
-theme (a Cursor-like dark grey theme: `#181818` editor, `#141414` side bars, blue `#3794ff` accent, Dark+ token colours).
-No root, no files outside your home directory.
+**The editor** — VSCodium 1.135.06055 (MIT, telemetry-free, Open VSX extension gallery), installed per user
+(`~/.local/opt/kursor`, `~/Applications/Kursor.app` or `%LOCALAPPDATA%\Programs\Kursor`) and rebranded as *Kursor*: its
+own user data directory, extensions directory (`~/.kursor/extensions`), `kursor` command, `kursor://` URL scheme,
+launcher entry / app bundle / Start Menu shortcut, icons and the **Kursor Dark** colour theme (a Cursor-like dark grey
+theme: `#181818` editor, `#141414` side bars, blue `#3794ff` accent, Dark+ token colours). No root/admin rights, no
+files outside your own account (see [Files and locations](#files-and-locations)).
 
 **The extension** (`dist/kursor.vsix`, installed into the editor by the installer):
 
@@ -55,64 +56,95 @@ No root, no files outside your home directory.
 
 ## Requirements
 
-- Linux x86_64. Tested on Omarchy (Arch + Hyprland). Needed tools: `bash` 4+, `curl`, `tar`, `sha256sum`, `jq`
-  (`sudo pacman -S --needed curl tar coreutils jq`); for the desktop integration `update-desktop-database`,
-  `update-mime-database`, `xdg-mime` (all present on Omarchy).
-- Node.js 20+ and npm, to build the extension package.
+- **Linux** x64/arm64 (tested on Omarchy — Arch + Hyprland; any desktop works), **macOS** 11+ (Apple silicon or Intel), or
+  **Windows 10/11** x64/arm64.
+- **Node.js 18+** — only to run the installer (and to build the extension from source). Kursor itself does not use it.
+  macOS: `brew install node`; Arch/Omarchy: `sudo pacman -S nodejs npm`; Windows: `winget install OpenJS.NodeJS.LTS`;
+  or <https://nodejs.org>.
 - **Claude Code CLI** installed and signed in: `claude --version` and `claude auth status` should work in a terminal
-  (Kursor was built against 2.1.263). Install it from <https://claude.com/claude-code>. Kursor does not need an API key.
-- About 1 GB of disk under `~/.local/opt/kursor` plus the 240 MB download cached in `~/.cache/kursor`.
+  (Kursor was built against 2.1.263). Install instructions per OS: <https://code.claude.com/docs/en/setup>. Kursor does
+  not need an API key.
+- To build the extension from source: npm (comes with Node). Prebuilt bundles need nothing else.
+- About 1 GB of disk for the editor plus the ~240 MB VSCodium download, cached in `~/.cache/kursor`,
+  `~/Library/Caches/kursor` or `%LOCALAPPDATA%\kursor\cache`.
 
 ## Install
+
+**From a release bundle** (no build step): download `Kursor-<platform>-<arch>-<version>.tar.gz` / `.zip` from the
+[Releases](../../releases) page, unpack it, and run the installer inside:
+
+```
+Linux / macOS:   bash install.sh
+Windows:         install.cmd            (PowerShell; double-click works too)
+```
+
+**From source:**
 
 ```bash
 git clone <this repository> kursor && cd kursor
 npm install
 npm run package            # typecheck + production build + dist/kursor.vsix
-bash product/install.sh    # everything below your home directory, no sudo
+
+bash product/install.sh    # Linux / macOS
+product\install.cmd        # Windows (PowerShell)
 ```
 
-The installer, step by step:
+`install.sh` / `install.cmd` only locate Node.js (PATH, mise, nvm, fnm, volta, Homebrew, the usual Windows locations)
+and start `product/install.mjs`, a dependency-free Node script that does the same thing on every OS:
 
-1. Downloads `VSCodium-linux-x64-1.135.06055.tar.gz` into `~/.cache/kursor` (skipped when already there) and verifies
-   its SHA-256 against the pinned value (other versions via `KURSOR_VSCODIUM_VERSION` are verified against VSCodium's
-   published `.sha256`).
-2. Extracts it into a staging directory, rebrands it (binary `codium` → `kursor`, `bin/codium` → `bin/kursor`,
-   `product.json`: `nameShort`/`nameLong` *Kursor*, `applicationName` *kursor*, `dataFolderName` `.kursor`,
-   `urlProtocol` *kursor*; `package.json`: `name` *Kursor*, `desktopName` `kursor.desktop`; window icon), and swaps it
-   into `~/.local/opt/kursor`. Version, commit, checksums and the Open VSX gallery are left exactly as shipped.
-3. Writes the `~/.local/bin/kursor` launcher (reads `~/.config/kursor-flags.conf`, adds `--ozone-platform=wayland
-   --enable-wayland-ime` under a Wayland session), the desktop entries (`kursor.desktop`, `kursor-url-handler.desktop`),
-   hicolor icons, and a MIME type for `*.code-workspace` / `kursor://` links.
-4. Seeds, **only when missing**, `~/.kursor/argv.json` (`password-store: gnome-libsecret`),
-   `~/.config/Kursor/User/settings.json` (Cursor-like defaults, see [Settings](#settings)) and `keybindings.json`.
-5. Installs the extension headlessly: `~/.local/opt/kursor/bin/kursor --install-extension dist/kursor.vsix --force`.
-6. On Omarchy: installs the theme hook (`omarchy hook install theme-set product/omarchy/kursor-theme.hook`) and runs it
-   once, then prints the next steps and runs `kursor --version` as a self-check.
+1. Downloads the matching VSCodium 1.135.06055 archive into the cache (skipped when already there) and verifies its
+   SHA-256 (pinned for Linux x64, VSCodium's published `.sha256` for the others; other versions via
+   `KURSOR_VSCODIUM_VERSION`). A release bundle already contains the rebranded editor, so this step is skipped.
+2. Extracts it into a staging directory next to the install location, rebrands it (`product.json`: `nameShort`/`nameLong`
+   *Kursor*, `applicationName` *kursor*, `dataFolderName` `.kursor`, `urlProtocol` *kursor*; `package.json`: `name`
+   *Kursor*, `desktopName` `kursor.desktop`; binaries and CLI launchers renamed `codium` → `kursor`; icons generated from
+   `product/icons/*.png` — ICNS on macOS, ICO on Windows; `Info.plist` identity on macOS), and swaps it into place
+   atomically. Version, commit, checksums and the Open VSX gallery are left exactly as shipped.
+3. Platform integration — **Linux:** `~/.local/bin/kursor` launcher (reads `~/.config/kursor-flags.conf`, adds
+   `--ozone-platform=wayland --enable-wayland-ime` under Wayland), desktop entries, hicolor icons, MIME type for
+   `*.code-workspace` / `kursor://`. **macOS:** ad-hoc `codesign` of the modified bundle, quarantine attribute removed,
+   `~/.local/bin/kursor` → `Kursor.app/Contents/Resources/app/bin/kursor`. **Windows:** Start Menu shortcut, `<install>\bin`
+   added to your user `Path`, `kursor://` protocol under `HKCU\Software\Classes`.
+4. Seeds, **only when missing**, `argv.json`, `settings.json` (Cursor-like defaults, see [Settings](#settings)) and
+   `keybindings.json` in the per-OS locations below.
+5. Installs the extension headlessly: `<cli> --install-extension kursor.vsix --force`.
+6. Linux with Omarchy: installs the theme hook (`omarchy hook install theme-set product/omarchy/kursor-theme.hook`) and
+   runs it once. Then verifies (`kursor --version` must print `1.135.06055`) and prints the next steps for your OS.
 
-Options:
+Options (`--help` lists them all):
 
 | Flag | Effect |
 |---|---|
-| `--vsix <path>` | extension package to install (default `dist/kursor.vsix`) |
+| `--vsix <path>` | extension package to install (default `dist/kursor.vsix`, or `kursor.vsix` inside a bundle) |
 | `--no-extension` | editor only |
 | `--with-icons` | also install `PKief.material-icon-theme` from Open VSX and select it |
-| `--no-omarchy` | skip the Omarchy theme hook (Kursor keeps the Kursor Dark theme) |
-| `--hypr-bind` | append `SUPER + SHIFT + K` → Kursor to `~/.config/hypr/bindings.lua`, then `hyprctl reload && hyprctl configerrors` |
-| `--default-editor` | make Kursor Omarchy's default editor (`~/.local/state/omarchy/defaults/editor`) |
-| `--force-download` | ignore the cached tarball |
+| `--force-download` | ignore the cached archive |
+| `--dry-run` | print the plan, change nothing |
+| `--yes` | no questions |
+| `--no-omarchy` | Linux: skip the Omarchy theme hook (Kursor keeps the Kursor Dark theme) |
+| `--hypr-bind` | Linux: append `SUPER + SHIFT + K` → Kursor to `~/.config/hypr/bindings.lua`, then `hyprctl reload && hyprctl configerrors` |
+| `--default-editor` | Linux: make Kursor Omarchy's default editor (`~/.local/state/omarchy/defaults/editor`) |
+| `--system` | macOS/Windows: install for all users (`/Applications`, `%ProgramFiles%` — needs write access/elevation; never uses sudo itself) |
+| `--desktop-shortcut`, `--no-protocol` | Windows: also create a desktop shortcut / skip the `kursor://` registration |
+| `--stage-only <dir> --platform <p> --arch <a>` | download + verify + rebrand for any platform into `<dir>` without installing (what `npm run bundle` uses) |
 
-Environment: `KURSOR_CACHE_DIR` (default `~/.cache/kursor`), `KURSOR_VSCODIUM_VERSION`, `KURSOR_REPO_URL` (an https URL
-of this repo; when set, Help › Report Issue / Documentation point at it, otherwise those menu entries are hidden).
+Environment: `KURSOR_CACHE_DIR` (download cache), `KURSOR_VSCODIUM_VERSION`, `KURSOR_REPO_URL` (an https URL of this
+repo; when set, Help › Report Issue / Documentation point at it, otherwise those menu entries are hidden).
 
-**Upgrading** is re-running the same three commands. The installer replaces `~/.local/opt/kursor` and refreshes the
-launcher, desktop entries and icons, but never overwrites `settings.json`, `keybindings.json`, `argv.json` or the flags
-file once they exist. Extensions live outside the application directory and survive upgrades.
+**Upgrading** is re-running the installer. It replaces the application directory and refreshes launchers, shortcuts and
+icons, but never overwrites `settings.json`, `keybindings.json`, `argv.json` or the flags file once they exist. Extensions
+live outside the application directory and survive upgrades.
+
+**macOS note.** The bundle is re-signed ad hoc after the rebrand (it cannot carry VSCodium's signature any more). If
+macOS refuses the first launch, right-click `Kursor.app` → *Open* once. **Windows note.** `Kursor.exe` keeps VSCodium's
+embedded icon unless [`rcedit`](https://github.com/electron/rcedit) is on `PATH` during install; shortcuts and the
+Start Menu use `Kursor.ico` either way.
 
 ## First launch and sign-in
 
-Run `kursor` (or `kursor .` in a project), pick *Kursor* in your launcher, or use `SUPER + SHIFT + K` if you installed
-with `--hypr-bind`. The chat pane opens in the secondary side bar on the right (Ctrl+I toggles it).
+Run `kursor` (or `kursor .` in a project), pick *Kursor* in your launcher / Launchpad / Start Menu, or use
+`SUPER + SHIFT + K` on Omarchy if you installed with `--hypr-bind` (Windows: open a new terminal first so the `Path`
+change is picked up). The chat pane opens in the secondary side bar on the right (Ctrl+I toggles it).
 
 Kursor checks the CLI on start (`claude --version` and `claude auth status --json`). If the CLI is missing or not signed
 in, the chat shows a notice with **Sign in** (runs `claude auth login` in a terminal inside Kursor) and **Set path**
@@ -239,6 +271,7 @@ A longer walkthrough of each feature is in `docs/USAGE.md` in the source reposit
   `SUPER + SHIFT + N`, `omarchy-launch-editor` and GUI apps that honour Omarchy's `$EDITOR` open Kursor. Omarchy's
   `$EDITOR` wrapper returns immediately for GUI editors; for git use `git config --global core.editor "kursor --wait"`.
 - The installer never uses sudo and writes nothing under `/usr`; `uninstall.sh` removes all of the above again.
+  (macOS and Windows have no Omarchy steps; `--hypr-bind`, `--default-editor` and `--no-omarchy` are ignored there.)
 
 ## Settings
 
@@ -270,17 +303,17 @@ Cursor-style shortcuts.
 
 ## Files and locations
 
-| Path | Purpose |
-|---|---|
-| `~/.local/opt/kursor/` | the rebranded VSCodium (`kursor` binary, `bin/kursor` CLI, `resources/app/…`, `kursor-install.json` marker) |
-| `~/.local/bin/kursor` | launcher wrapper (flags file + Wayland flags; CLI calls such as `--version` pass through without GUI flags) |
-| `~/.config/kursor-flags.conf` | extra Chromium/Electron flags, one per line |
-| `~/.config/Kursor/` | user data: `User/settings.json`, `User/keybindings.json`, window state, workspace storage, logs |
-| `~/.kursor/extensions/`, `~/.kursor/argv.json` | installed extensions and permanent arguments |
-| `~/.cache/kursor/` | the verified VSCodium download |
-| `~/.local/share/applications/kursor*.desktop`, `~/.local/share/icons/hicolor/*/apps/kursor.*`, `~/.local/share/mime/packages/kursor.xml` | desktop integration |
-| `~/.config/omarchy/hooks/theme-set.d/kursor-theme.hook` | Omarchy theme hook |
-| `~/.claude/ide/<port>.lock` | IDE-bridge lock file written while Kursor runs (removed on exit) |
+| What | Linux | macOS | Windows |
+|---|---|---|---|
+| the rebranded editor | `~/.local/opt/kursor/` (`kursor` binary, `bin/kursor` CLI, `kursor-install.json` marker) | `~/Applications/Kursor.app` (`--system`: `/Applications`) | `%LOCALAPPDATA%\Programs\Kursor\` (`--system`: `%ProgramFiles%\Kursor`) |
+| `kursor` command | `~/.local/bin/kursor` wrapper (flags file + Wayland flags; CLI calls such as `--version` pass through without GUI flags) | `~/.local/bin/kursor` → `Kursor.app/Contents/Resources/app/bin/kursor` (`--system` also `/usr/local/bin/kursor`) | `<install>\bin\kursor.cmd`, `<install>\bin` on the user `Path` |
+| user data: `User/settings.json`, `User/keybindings.json`, state, logs | `~/.config/Kursor/` | `~/Library/Application Support/Kursor/` | `%APPDATA%\Kursor\` |
+| extensions and `argv.json` | `~/.kursor/` | `~/.kursor/` | `%USERPROFILE%\.kursor\` |
+| download cache | `~/.cache/kursor/` | `~/Library/Caches/kursor/` | `%LOCALAPPDATA%\kursor\cache\` |
+| extra Chromium/Electron flags | `~/.config/kursor-flags.conf` | — (use `argv.json`) | — (use `argv.json`) |
+| desktop integration | `~/.local/share/applications/kursor*.desktop`, `~/.local/share/icons/hicolor/*/apps/kursor.*`, `~/.local/share/mime/packages/kursor.xml` | LaunchServices picks the bundle up from `~/Applications` | `Start Menu\Programs\Kursor.lnk`, `HKCU\Software\Classes\kursor` |
+| Omarchy theme hook | `~/.config/omarchy/hooks/theme-set.d/kursor-theme.hook` | — | — |
+| IDE-bridge lock file (while Kursor runs) | `~/.claude/ide/<port>.lock` | same | `%USERPROFILE%\.claude\ide\<port>.lock` |
 
 ## Troubleshooting
 
@@ -289,8 +322,9 @@ terminal. If they work there but not in Kursor, the binary is probably only on t
 `kursor.claude.path` to the output of `command -v claude` (for mise: `mise which claude`). Check *Kursor: Show Logs*
 (Output panel, "Kursor") for the resolution steps. Sign in with `claude auth login`; Kursor stores nothing itself.
 
-**`kursor: command not found`.** `~/.local/bin` is not on your `PATH` in that shell (Omarchy adds it for login shells and
-the session). Use `~/.local/bin/kursor` or add the directory to `PATH`.
+**`kursor: command not found`.** Linux/macOS: `~/.local/bin` is not on your `PATH` in that shell (Omarchy adds it for
+login shells and the session; on macOS add `export PATH="$HOME/.local/bin:$PATH"` to your shell profile, or install
+with `--system` for `/usr/local/bin`). Windows: open a new terminal — the `Path` change only applies to new ones.
 
 **Wayland.** The launcher adds `--ozone-platform=wayland --enable-wayland-ime` when `WAYLAND_DISPLAY` is set. For
 XWayland instead, put `--ozone-platform=x11` in `~/.config/kursor-flags.conf`; for scaling issues try
@@ -300,7 +334,7 @@ Chromium behaviours, not Kursor's.
 **"Installation appears to be corrupt [Unsupported]".** VS Code shows this when the files listed in
 `product.json` → `checksums` were modified. The installer only changes `product.json`/`package.json`/the icon, so a
 fresh install never shows it. If it appears, something else (an extension that patches core files, a manual edit)
-touched `~/.local/opt/kursor/resources/app/out`; re-run `bash product/install.sh` to restore a clean tree.
+touched the editor's `resources/app/out`; re-run the installer to restore a clean tree.
 
 **"The SUID sandbox helper binary was found, but is not configured correctly".** Chromium wants either a root-owned
 `chrome-sandbox` or unprivileged user namespaces. Arch/Omarchy kernels have user namespaces enabled, so this should not
@@ -317,6 +351,9 @@ there; a `.vsix` can always be installed with `kursor --install-extension file.v
 when the CLI is not ready). Markdown and plaintext are disabled by default (`kursor.tab.disabledLanguages`). Completions
 wait for a typing pause (`kursor.tab.debounceMs`); Alt+\ triggers one immediately.
 
+**macOS: "Kursor.app is damaged / cannot be opened".** The app is signed ad hoc by the installer; right-click → *Open*
+once, or re-run `bash product/install.sh` (it runs `codesign --force --deep --sign -` and clears the quarantine attribute).
+
 **Kursor and VS Code side by side.** Both can run; they share nothing except your `claude` login. Only one editor's IDE
 bridge is used by a given `claude` terminal (the one it was started from, via `CLAUDE_CODE_SSE_PORT`).
 
@@ -325,14 +362,18 @@ bridge is used by a given `claude` terminal (the one it was started from, via `C
 
 ## Uninstall
 
-```bash
-bash product/uninstall.sh            # removes the app, launcher, desktop files, icons, MIME, hook, keybinding;
-                                     # asks before deleting ~/.config/Kursor, ~/.kursor and the flags file
-bash product/uninstall.sh --yes --purge   # non-interactive, also deletes the cached download
-bash product/uninstall.sh --keep-config   # keep settings/extensions without being asked
+```
+Linux / macOS:   bash product/uninstall.sh            # or bash uninstall.sh inside a bundle
+Windows:         product\uninstall.cmd
+
+    --yes            delete settings, extensions and flags too, without asking
+    --keep-config    keep them without being asked
+    --purge          also delete the cached VSCodium download
 ```
 
-Your `claude` installation and login are never touched.
+Removes the application, the `kursor` command, desktop entries / shortcuts / `Path` entry / `kursor://` registration, the
+Omarchy hook, keybinding and default-editor setting, then asks (TTY only; kept otherwise) about the user data directory,
+`~/.kursor` and the flags file. Your `claude` installation and login are never touched.
 
 ## Development
 
@@ -342,13 +383,18 @@ npm run typecheck      # extension host + both webviews
 npm run build          # dist/extension.js, dist/webview.js, dist/settings.js (+ codicons)
 npm run watch
 npm run package        # production build + dist/kursor.vsix
-npm run install:kursor # = bash product/install.sh
+npm run install:kursor # = node product/install.mjs  (bash product/install.sh / product\install.cmd do the same)
+npm run uninstall:kursor
+npm run bundle -- --platform linux --arch x64   # redistributable Kursor-<platform>-<arch>-<version>.tar.gz|zip in dist/bundles
 ```
+
+Releases: pushing a `v*` tag runs `.github/workflows/release.yml`, which builds the vsix on Ubuntu, then the six bundles
+(linux/darwin/win32 × x64/arm64) on the native runners and attaches them to a GitHub Release.
 
 Repository layout: `src/extension/**` (extension host: `claude/` bridge, `chat/`, `context/`, `edits/`, `inline/`, `tab/`,
 `terminal/`, `scm/`, `actions/`, `settings/`, `ide/`, `rules/`), `src/webview/**` (chat UI, React), `src/webview-settings/**`
 (settings panel), `src/shared/**` (host ↔ webview protocols), `media/` (icons, `themes/kursor-dark.json`), `product/`
-(installer, uninstaller, Omarchy hook, seeded defaults — see `product/README.md`), `docs/ARCHITECTURE.md` (design brief
+(cross-platform installer, uninstaller, bundle builder, Omarchy hook, seeded defaults — see `product/README.md`), `docs/ARCHITECTURE.md` (design brief
 and module contracts), `docs/USAGE.md` (user guide). Each extension module has a `README.md` describing its design.
 
 To develop the extension against the installed editor: `kursor --extensionDevelopmentPath=$PWD` after `npm run build`.
