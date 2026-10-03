@@ -39,9 +39,10 @@ GUI flows and please report them.
 **The editor** — VSCodium 1.135.06055 (MIT, telemetry-free, Open VSX extension gallery), installed per user
 (`~/.local/opt/kursor`, `~/Applications/Kursor.app` or `%LOCALAPPDATA%\Programs\Kursor`) and rebranded as *Kursor*: its
 own user data directory, extensions directory (`~/.kursor/extensions`), `kursor` command, `kursor://` URL scheme,
-launcher entry / app bundle / Start Menu shortcut, icons and the **Kursor Dark** colour theme (a Cursor-like dark grey
-theme: `#181818` editor, `#141414` side bars, blue `#3794ff` accent, Dark+ token colours). No root/admin rights, no
-files outside your own account (see [Files and locations](#files-and-locations)).
+launcher entry / app bundle / Start Menu shortcut, icons and the **Kursor Dark** colour theme, built from the brand
+palette (ink window, surface panels, violet accent, orchid cursor, its own syntax colours; see
+[docs/BRAND.md](docs/BRAND.md#in-the-app)). No root/admin rights, no files outside your own account (see
+[Files and locations](#files-and-locations)).
 
 **The extension** (`dist/kursor.vsix`, installed into the editor by the installer):
 
@@ -415,5 +416,5 @@ To develop the extension against the installed editor: `kursor --extensionDevelo
   marketplace. The rebrand changes names, identifiers and the icon only; Microsoft's marketplace is not used (Open VSX is).
   VS Code's Product Icons / branding are not included.
 - Material Icon Theme (`--with-icons`) is by Philipp Kief, MIT, installed from Open VSX.
-- This repository (extension, installer, theme, docs) is MIT licensed; see `package.json`. The Kursor Dark theme's token
-  colours are derived from VS Code's default dark themes (MIT).
+- This repository (extension, installer, theme, docs) is MIT licensed; see `package.json`. The Kursor Dark theme is
+  generated from the Kursor palette by `scripts/build-theme.mjs`.

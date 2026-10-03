@@ -919,6 +919,7 @@
     "build": "node esbuild.mjs",
     "build:prod": "node esbuild.mjs --production",
     "watch": "node esbuild.mjs --watch",
+    "theme": "node scripts/build-theme.mjs",
     "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p src/webview/tsconfig.json && tsc --noEmit -p src/webview-settings/tsconfig.json",
     "package": "npm run typecheck && npm run build:prod && vsce package --no-dependencies --skip-license --no-rewrite-relative-links -o dist/kursor.vsix",
     "install:kursor": "node product/install.mjs",

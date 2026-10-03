@@ -343,9 +343,8 @@ See vscodium.md §8 and omarchy.md §8 (recipes are verified against this machin
 - `product/uninstall.sh` reversing everything (asks before deleting `~/.config/Kursor`).
 - `product/omarchy/kursor-theme.hook` (from omarchy.md §8.3, parametrised with `~/.config/Kursor/User/settings.json`
   and `~/.kursor/extensions`).
-- `media/themes/kursor-dark.json`: a "Cursor Dark"-like VS Code color theme (dark grey `#181818` editor, `#141414`
-  side bars, subtle borders, blue accent `#3794ff`-ish, readable token colors; base it on Default Dark Modern's token
-  colors — write a complete, valid theme with `colors` + `tokenColors`).
+- `media/themes/kursor-dark.json`: generated from the brand palette by `scripts/build-theme.mjs` (`npm run theme`) —
+  ink window, surface cards for VS Code's Modern UI, violet accent, orchid cursor, its own syntax palette.
 - `README.md`: what Kursor is, install (`npm install && npm run package && bash product/install.sh`), features with
   keybindings table, how Claude Code is used (own binary/login, no credentials stored), Omarchy integration, settings,
   troubleshooting (sign-in, path, Wayland), uninstall, compliance note.

@@ -39,9 +39,23 @@ never set the mark on the violet gradient.
 
 Accent gradient: `linear-gradient(135deg, #7C8CFF, #B57CFF)`. Use it for the hero headline highlight, the
 primary call-to-action and the cursor bar only. Interactive accent on dark surfaces: `#7C8CFF`, hover `#8F9BFF`,
-text on accent `#0F1014`. Inside the editor, the Kursor Dark theme applies these as `focusBorder`, links,
-buttons, badges, the activity-bar indicator and the editor cursor; the chat UI itself inherits whatever theme
-the user runs and only hardcodes the logo.
+text on accent `#0F1014`.
+
+## In the app
+
+**Kursor Dark** (`media/themes/kursor-dark.json`) is generated from the tokens above by
+`scripts/build-theme.mjs` (`npm run theme`; CI fails when the committed file is stale). Every colour in it is a
+token, a lightness step of one, or one of them with alpha:
+
+- Ink is the window: title bar, status bar and the gaps between panels. Surface is the editor, side bars and panel,
+  shown as floating cards with Border hairlines. Fields (inputs, dropdowns, code wells) are inset in Ink; menus,
+  widgets and the command palette float one step above Surface (`#222631`).
+- Text is `#CDD1DC`, headings and selected items Mist, secondary text Muted, line numbers `#5F6578`.
+- Violet marks focus, links, buttons, badges, selections and the activity indicator. Orchid is the editor and
+  terminal cursor. Keep / Undo / Warn are diffs and git status (added / removed / modified), errors and warnings.
+- Syntax uses the accents lightened for text, plus one sky hue for types: keywords `#C99BFF`, functions `#8F9BFF`,
+  strings `#8BDFA9`, numbers and constants `#EEBA6D`, types `#79CFEC`, tags `#FF8F9A`, comments `#6E768A` italic.
+  Variables, properties and parameters stay in the text colour, operators and punctuation in Muted.
 
 ## Type
 
@@ -64,6 +78,7 @@ cp brand/kursor-mark.svg media/kursor.svg site/img/kursor.svg
 cp brand/kursor-mark-mono.svg media/kursor-activity.svg
 cp product/icons/kursor-32.png site/img/favicon.png && cp product/icons/kursor-512.png site/img/apple-touch-icon.png
 rsvg-convert -w 1200 -h 630 brand/social-card.svg -o site/img/social-card.png
+npm run theme   # media/themes/kursor-dark.json from scripts/build-theme.mjs
 ```
 
 The installer builds `.icns` and `.ico` from `product/icons/*.png` on the fly.

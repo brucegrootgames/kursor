@@ -1,4 +1,4 @@
-# Continuous integration: typecheck, build, unit tests, smoke-load and packaging on every push and PR.
+# Continuous integration: typecheck, theme freshness, build, unit tests, smoke-load and packaging on every push and PR.
 name: ci
 
 on:
@@ -17,6 +17,7 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run typecheck
+      - run: node scripts/build-theme.mjs --check
       - run: npm run build
       - run: node --test src/extension/*/__tests__/*.test.mjs src/webview/__tests__/*.test.mjs
       - run: node scripts/smoke-load.mjs

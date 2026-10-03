@@ -7,6 +7,9 @@ builds the extension and one bundle per platform from that tag.
 
 ## [Unreleased]
 
+### Changed
+- Kursor Dark is rebuilt from the brand palette by `scripts/build-theme.mjs`: ink window, surface panels, violet accent, orchid cursor, Keep / Undo / Warn for diffs and git status, and Kursor's own syntax colours instead of VS Code's Dark+.
+
 ## [0.1.1] - 2026-10-03
 
 ### Added
