@@ -10,289 +10,620 @@
 <meta property="og:image" content="https://brucegrootgames.github.io/kursor/img/social-card.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="icon" type="image/svg+xml" href="img/kursor.svg">
 <link rel="icon" type="image/png" href="img/favicon.png">
 <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
 <meta name="theme-color" content="#0f1014">
-<meta name="twitter:card" content="summary_large_image">
+<meta name="color-scheme" content="dark">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
+  /* Kursor website. Tokens from docs/BRAND.md: Ink page, Surface panels, Border hairlines, Mist and Muted text.
+     The violet → orchid gradient appears only on the headline highlight, the primary action and the cursor bar. */
   :root {
-    --bg: #0f1014; --bg-2: #15171d; --card: #1a1d25; --border: #262a35; --fg: #eef0f6; --muted: #8b91a1;
-    --accent: #7c8cff; --accent-2: #b57cff; --green: #5fd38a; --red: #ff6b78; --mono: "JetBrains Mono", ui-monospace, "Cascadia Code", Menlo, Consolas, monospace;
-    --sans: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu, "Helvetica Neue", Arial, sans-serif;
+    --ink: #0f1014; --panel: #14161c; --surface: #1a1d25; --raised: #222631; --border: #262a35; --border-strong: #353a48;
+    --mist: #eef0f6; --text: #cdd1dc; --muted: #8b91a1; --faint: #5f6578;
+    --violet: #7c8cff; --violet-hover: #8f9bff; --orchid: #b57cff; --keep: #5fd38a; --undo: #ff6b78; --warn: #e8a33d;
+    --gradient: linear-gradient(135deg, #7c8cff, #b57cff);
+    --bar: linear-gradient(180deg, #8f9bff, #b57cff);
+    --sans: Inter, "Adwaita Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu, sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, "Cascadia Code", Menlo, Consolas, monospace;
+    --radius: 16px;
+    color-scheme: dark;
   }
   * { box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
-  body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.6 var(--sans); }
-  a { color: var(--accent); text-decoration: none; }
-  a:hover { text-decoration: underline; }
-  code, kbd, pre { font-family: var(--mono); }
-  kbd { display: inline-block; padding: 1px 6px; border: 1px solid var(--border); border-bottom-width: 2px; border-radius: 5px; background: var(--bg-2); font-size: 12px; color: var(--fg); }
-  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
-  header { position: sticky; top: 0; z-index: 10; backdrop-filter: blur(10px); background: rgba(15,16,20,.8); border-bottom: 1px solid var(--border); }
-  nav { display: flex; align-items: center; gap: 22px; height: 58px; }
-  nav .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 18px; color: var(--fg); }
-  nav .brand img { width: 28px; height: 28px; border-radius: 7px; }
-  nav .links { margin-left: auto; display: flex; gap: 18px; font-size: 14px; }
-  nav .links a { color: var(--muted); }
-  nav .links a:hover { color: var(--fg); text-decoration: none; }
-  .btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 9px; border: 1px solid var(--border); background: var(--card); color: var(--fg); font-weight: 600; font-size: 14px; }
-  .btn:hover { text-decoration: none; border-color: #3a4052; }
-  .btn.primary { background: linear-gradient(135deg, var(--accent), var(--accent-2)); border: none; color: #0b0c10; }
-  .hero { padding: 72px 0 40px; display: grid; grid-template-columns: 1.05fr 1fr; gap: 40px; align-items: center; }
-  .hero h1 { font-size: 46px; line-height: 1.1; margin: 0 0 16px; letter-spacing: -0.02em; }
-  .hero h1 span { background: linear-gradient(135deg, var(--accent), var(--accent-2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
-  .hero p.lead { font-size: 18px; color: var(--muted); margin: 0 0 24px; }
-  .hero .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 18px; }
-  .hero .fine { font-size: 13px; color: var(--muted); }
-  .shot { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: var(--bg-2); box-shadow: 0 30px 80px rgba(0,0,0,.45); }
-  .shot img { display: block; width: 100%; height: auto; }
-  section { padding: 56px 0; border-top: 1px solid var(--border); }
-  section h2 { font-size: 30px; margin: 0 0 8px; letter-spacing: -0.01em; }
-  section p.sub { color: var(--muted); margin: 0 0 28px; max-width: 720px; }
-  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-  .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
-  .card h3 { margin: 0 0 6px; font-size: 16px; display: flex; align-items: center; gap: 8px; }
-  .card p { margin: 0; color: var(--muted); font-size: 14px; }
-  .card .k { margin-top: 10px; }
-  .feature-row { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; align-items: center; margin-top: 36px; }
-  .feature-row.flip > .text { order: 2; }
-  .feature-row h3 { font-size: 22px; margin: 0 0 8px; }
-  .feature-row p { color: var(--muted); margin: 0 0 10px; }
-  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .tabs { display: flex; gap: 6px; margin-bottom: 12px; }
-  .tabs button { background: var(--bg-2); border: 1px solid var(--border); color: var(--muted); padding: 7px 14px; border-radius: 8px; cursor: pointer; font: 600 13px var(--sans); }
-  .tabs button[aria-selected="true"] { color: var(--fg); border-color: var(--accent); }
-  .panel { display: none; }
-  .panel[data-active] { display: block; }
-  pre { margin: 0 0 12px; padding: 14px 16px; background: #0a0b0e; border: 1px solid var(--border); border-radius: 10px; overflow-x: auto; font-size: 13.5px; line-height: 1.55; }
-  pre .c { color: var(--muted); }
-  ol.steps { margin: 0; padding-left: 20px; color: var(--muted); font-size: 14.5px; }
-  ol.steps li { margin: 6px 0; }
-  ol.steps strong { color: var(--fg); }
-  table { width: 100%; border-collapse: collapse; font-size: 14px; }
-  th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
-  th { color: var(--muted); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; }
-  td.k { white-space: nowrap; }
-  .note { background: linear-gradient(180deg, rgba(124,140,255,.08), rgba(181,124,255,.04)); border: 1px solid #2e3350; border-radius: 12px; padding: 18px 20px; font-size: 14.5px; color: #c9cde0; }
-  .note strong { color: var(--fg); }
-  details { border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; margin-bottom: 8px; background: var(--card); }
-  summary { cursor: pointer; font-weight: 600; }
-  details p { color: var(--muted); font-size: 14.5px; margin: 8px 0 0; }
-  .swatches { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin: 18px 0; }
-  .swatch { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; background: var(--card); font-size: 12px; }
-  .swatch i { display: block; height: 54px; }
-  .swatch span { display: block; padding: 7px 10px; color: var(--muted); }
-  .swatch b { color: var(--fg); display: block; font-weight: 600; }
-  .assets { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-  .asset { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; text-align: center; font-size: 13px; color: var(--muted); }
-  .asset .box { height: 110px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; border-radius: 8px; background: var(--bg); }
-  .asset .box.light { background: #eef0f6; color: #0f1014; }
-  .asset img, .asset svg { max-height: 88px; }
-  .asset a { display: block; margin-top: 4px; }
-  @media (max-width: 860px) { .swatches { grid-template-columns: repeat(2, 1fr); } .assets { grid-template-columns: 1fr 1fr; } }
-  footer { border-top: 1px solid var(--border); padding: 32px 0 48px; color: var(--muted); font-size: 13px; }
-  footer .row { display: flex; flex-wrap: wrap; gap: 18px; justify-content: space-between; }
-  @media (max-width: 860px) {
-    .hero { grid-template-columns: 1fr; padding-top: 44px; }
-    .hero h1 { font-size: 36px; }
-    .grid, .feature-row, .pair { grid-template-columns: 1fr; }
-    .feature-row.flip > .text { order: 0; }
-    nav .links a:not(.btn) { display: none; }
+  html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--ink); color: var(--text); font: 16px/1.65 var(--sans); -webkit-font-smoothing: antialiased; }
+  h1, h2, h3 { color: var(--mist); letter-spacing: -0.02em; text-wrap: balance; }
+  a { color: var(--violet); text-decoration: none; }
+  a:hover { text-decoration: underline; text-underline-offset: 3px; }
+  ::selection { background: rgba(124, 140, 255, 0.35); color: var(--mist); }
+  :focus-visible { outline: 2px solid var(--violet); outline-offset: 3px; border-radius: 6px; }
+  img { max-width: 100%; }
+  code, pre { font-family: var(--mono); }
+  code { font-size: 0.88em; color: var(--mist); background: var(--raised); border-radius: 5px; padding: 0.12em 0.38em; white-space: nowrap; }
+  pre code { font-size: inherit; color: inherit; background: none; border-radius: 0; padding: 0; white-space: pre; }
+  kbd {
+    display: inline-flex; align-items: center; justify-content: center; min-width: 22px; height: 22px; padding: 0 6px;
+    font: 500 12px/1 var(--sans); color: var(--mist); background: var(--raised); border: 1px solid var(--border-strong);
+    border-bottom-width: 2px; border-radius: 6px; vertical-align: 0.08em;
+  }
+  .combo { display: inline-flex; gap: 3px; vertical-align: middle; }
+  .combo kbd { vertical-align: 0; }
+  .wrap { width: min(1160px, calc(100% - 48px)); margin-inline: auto; }
+  .skip { position: absolute; left: 12px; top: -48px; z-index: 100; padding: 8px 14px; border-radius: 8px; background: var(--mist); color: var(--ink); font-weight: 600; }
+  .skip:focus { top: 12px; }
+  section[id] { scroll-margin-top: 84px; }
+
+  /* the cursor bar: the one coloured element */
+  .caret { display: inline-block; width: 0.075em; height: 0.8em; margin-left: 0.09em; border-radius: 0.04em; background: var(--bar); vertical-align: -0.04em; animation: blink 1.1s ease-in-out infinite; }
+  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.15; } }
+  .hl { background: var(--gradient); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+  /* buttons */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 9px; height: 46px; padding: 0 20px; border-radius: 11px;
+    font: 600 15px/1 var(--sans); color: var(--mist); background: var(--surface); border: 1px solid var(--border-strong);
+    transition: background 0.15s, border-color 0.15s, filter 0.15s;
+  }
+  .btn:hover { text-decoration: none; background: var(--raised); border-color: #474d60; }
+  .btn svg { width: 17px; height: 17px; flex: 0 0 auto; }
+  .btn-primary { color: var(--ink); background: var(--gradient); border: 0; }
+  .btn-primary:hover { background: var(--gradient); filter: brightness(1.07); }
+  .btn-small { height: 36px; padding: 0 14px; font-size: 14px; border-radius: 9px; }
+
+  /* nav */
+  .nav { position: sticky; top: 0; z-index: 50; background: rgba(15, 16, 20, 0.74); backdrop-filter: saturate(140%) blur(14px); -webkit-backdrop-filter: saturate(140%) blur(14px); border-bottom: 1px solid rgba(38, 42, 53, 0.85); }
+  .nav-row { display: flex; align-items: center; gap: 32px; height: 64px; }
+  .brand { display: inline-flex; align-items: center; gap: 10px; color: var(--mist); font-weight: 700; font-size: 18px; letter-spacing: -0.02em; }
+  .brand:hover { text-decoration: none; }
+  .brand img { width: 28px; height: 28px; display: block; }
+  .links { display: flex; gap: 26px; font-size: 14.5px; }
+  .links a { color: var(--muted); }
+  .links a:hover { color: var(--mist); text-decoration: none; }
+  .nav-actions { margin-left: auto; display: flex; gap: 10px; }
+
+  /* hero */
+  .hero { position: relative; padding: 92px 0 0; }
+  .hero::before {
+    content: ""; position: absolute; inset: 0 0 auto; height: 820px; pointer-events: none;
+    background-image: radial-gradient(rgba(139, 145, 161, 0.2) 1px, transparent 1.3px); background-size: 24px 24px;
+    -webkit-mask-image: radial-gradient(ellipse 70% 62% at 50% 0%, #000 35%, transparent 100%); mask-image: radial-gradient(ellipse 70% 62% at 50% 0%, #000 35%, transparent 100%);
+  }
+  .hero-copy { position: relative; display: flex; flex-direction: column; align-items: center; text-align: center; }
+  .pill { display: inline-flex; align-items: center; gap: 10px; height: 32px; padding: 0 14px 0 12px; border: 1px solid var(--border-strong); border-radius: 999px; background: rgba(26, 29, 37, 0.75); color: var(--text); font-size: 13.5px; font-weight: 500; }
+  .pill:hover { text-decoration: none; border-color: #474d60; }
+  .pill i { width: 3px; height: 14px; border-radius: 2px; background: var(--bar); }
+  .pill span { color: var(--muted); }
+  .hero h1 { font-size: clamp(40px, 6.6vw, 78px); line-height: 1.03; margin: 26px 0 24px; font-weight: 700; }
+  .lead { max-width: 660px; margin: 0 0 32px; font-size: clamp(17px, 1.5vw, 19px); color: var(--muted); }
+  .lead kbd { font-size: 12.5px; }
+  .actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+  .fine { margin: 20px 0 0; font-size: 13.5px; color: var(--faint); }
+  .hero-shot { position: relative; margin-top: 68px; }
+  .frame { margin: 0; overflow: hidden; border: 1px solid var(--border-strong); border-radius: 18px; background: var(--surface); box-shadow: 0 46px 90px -44px rgba(0, 0, 0, 0.95), 0 18px 36px -20px rgba(0, 0, 0, 0.6); }
+  .frame img { display: block; width: 100%; height: auto; }
+
+  /* at a glance */
+  .facts { margin-top: 72px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border: 1px solid var(--border); border-radius: var(--radius); background: var(--panel); }
+  .fact { padding: 24px 26px; }
+  .fact + .fact { border-left: 1px solid var(--border); }
+  .fact b { display: block; color: var(--mist); font-size: 15.5px; font-weight: 600; margin-bottom: 3px; }
+  .fact span { display: block; color: var(--muted); font-size: 14px; line-height: 1.5; }
+
+  /* sections */
+  .section { padding-top: 128px; }
+  .section-head { max-width: 740px; margin-bottom: 48px; }
+  .eyebrow { display: inline-flex; align-items: center; gap: 10px; margin: 0 0 16px; color: var(--muted); font-size: 14px; font-weight: 600; letter-spacing: 0.01em; }
+  .eyebrow::before { content: ""; width: 3px; height: 15px; border-radius: 2px; background: var(--bar); }
+  h2 { font-size: clamp(32px, 3.8vw, 46px); line-height: 1.08; margin: 0 0 16px; font-weight: 700; }
+  .sub { margin: 0; font-size: 17.5px; color: var(--muted); }
+
+  /* showcases: a panel with text and a screenshot that bleeds off its edge */
+  .showcase { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); overflow: hidden; border: 1px solid var(--border); border-radius: 22px; background: var(--panel); }
+  .showcase + .showcase { margin-top: 24px; }
+  .showcase-text { align-self: center; padding: 52px 44px 52px 48px; }
+  .showcase-text h3 { font-size: clamp(24px, 2.4vw, 30px); line-height: 1.15; margin: 0 0 14px; }
+  .showcase-text p { margin: 0 0 18px; color: var(--muted); }
+  .showcase-media { align-self: end; padding-top: 48px; min-width: 0; }
+  .showcase-media .frame { border-right: 0; border-bottom: 0; border-radius: 14px 0 0 0; box-shadow: -40px -30px 90px -50px rgba(0, 0, 0, 0.95); }
+  .showcase.flip { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); }
+  .showcase.flip .showcase-text { order: 2; padding: 52px 48px 52px 44px; }
+  .duo { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; align-items: end; padding: 48px 0 0 48px; }
+  .duo .frame { border-bottom: 0; border-radius: 14px 14px 0 0; box-shadow: 0 -30px 80px -50px rgba(0, 0, 0, 0.95); }
+  .keys { display: flex; flex-wrap: wrap; gap: 10px 18px; margin: 0; padding: 0; list-style: none; font-size: 13.5px; color: var(--muted); }
+  .keys li { display: inline-flex; align-items: center; gap: 8px; }
+
+  /* feature cards */
+  .cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 24px; }
+  .card { padding: 28px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--panel); }
+  .card h3 { font-size: 17.5px; margin: 0 0 8px; }
+  .card p { margin: 0; color: var(--muted); font-size: 14.5px; line-height: 1.6; }
+  .card .keys { margin-top: 16px; font-size: 13px; }
+  .icon { display: grid; place-items: center; width: 38px; height: 38px; margin-bottom: 20px; border: 1px solid var(--border-strong); border-radius: 10px; background: var(--surface); color: var(--mist); }
+  .icon svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* how it works */
+  .steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin: 0; padding: 0; list-style: none; }
+  .step { padding: 30px 28px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--panel); }
+  .step-n { display: block; margin-bottom: 18px; font: 500 13px var(--mono); color: var(--faint); }
+  .step h3 { font-size: 19px; margin: 0 0 10px; }
+  .step p { margin: 0; color: var(--muted); font-size: 15px; }
+  .notice { margin: 20px 0 0; padding: 22px 26px; border: 1px solid var(--border); border-radius: var(--radius); color: var(--muted); font-size: 14.5px; }
+  .notice strong { color: var(--mist); }
+
+  /* install */
+  .install { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 56px; align-items: start; }
+  .install .section-head { margin-bottom: 0; }
+  .prereq { margin: 28px 0 0; padding: 0; list-style: none; display: grid; gap: 12px; }
+  .prereq li { display: flex; gap: 12px; color: var(--text); font-size: 15px; }
+  .prereq li::before { content: ""; flex: 0 0 auto; width: 18px; height: 18px; margin-top: 3px; border-radius: 50%; border: 1px solid var(--border-strong); background: var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 18'%3E%3Cpath d='M5.2 9.3l2.4 2.3 5.2-5.2' fill='none' stroke='%235fd38a' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 18px no-repeat; }
+  .install-note { margin: 24px 0 0; font-size: 14px; color: var(--muted); }
+  .terminal { overflow: hidden; border: 1px solid var(--border-strong); border-radius: var(--radius); background: #0b0c10; box-shadow: 0 40px 100px -50px rgba(0, 0, 0, 0.9); }
+  .terminal-bar { display: flex; align-items: center; gap: 6px; padding: 10px 10px 10px 12px; border-bottom: 1px solid var(--border); background: var(--panel); }
+  .tab { height: 32px; padding: 0 14px; border: 1px solid transparent; border-radius: 8px; background: none; color: var(--muted); font: 600 13.5px var(--sans); cursor: pointer; }
+  .tab:hover { color: var(--mist); }
+  .tab[aria-selected="true"] { color: var(--mist); background: var(--raised); border-color: var(--border-strong); }
+  .copy { margin-left: auto; display: inline-flex; align-items: center; gap: 7px; height: 32px; padding: 0 12px; border: 1px solid var(--border-strong); border-radius: 8px; background: var(--surface); color: var(--text); font: 500 13px var(--sans); cursor: pointer; }
+  .copy:hover { color: var(--mist); border-color: #474d60; }
+  .copy svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+  .copy[data-done] { color: var(--keep); }
+  .panel { padding: 22px 24px 24px; }
+  .panel pre { margin: 0; overflow-x: auto; font-size: 13.5px; line-height: 1.75; color: var(--mist); font-variant-ligatures: none; }
+  .panel pre .c { color: var(--faint); }
+  .panel ol { margin: 20px 0 0; padding: 18px 0 0 18px; border-top: 1px solid var(--border); color: var(--muted); font-size: 14px; }
+  .panel li { margin: 5px 0; }
+  .panel li strong { color: var(--text); font-weight: 600; }
+
+  /* shortcuts */
+  .kb { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: start; }
+  .kb-group { padding: 10px 26px 14px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--panel); }
+  .kb-group h3 { margin: 14px 0 6px; font-size: 13.5px; font-weight: 600; letter-spacing: 0.01em; color: var(--muted); }
+  .kb-group dl { margin: 0; }
+  .kb-row { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 11px 0; border-top: 1px solid var(--border); }
+  .kb-row dt { color: var(--text); font-size: 15px; }
+  .kb-row dd { margin: 0; display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 6px; color: var(--faint); font-size: 13px; text-align: right; }
+  .kb-note { margin: 18px 0 0; color: var(--muted); font-size: 14px; }
+
+  /* brand */
+  .assets { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+  .asset { padding: 14px 14px 18px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--panel); font-size: 14px; color: var(--muted); }
+  .asset .box { display: flex; align-items: center; justify-content: center; height: 132px; margin-bottom: 14px; border-radius: 10px; background: var(--ink); color: var(--mist); }
+  .asset .box.light { background: var(--mist); color: var(--ink); }
+  .asset b { display: block; color: var(--mist); font-weight: 600; }
+  .asset .dl { display: flex; gap: 14px; margin-top: 6px; font-size: 13.5px; }
+  .palette { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px; margin-top: 16px; }
+  .swatch { overflow: hidden; border: 1px solid var(--border); border-radius: 14px; background: var(--panel); font-size: 13px; }
+  .swatch i { display: block; height: 64px; border-bottom: 1px solid var(--border); }
+  .swatch div { padding: 11px 14px 13px; color: var(--muted); line-height: 1.45; }
+  .swatch b { display: block; color: var(--mist); font-weight: 600; font-size: 14px; }
+  .swatch code { background: none; padding: 0; font-size: 12.5px; color: var(--text); }
+  .brand-foot { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; margin-top: 16px; }
+  .spec { padding: 22px 26px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--panel); }
+  .spec .aa { margin: 0 0 6px; color: var(--mist); font-size: 38px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; }
+  .spec .aa.mono { font: 500 30px/1.25 var(--mono); letter-spacing: 0; }
+  .spec p { margin: 0; color: var(--muted); font-size: 14px; }
+  .gradient-strip { height: 10px; margin-top: 10px; border-radius: 6px; background: var(--gradient); }
+
+  /* faq */
+  .faq { max-width: 860px; }
+  .faq details { border-top: 1px solid var(--border); }
+  .faq details:last-child { border-bottom: 1px solid var(--border); }
+  .faq summary { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 22px 2px; cursor: pointer; list-style: none; color: var(--mist); font-size: 17px; font-weight: 600; }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after { content: ""; flex: 0 0 auto; width: 12px; height: 12px; background: linear-gradient(var(--muted), var(--muted)) center / 12px 1.6px no-repeat, linear-gradient(var(--muted), var(--muted)) center / 1.6px 12px no-repeat; transition: transform 0.2s; }
+  .faq details[open] summary::after { transform: rotate(45deg); }
+  .faq details p { margin: -6px 0 22px; padding-right: 40px; color: var(--muted); font-size: 15.5px; }
+
+  /* closing call to action */
+  .cta { position: relative; overflow: hidden; margin-top: 128px; padding: 84px 32px; border: 1px solid var(--border); border-radius: 26px; background: var(--panel); text-align: center; }
+  .cta::before {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background-image: radial-gradient(rgba(139, 145, 161, 0.16) 1px, transparent 1.3px); background-size: 24px 24px;
+    -webkit-mask-image: radial-gradient(ellipse 60% 70% at 50% 50%, #000 20%, transparent 100%); mask-image: radial-gradient(ellipse 60% 70% at 50% 50%, #000 20%, transparent 100%);
+  }
+  .cta > * { position: relative; }
+  .cta h2 { font-size: clamp(32px, 4.4vw, 54px); margin-bottom: 14px; }
+  .cta p { margin: 0 auto 32px; max-width: 560px; color: var(--muted); font-size: 17.5px; }
+
+  /* footer */
+  .footer { margin-top: 112px; padding: 40px 0 56px; border-top: 1px solid var(--border); color: var(--muted); font-size: 14px; }
+  .footer-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 18px 32px; }
+  .footer .brand { font-size: 16px; }
+  .footer .brand img { width: 24px; height: 24px; }
+  .footer-links { display: flex; flex-wrap: wrap; gap: 8px 22px; }
+  .footer-links a { color: var(--muted); }
+  .footer-links a:hover { color: var(--mist); }
+  .footer-legal { margin-top: 22px; color: var(--faint); font-size: 13px; }
+  .footer-legal a { color: var(--muted); }
+
+  @media (max-width: 980px) {
+    .links { display: none; }
+    .showcase, .showcase.flip { grid-template-columns: minmax(0, 1fr); }
+    .showcase.flip .showcase-text { order: 0; }
+    .showcase-text, .showcase.flip .showcase-text { padding: 36px 32px 0; }
+    .showcase-media { padding: 32px 0 0 32px; }
+    .duo { padding: 32px 32px 0; }
+    .cards, .steps { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+    .install { grid-template-columns: minmax(0, 1fr); gap: 36px; }
+    .assets { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .palette { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+  @media (max-width: 680px) {
+    .wrap { width: calc(100% - 32px); }
+    .nav-actions .btn-install { display: none; }
+    .hero { padding-top: 56px; }
+    .hero-shot { margin-top: 44px; }
+    .frame { border-radius: 12px; }
+    .facts { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+    .fact:nth-child(3) { border-left: 0; }
+    .fact:nth-child(n + 3) { border-top: 1px solid var(--border); }
+    .section { padding-top: 96px; }
+    .showcase-text, .showcase.flip .showcase-text { padding: 28px 22px 0; }
+    .showcase-media { padding: 26px 0 0 22px; }
+    .duo { gap: 10px; padding: 26px 22px 0; }
+    .cards, .steps, .kb, .brand-foot { grid-template-columns: minmax(0, 1fr); }
+    .palette { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .kb-group { padding: 6px 18px 10px; }
+    .kb-row { flex-direction: column; align-items: flex-start; gap: 8px; }
+    .kb-row dd { justify-content: flex-start; text-align: left; }
+    .cta { margin-top: 96px; padding: 56px 22px; }
+    .faq details p { padding-right: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .caret { animation: none; }
+    .faq summary::after, .btn { transition: none; }
   }
 </style>
 </head>
 <body>
-<header>
-  <div class="wrap">
-    <nav>
-      <a class="brand" href="#"><img src="img/kursor.svg" alt=""> Kursor</a>
-      <div class="links">
-        <a href="#features">Features</a>
-        <a href="#how">How it works</a>
-        <a href="#install">Install</a>
-        <a href="#shortcuts">Shortcuts</a>
-        <a href="#faq">FAQ</a>
-        <a href="#brand">Brand</a>
-        <a class="btn" href="https://github.com/brucegrootgames/kursor">GitHub</a>
-      </div>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="nav">
+  <div class="wrap nav-row">
+    <a class="brand" href="#top"><img src="img/kursor.svg" alt="" width="28" height="28">Kursor</a>
+    <nav class="links" aria-label="Sections">
+      <a href="#features">Features</a>
+      <a href="#how">How it works</a>
+      <a href="#install">Install</a>
+      <a href="#shortcuts">Shortcuts</a>
+      <a href="#faq">FAQ</a>
+      <a href="#brand">Brand</a>
     </nav>
+    <div class="nav-actions">
+      <a class="btn btn-small btn-install" href="#install">Install</a>
+      <a class="btn btn-small" href="https://github.com/brucegrootgames/kursor"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0a8 8 0 0 0-2.53 15.59c.4.07.55-.17.55-.38v-1.33c-2.23.48-2.7-1.07-2.7-1.07-.36-.92-.89-1.17-.89-1.17-.73-.5.06-.49.06-.49.8.06 1.23.83 1.23.83.71 1.22 1.87.87 2.33.66.07-.52.28-.87.5-1.07-1.78-.2-3.65-.89-3.65-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48v2.2c0 .21.15.46.55.38A8 8 0 0 0 8 0z"/></svg>GitHub</a>
+    </div>
   </div>
 </header>
 
-<main class="wrap">
-  <div class="hero">
-    <div>
-      <h1>The Cursor experience,<br>on <span>your own Claude Code</span>.</h1>
+<main id="main">
+  <section class="hero" id="top">
+    <div class="wrap hero-copy">
+      <a class="pill" href="https://github.com/brucegrootgames/kursor/releases/latest"><i></i>Open source<span>·</span>Linux, macOS, Windows</a>
+      <h1>The Cursor experience,<br> on <span class="hl">your own Claude Code</span><span class="caret" aria-hidden="true"></span></h1>
       <p class="lead">Kursor is an open-source, Cursor-style AI editor built on VS Code (VSCodium). Agent chat, <kbd>Ctrl</kbd>+<kbd>K</kbd> inline edits and Tab completions, all powered by the Claude Code CLI already installed and signed in on your machine. No new account, no API keys, no middleman.</p>
       <div class="actions">
-        <a class="btn primary" href="#install">Install for Linux, macOS, Windows</a>
+        <a class="btn btn-primary" href="#install">Install for Linux, macOS, Windows</a>
         <a class="btn" href="https://github.com/brucegrootgames/kursor/releases/latest">Download a release</a>
       </div>
       <p class="fine">MIT licensed. Usage runs on your own Claude plan. Not affiliated with Anthropic or Anysphere (Cursor).</p>
     </div>
-    <div class="shot"><img src="img/overview.png" alt="Kursor: editor with the agent chat in the right side bar showing Read, Search, Edit and Run tool rows, an edited file with Review / Undo / Keep, test output and the review bar" width="1600" height="1387"></div>
-  </div>
-
-  <section id="features">
-    <h2>Everything you reach for in Cursor</h2>
-    <p class="sub">The same muscle memory, the same panes, the same review flow. Kursor's extension reimplements the Cursor UI on top of the Claude Code agent loop.</p>
-    <div class="grid">
-      <div class="card"><h3>Agent chat</h3><p>Agent, Ask and Plan modes in the secondary side bar. Streaming replies, tool rows for Read / Search / Run / Edit, @-mentions for files, folders, problems, terminal and git, slash commands, image attachments.</p><p class="k"><kbd>Ctrl</kbd>+<kbd>I</kbd> toggle · <kbd>Ctrl</kbd>+<kbd>L</kbd> add selection</p></div>
-      <div class="card"><h3>Review every edit</h3><p>Agent edits land in your files with Keep / Undo / Review per file and per hunk, a review bar for the whole turn, and checkpoints to restore files to the state before any message.</p><p class="k"><kbd>Ctrl</kbd>+<kbd>Enter</kbd> keep all · <kbd>Ctrl</kbd>+<kbd>⇧</kbd>+<kbd>⌫</kbd> undo all</p></div>
-      <div class="card"><h3>Ctrl+K inline edit</h3><p>Describe a change over a selection; Kursor shows a red/green diff in place with Accept / Reject per block. Quick question, whole-file edit and send-to-chat from the same prompt.</p><p class="k"><kbd>Ctrl</kbd>+<kbd>K</kbd> · <kbd>Ctrl</kbd>+<kbd>Enter</kbd> / <kbd>Ctrl</kbd>+<kbd>⌫</kbd></p></div>
-      <div class="card"><h3>Tab completions</h3><p>Ghost-text completions from a fast model, debounced so they stay cheap. Toggle, snooze or disable per language from the status bar.</p><p class="k"><kbd>Tab</kbd> accept · <kbd>Alt</kbd>+<kbd>\</kbd> trigger</p></div>
-      <div class="card"><h3>Terminal and commits</h3><p><kbd>Ctrl</kbd>+<kbd>K</kbd> in the terminal turns a sentence into a command (Run / Insert / Edit). The sparkle in Source Control writes a commit message from your staged diff.</p></div>
-      <div class="card"><h3>Permissions you control</h3><p>Shell commands stop at a Run / Skip / Always-allow card, exactly like Cursor's terminal approvals. Edits auto-apply or ask, per your setting. Plan mode shows a plan with Build / Reject.</p></div>
-      <div class="card"><h3>Rules</h3><p>Reads <code>.cursor/rules/*.mdc</code> (always, auto-attached, agent-requested, manual), <code>.cursorrules</code>, <code>AGENTS.md</code> and your User Rules; <code>CLAUDE.md</code> keeps working through Claude Code itself.</p></div>
-      <div class="card"><h3>Fix in Chat</h3><p>Lightbulb actions on diagnostics and selections: Fix in Chat, Add to Chat, Explain, Edit with Kursor. Terminal context menu: add selection, debug last command.</p></div>
-      <div class="card"><h3>Omarchy-native on Linux</h3><p>Follows your Omarchy theme automatically, registers in the launcher, optional <kbd>SUPER</kbd>+<kbd>⇧</kbd>+<kbd>K</kbd> binding and default-editor hookup. Plain Linux, macOS and Windows get the native integration too.</p></div>
+    <div class="wrap hero-shot">
+      <figure class="frame"><img src="img/overview.png" alt="Kursor: editor with the agent chat in the right side bar showing Read, Search, Edit and Run tool rows, an edited file with Review / Undo / Keep, test output and the review bar" width="1600" height="1387" fetchpriority="high"></figure>
     </div>
-
-    <div class="feature-row">
-      <div class="text">
-        <h3>Inline edits that stay in your editor</h3>
-        <p>Select code, press <kbd>Ctrl</kbd>+<kbd>K</kbd>, type what you want. The result is rendered as an in-place vertical diff: removed lines in red, new lines in green, with Accept and Reject lenses on every block. Nothing is written until you accept, and <kbd>Ctrl</kbd>+<kbd>Z</kbd> rejects everything.</p>
-      </div>
-      <div class="shot"><img src="img/inline-edit.png" alt="Ctrl+K inline edit: removed lines in red and new lines in green, including a JSDoc block, with Accept and Reject lenses on each block" width="1496" height="1046"></div>
-    </div>
-    <div class="feature-row flip">
-      <div class="text">
-        <h3>Approve commands, review edits</h3>
-        <p>When the agent wants to run something that isn't read-only, you get a card with the exact command, a one-line explanation and Run / Skip / Always allow. File edits show up as rows with +/− counts and Review, Undo and Keep buttons, and a review bar tracks the whole turn.</p>
-      </div>
-      <div class="pair">
-        <div class="shot"><img src="img/permission.png" alt="Permission card for npm run lint -- --fix with Run, Skip and Always allow, above the review bar and the composer" width="794" height="1028"></div>
-        <div class="shot"><img src="img/review.png" alt="Chat transcript with Read and Search rows, an Edited row showing +9 −1 with Review, Undo and Keep, and the test run output" width="794" height="780"></div>
+    <div class="wrap">
+      <div class="facts">
+        <div class="fact"><b>Your own Claude Code</b><span>Runs the <code>claude</code> you installed, unmodified</span></div>
+        <div class="fact"><b>No API keys</b><span>Uses your existing Claude login and plan</span></div>
+        <div class="fact"><b>No telemetry</b><span>The extension has no server and no analytics</span></div>
+        <div class="fact"><b>MIT licensed</b><span>VSCodium and Open VSX underneath</span></div>
       </div>
     </div>
   </section>
 
-  <section id="how">
-    <h2>How it works</h2>
-    <p class="sub">Kursor is two pieces: a rebranded VSCodium build and a VS Code extension. The extension never talks to Anthropic directly.</p>
-    <div class="grid">
-      <div class="card"><h3>1 · Your Claude Code</h3><p>Kursor finds the <code>claude</code> binary you already installed (mise, npm, Homebrew, the native installer) and spawns it unmodified with the Claude Agent SDK's streaming protocol. It signs in with <em>its</em> login; Kursor never reads, stores or forwards credentials.</p></div>
-      <div class="card"><h3>2 · The editor</h3><p>A stock VSCodium release, renamed to Kursor with its own icon, data folders and <code>kursor://</code> scheme. Open VSX for extensions. The Kursor extension adds the chat pane, inline edits, completions and the Cursor keymap.</p></div>
-      <div class="card"><h3>3 · Your machine, your plan</h3><p>Every chat turn, inline edit and completion is a Claude Code call under your own Pro, Max, Team or Console account, at normal Claude Code rates. Nothing leaves your machine except what Claude Code itself sends.</p></div>
+  <section class="section" id="features">
+    <div class="wrap">
+      <header class="section-head">
+        <p class="eyebrow">Features</p>
+        <h2>Everything you reach for in Cursor</h2>
+        <p class="sub">The same muscle memory, the same panes, the same review flow. Kursor's extension reimplements the Cursor UI on top of the Claude Code agent loop.</p>
+      </header>
+
+      <article class="showcase">
+        <div class="showcase-text">
+          <h3>Inline edits that stay in your editor</h3>
+          <p>Select code, press <kbd>Ctrl</kbd>+<kbd>K</kbd>, type what you want. The result is rendered as an in-place vertical diff: removed lines in red, new lines in green, with Accept and Reject lenses on every block. Nothing is written until you accept, and <kbd>Ctrl</kbd>+<kbd>Z</kbd> rejects everything. Quick question, whole-file edit and send-to-chat work from the same prompt.</p>
+          <ul class="keys">
+            <li><span class="combo"><kbd>Ctrl</kbd><kbd>K</kbd></span> edit</li>
+            <li><span class="combo"><kbd>Ctrl</kbd><kbd>Enter</kbd></span> accept</li>
+            <li><span class="combo"><kbd>Ctrl</kbd><kbd>⌫</kbd></span> reject</li>
+          </ul>
+        </div>
+        <div class="showcase-media">
+          <figure class="frame"><img src="img/inline-edit.png" alt="Ctrl+K inline edit: removed lines in red and new lines in green, including a JSDoc block, with Accept and Reject lenses on each block" width="1496" height="1046" loading="lazy" decoding="async"></figure>
+        </div>
+      </article>
+
+      <article class="showcase flip">
+        <div class="showcase-text">
+          <h3>Approve commands, review edits</h3>
+          <p>When the agent wants to run something that isn't read-only, you get a card with the exact command, a one-line explanation and Run / Skip / Always allow. File edits show up as rows with +/− counts and Review, Undo and Keep, per file and per hunk; a review bar tracks the whole turn, and checkpoints restore files to the state before any message. Plan mode shows a plan with Build / Reject.</p>
+          <ul class="keys">
+            <li><span class="combo"><kbd>Ctrl</kbd><kbd>Enter</kbd></span> keep all</li>
+            <li><span class="combo"><kbd>Ctrl</kbd><kbd>⇧</kbd><kbd>⌫</kbd></span> undo all</li>
+          </ul>
+        </div>
+        <div class="duo">
+          <figure class="frame"><img src="img/permission.png" alt="Permission card for npm run lint -- --fix with Run, Skip and Always allow, above the review bar and the composer" width="794" height="1028" loading="lazy" decoding="async"></figure>
+          <figure class="frame"><img src="img/review.png" alt="Chat transcript with Read and Search rows, an Edited row showing +9 −1 with Review, Undo and Keep, and the test run output" width="794" height="780" loading="lazy" decoding="async"></figure>
+        </div>
+      </article>
+
+      <div class="cards">
+        <div class="card">
+          <span class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6.5A2.5 2.5 0 0 1 7.5 4h9A2.5 2.5 0 0 1 19 6.5v6.5a2.5 2.5 0 0 1-2.5 2.5h-5.3L7 19.5v-4H7.5A2.5 2.5 0 0 1 5 13z"/><path d="M9 9.3h6M9 12.3h3.5"/></svg></span>
+          <h3>Agent chat</h3>
+          <p>Agent, Ask and Plan modes in the secondary side bar. Streaming replies, tool rows for Read / Search / Run / Edit, @-mentions for files, folders, problems, terminal and git, slash commands, image attachments.</p>
+          <ul class="keys"><li><span class="combo"><kbd>Ctrl</kbd><kbd>I</kbd></span> toggle</li><li><span class="combo"><kbd>Ctrl</kbd><kbd>L</kbd></span> add selection</li></ul>
+        </div>
+        <div class="card">
+          <span class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h11M11.5 8l4 4-4 4M19.5 6.5v11"/></svg></span>
+          <h3>Tab completions</h3>
+          <p>Ghost-text completions from a fast model, debounced so they stay cheap. Toggle, snooze or disable per language from the status bar.</p>
+          <ul class="keys"><li><kbd>Tab</kbd> accept</li><li><span class="combo"><kbd>Alt</kbd><kbd>\</kbd></span> trigger</li></ul>
+        </div>
+        <div class="card">
+          <span class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="15" rx="2.5"/><path d="M7.5 9.5l3 2.5-3 2.5M12.5 15h4"/></svg></span>
+          <h3>Terminal and commits</h3>
+          <p><kbd>Ctrl</kbd>+<kbd>K</kbd> in the terminal turns a sentence into a command (Run / Insert / Edit). The sparkle in Source Control writes a commit message from your staged diff.</p>
+        </div>
+        <div class="card">
+          <span class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3.5h7l4 4V19a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 6 19V5a1.5 1.5 0 0 1 1-1.5z"/><path d="M14 3.5V8h4M9.5 12h5M9.5 15.5h5"/></svg></span>
+          <h3>Rules</h3>
+          <p>Reads <code>.cursor/rules/*.mdc</code> (always, auto-attached, agent-requested, manual), <code>.cursorrules</code>, <code>AGENTS.md</code> and your User Rules; <code>CLAUDE.md</code> keeps working through Claude Code itself.</p>
+        </div>
+        <div class="card">
+          <span class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 17.5h5M10.5 20.5h3M12 3.5a5.5 5.5 0 0 0-3.2 10c.5.4.8 1 .8 1.7v.3h4.8v-.3c0-.7.3-1.3.8-1.7a5.5 5.5 0 0 0-3.2-10z"/></svg></span>
+          <h3>Fix in Chat</h3>
+          <p>Lightbulb actions on diagnostics and selections: Fix in Chat, Add to Chat, Explain, Edit with Kursor. Terminal context menu: add selection, debug last command.</p>
+        </div>
+        <div class="card">
+          <span class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="15" rx="2.5"/><path d="M12 4.5v15M12 12h8.5"/></svg></span>
+          <h3>Omarchy-native on Linux</h3>
+          <p>Follows your Omarchy theme automatically, registers in the launcher, optional <kbd>SUPER</kbd>+<kbd>⇧</kbd>+<kbd>K</kbd> binding and default-editor hookup. Plain Linux, macOS and Windows get the native integration too.</p>
+        </div>
+      </div>
     </div>
-    <p class="note" style="margin-top:20px"><strong>Trademark and terms.</strong> Kursor is an independent open-source project. It is not affiliated with, endorsed by, or built by Anthropic or Anysphere. "Claude" and "Claude Code" are trademarks of Anthropic; "Cursor" is a trademark of Anysphere. Kursor runs the unmodified Claude Code binary that you install and sign into yourself; your use of Claude Code is governed by Anthropic's terms.</p>
   </section>
 
-  <section id="install">
-    <h2>Install</h2>
-    <p class="sub">Two prerequisites on every platform: the <a href="https://code.claude.com/docs/en/setup">Claude Code CLI</a> installed and signed in (<code>claude auth login</code>), and Node.js 18+ to run the installer (not needed afterwards). Then pick your OS.</p>
-    <div class="tabs" role="tablist">
-      <button role="tab" aria-selected="true" data-tab="linux">Linux</button>
-      <button role="tab" aria-selected="false" data-tab="mac">macOS</button>
-      <button role="tab" aria-selected="false" data-tab="win">Windows</button>
+  <section class="section" id="how">
+    <div class="wrap">
+      <header class="section-head">
+        <p class="eyebrow">How it works</p>
+        <h2>Two pieces, and your own Claude Code</h2>
+        <p class="sub">Kursor is a rebranded VSCodium build and a VS Code extension. The extension never talks to Anthropic directly.</p>
+      </header>
+      <ol class="steps">
+        <li class="step"><span class="step-n">01</span><h3>Your Claude Code</h3><p>Kursor finds the <code>claude</code> binary you already installed (mise, npm, Homebrew, the native installer) and spawns it unmodified with the Claude Agent SDK's streaming protocol. It signs in with <em>its</em> login; Kursor never reads, stores or forwards credentials.</p></li>
+        <li class="step"><span class="step-n">02</span><h3>The editor</h3><p>A stock VSCodium release, renamed to Kursor with its own icon, data folders and <code>kursor://</code> scheme. Open VSX for extensions. The Kursor extension adds the chat pane, inline edits, completions and the Cursor keymap.</p></li>
+        <li class="step"><span class="step-n">03</span><h3>Your machine, your plan</h3><p>Every chat turn, inline edit and completion is a Claude Code call under your own Pro, Max, Team or Console account, at normal Claude Code rates. Nothing leaves your machine except what Claude Code itself sends.</p></li>
+      </ol>
+      <p class="notice"><strong>Trademark and terms.</strong> Kursor is an independent open-source project. It is not affiliated with, endorsed by, or built by Anthropic or Anysphere. "Claude" and "Claude Code" are trademarks of Anthropic; "Cursor" is a trademark of Anysphere. Kursor runs the unmodified Claude Code binary that you install and sign into yourself; your use of Claude Code is governed by Anthropic's terms.</p>
     </div>
-    <div class="panel" data-active id="tab-linux">
-<pre><span class="c"># from a release bundle (Kursor-linux-x64-&lt;version&gt;.tar.gz)</span>
+  </section>
+
+  <section class="section" id="install">
+    <div class="wrap install">
+      <header class="section-head">
+        <p class="eyebrow">Install</p>
+        <h2>Three platforms, one installer</h2>
+        <p class="sub">Download the bundle for your platform from the latest release, or build from source. The installer needs no root or admin rights.</p>
+        <ul class="prereq">
+          <li><span>The <a href="https://code.claude.com/docs/en/setup">Claude Code CLI</a>, installed and signed in (<code>claude auth login</code>)</span></li>
+          <li><span>Node.js 18+ to run the installer (not needed afterwards)</span></li>
+        </ul>
+        <p class="install-note">Re-running the installer upgrades in place and never overwrites your settings. <code>uninstall.sh</code> / <code>uninstall.cmd</code> remove everything (<code>--purge</code> also deletes settings).</p>
+      </header>
+      <div class="terminal">
+        <div class="terminal-bar">
+          <div role="tablist" aria-label="Operating system">
+            <button class="tab" role="tab" id="tab-linux" aria-controls="panel-linux" aria-selected="true" data-os="linux">Linux</button>
+            <button class="tab" role="tab" id="tab-mac" aria-controls="panel-mac" aria-selected="false" tabindex="-1" data-os="mac">macOS</button>
+            <button class="tab" role="tab" id="tab-win" aria-controls="panel-win" aria-selected="false" tabindex="-1" data-os="win">Windows</button>
+          </div>
+          <button class="copy" type="button" data-copy><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1.8"/><path d="M10.5 3.2A1.7 1.7 0 0 0 9 2.5H4.3A1.8 1.8 0 0 0 2.5 4.3V9c0 .6.3 1.2.8 1.5"/></svg><span>Copy</span></button>
+        </div>
+        <div class="panel" id="panel-linux" role="tabpanel" aria-labelledby="tab-linux">
+<pre><code><span class="c"># from a release bundle (Kursor-linux-x64-&lt;version&gt;.tar.gz)</span>
 tar -xzf Kursor-linux-x64-*.tar.gz &amp;&amp; cd Kursor-linux-x64-*/
-bash install.sh                 <span class="c"># add --hypr-bind --default-editor on Omarchy</span>
+bash install.sh  <span class="c"># add --hypr-bind --default-editor on Omarchy</span>
 
 <span class="c"># or from source</span>
 git clone https://github.com/brucegrootgames/kursor.git &amp;&amp; cd kursor
-npm install &amp;&amp; npm run package &amp;&amp; bash product/install.sh</pre>
-      <ol class="steps"><li>Installs to <strong>~/.local/opt/kursor</strong>, command <strong>kursor</strong>, a launcher entry and icons. No root.</li><li>On Omarchy it also installs a theme hook so Kursor follows <code>omarchy theme set</code>.</li><li>Launch with <code>kursor</code> or from your app launcher.</li></ol>
-    </div>
-    <div class="panel" id="tab-mac">
-<pre><span class="c"># from a release bundle (Kursor-darwin-arm64 or darwin-x64)</span>
+npm install &amp;&amp; npm run package &amp;&amp; bash product/install.sh</code></pre>
+          <ol><li>Installs to <strong>~/.local/opt/kursor</strong>, command <strong>kursor</strong>, a launcher entry and icons. No root.</li><li>On Omarchy it also installs a theme hook so Kursor follows <code>omarchy theme set</code>.</li><li>Launch with <code>kursor</code> or from your app launcher.</li></ol>
+        </div>
+        <div class="panel" id="panel-mac" role="tabpanel" aria-labelledby="tab-mac" hidden>
+<pre><code><span class="c"># from a release bundle (Kursor-darwin-arm64 or darwin-x64)</span>
 tar -xzf Kursor-darwin-arm64-*.tar.gz &amp;&amp; cd Kursor-darwin-arm64-*/
-bash install.sh                 <span class="c"># --system for /Applications</span>
+bash install.sh  <span class="c"># --system for /Applications</span>
 
 <span class="c"># or from source</span>
 git clone https://github.com/brucegrootgames/kursor.git &amp;&amp; cd kursor
-npm install &amp;&amp; npm run package &amp;&amp; bash product/install.sh</pre>
-      <ol class="steps"><li>Installs <strong>~/Applications/Kursor.app</strong> and a <strong>kursor</strong> command in ~/.local/bin.</li><li>The app is re-signed ad hoc after rebranding; the first launch may need right-click → Open.</li><li>All shortcuts use <kbd>⌘</kbd> instead of <kbd>Ctrl</kbd>.</li></ol>
-    </div>
-    <div class="panel" id="tab-win">
-<pre><span class="c"># from a release bundle (Kursor-win32-x64-&lt;version&gt;.zip), in PowerShell</span>
+npm install &amp;&amp; npm run package &amp;&amp; bash product/install.sh</code></pre>
+          <ol><li>Installs <strong>~/Applications/Kursor.app</strong> and a <strong>kursor</strong> command in ~/.local/bin.</li><li>The app is re-signed ad hoc after rebranding; the first launch may need right-click → Open.</li><li>All shortcuts use <kbd>⌘</kbd> instead of <kbd>Ctrl</kbd>.</li></ol>
+        </div>
+        <div class="panel" id="panel-win" role="tabpanel" aria-labelledby="tab-win" hidden>
+<pre><code><span class="c"># from a release bundle (Kursor-win32-x64-&lt;version&gt;.zip), in PowerShell</span>
 Expand-Archive Kursor-win32-x64-*.zip -DestinationPath . ; cd Kursor-win32-x64-*
-.\install.cmd                   <span class="c"># --desktop-shortcut, --system for Program Files</span>
+.\install.cmd  <span class="c"># --desktop-shortcut, --system for Program Files</span>
 
 <span class="c"># or from source</span>
 git clone https://github.com/brucegrootgames/kursor.git ; cd kursor
-npm install ; npm run package ; product\install.cmd</pre>
-      <ol class="steps"><li>Installs to <strong>%LOCALAPPDATA%\Programs\Kursor</strong> with a Start Menu shortcut, <strong>kursor</strong> on your user PATH and the <code>kursor://</code> protocol.</li><li>Open a new terminal afterwards for <code>kursor</code> to be found.</li></ol>
+npm install ; npm run package ; product\install.cmd</code></pre>
+          <ol><li>Installs to <strong>%LOCALAPPDATA%\Programs\Kursor</strong> with a Start Menu shortcut, <strong>kursor</strong> on your user PATH and the <code>kursor://</code> protocol.</li><li>Open a new terminal afterwards for <code>kursor</code> to be found.</li></ol>
+        </div>
+      </div>
     </div>
-    <p class="fine" style="color:var(--muted);font-size:13px">Re-running the installer upgrades in place and never overwrites your settings. <code>uninstall.sh</code> / <code>uninstall.cmd</code> remove everything (<code>--purge</code> also deletes settings).</p>
   </section>
 
-  <section id="shortcuts">
-    <h2>Keyboard shortcuts</h2>
-    <p class="sub">Cursor's defaults. On macOS replace <kbd>Ctrl</kbd> with <kbd>⌘</kbd>. VS Code's <kbd>Ctrl</kbd>+<kbd>K</kbd> chords move to <kbd>Ctrl</kbd>+<kbd>R</kbd>, as in Cursor.</p>
-    <table>
-      <thead><tr><th>Shortcut</th><th>Action</th><th>Where</th></tr></thead>
-      <tbody>
-        <tr><td class="k"><kbd>Ctrl</kbd>+<kbd>I</kbd></td><td>Toggle the agent chat</td><td>anywhere</td></tr>
-        <tr><td class="k"><kbd>Ctrl</kbd>+<kbd>L</kbd></td><td>New chat with the current selection</td><td>editor</td></tr>
-        <tr><td class="k"><kbd>Ctrl</kbd>+<kbd>⇧</kbd>+<kbd>L</kbd></td><td>Add selection to the current chat</td><td>editor</td></tr>
-        <tr><td class="k"><kbd>Ctrl</kbd>+<kbd>K</kbd></td><td>Inline edit prompt</td><td>editor</td></tr>
-        <tr><td class="k"><kbd>Ctrl</kbd>+<kbd>Enter</kbd> / <kbd>Ctrl</kbd>+<kbd>⌫</kbd></td><td>Accept / reject the inline edit</td><td>editor with a diff</td></tr>
-        <tr><td class="k"><kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>Y</kbd> / <kbd>N</kbd></td><td>Accept / reject one block</td><td>editor with a diff</td></tr>
-        <tr><td class="k"><kbd>Tab</kbd> · <kbd>Alt</kbd>+<kbd>\</kbd></td><td>Accept · trigger a completion</td><td>editor</td></tr>
-        <tr><td class="k"><kbd>Ctrl</kbd>+<kbd>K</kbd></td><td>Generate a command</td><td>terminal</td></tr>
-        <tr><td class="k"><kbd>Enter</kbd> · <kbd>⇧</kbd>+<kbd>Enter</kbd> · <kbd>Ctrl</kbd>+<kbd>Enter</kbd></td><td>Send · newline · send now (skip the queue)</td><td>chat input</td></tr>
-        <tr><td class="k"><kbd>Ctrl</kbd>+<kbd>.</kbd> · <kbd>Ctrl</kbd>+<kbd>/</kbd></td><td>Cycle mode (Agent / Ask / Plan) · cycle model</td><td>chat input</td></tr>
-        <tr><td class="k"><kbd>Ctrl</kbd>+<kbd>Enter</kbd> / <kbd>Ctrl</kbd>+<kbd>⇧</kbd>+<kbd>⌫</kbd></td><td>Keep all / undo all agent edits</td><td>chat</td></tr>
-        <tr><td class="k"><kbd>Ctrl</kbd>+<kbd>N</kbd> · <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>'</kbd></td><td>New chat · chat history</td><td>chat</td></tr>
-        <tr><td class="k"><kbd>Ctrl</kbd>+<kbd>⇧</kbd>+<kbd>J</kbd></td><td>Kursor Settings</td><td>anywhere</td></tr>
-      </tbody>
-    </table>
+  <section class="section" id="shortcuts">
+    <div class="wrap">
+      <header class="section-head">
+        <p class="eyebrow">Shortcuts</p>
+        <h2>Cursor's keymap, unchanged</h2>
+        <p class="sub">Cursor's defaults. On macOS replace <kbd>Ctrl</kbd> with <kbd>⌘</kbd>. VS Code's <kbd>Ctrl</kbd>+<kbd>K</kbd> chords move to <kbd>Ctrl</kbd>+<kbd>R</kbd>, as in Cursor.</p>
+      </header>
+      <div class="kb">
+        <div class="kb-group">
+          <h3>Editor</h3>
+          <dl>
+            <div class="kb-row"><dt>Inline edit prompt</dt><dd><span class="combo"><kbd>Ctrl</kbd><kbd>K</kbd></span></dd></div>
+            <div class="kb-row"><dt>Accept / reject the inline edit</dt><dd><span class="combo"><kbd>Ctrl</kbd><kbd>Enter</kbd></span>/<span class="combo"><kbd>Ctrl</kbd><kbd>⌫</kbd></span></dd></div>
+            <div class="kb-row"><dt>Accept / reject one block</dt><dd><span class="combo"><kbd>Ctrl</kbd><kbd>Alt</kbd><kbd>Y</kbd></span>/<kbd>N</kbd></dd></div>
+            <div class="kb-row"><dt>Accept · trigger a completion</dt><dd><kbd>Tab</kbd>·<span class="combo"><kbd>Alt</kbd><kbd>\</kbd></span></dd></div>
+            <div class="kb-row"><dt>New chat with the current selection</dt><dd><span class="combo"><kbd>Ctrl</kbd><kbd>L</kbd></span></dd></div>
+            <div class="kb-row"><dt>Add selection to the current chat</dt><dd><span class="combo"><kbd>Ctrl</kbd><kbd>⇧</kbd><kbd>L</kbd></span></dd></div>
+          </dl>
+          <h3>Terminal</h3>
+          <dl>
+            <div class="kb-row"><dt>Generate a command</dt><dd><span class="combo"><kbd>Ctrl</kbd><kbd>K</kbd></span></dd></div>
+          </dl>
+        </div>
+        <div class="kb-group">
+          <h3>Chat</h3>
+          <dl>
+            <div class="kb-row"><dt>Send · newline · send now</dt><dd><kbd>Enter</kbd>·<span class="combo"><kbd>⇧</kbd><kbd>Enter</kbd></span>·<span class="combo"><kbd>Ctrl</kbd><kbd>Enter</kbd></span></dd></div>
+            <div class="kb-row"><dt>Cycle mode (Agent / Ask / Plan) · model</dt><dd><span class="combo"><kbd>Ctrl</kbd><kbd>.</kbd></span>·<span class="combo"><kbd>Ctrl</kbd><kbd>/</kbd></span></dd></div>
+            <div class="kb-row"><dt>Keep all / undo all agent edits</dt><dd><span class="combo"><kbd>Ctrl</kbd><kbd>Enter</kbd></span>/<span class="combo"><kbd>Ctrl</kbd><kbd>⇧</kbd><kbd>⌫</kbd></span></dd></div>
+            <div class="kb-row"><dt>New chat · chat history</dt><dd><span class="combo"><kbd>Ctrl</kbd><kbd>N</kbd></span>·<span class="combo"><kbd>Ctrl</kbd><kbd>Alt</kbd><kbd>'</kbd></span></dd></div>
+          </dl>
+          <h3>Anywhere</h3>
+          <dl>
+            <div class="kb-row"><dt>Toggle the agent chat</dt><dd><span class="combo"><kbd>Ctrl</kbd><kbd>I</kbd></span></dd></div>
+            <div class="kb-row"><dt>Kursor Settings</dt><dd><span class="combo"><kbd>Ctrl</kbd><kbd>⇧</kbd><kbd>J</kbd></span></dd></div>
+          </dl>
+        </div>
+      </div>
+      <p class="kb-note">"Send now" skips the queue while the agent is still working.</p>
+    </div>
   </section>
 
-  <section id="brand">
-    <h2>Brand</h2>
-    <p class="sub">A text cursor and a code bracket make the K. The cursor is the only thing that carries colour. Assets are free to use when referring to Kursor; the full guide is in <a href="https://github.com/brucegrootgames/kursor/blob/main/docs/BRAND.md">docs/BRAND.md</a>.</p>
-    <div class="assets">
-      <div class="asset"><div class="box"><img src="brand/kursor-mark.svg" alt="Kursor mark on tile" width="88" height="88"></div>Mark · tile<a href="brand/kursor-mark.svg" download>SVG</a><a href="brand/kursor-mark-512.png" download>PNG 512</a></div>
-      <div class="asset"><div class="box" style="color:#eef0f6"><svg viewBox="0 0 256 256" width="88" height="88" role="img" aria-label="Kursor glyph"><defs><linearGradient id="gbar" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8f9bff"/><stop offset="1" stop-color="#b57cff"/></linearGradient></defs><rect x="78" y="62" width="24" height="132" rx="10" fill="url(#gbar)"/><polyline points="176,70 110,128 176,186" fill="none" stroke="currentColor" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/></svg></div>Glyph · any surface<a href="brand/kursor-glyph.svg" download>SVG</a></div>
-      <div class="asset"><div class="box light"><svg viewBox="0 0 24 24" width="72" height="72" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="8.3" y1="5.5" x2="8.3" y2="18.5"/><polyline points="16.6,6.3 10.3,12 16.6,17.7"/></svg></div>Mono · any colour<a href="brand/kursor-mark-mono.svg" download>SVG</a></div>
-      <div class="asset"><div class="box"><img src="brand/kursor-wordmark.svg" alt="Kursor wordmark" width="220"></div>Wordmark<a href="brand/kursor-wordmark.svg" download>SVG</a><a href="brand/social-card.svg" download>Social card</a></div>
+  <section class="section" id="faq">
+    <div class="wrap">
+      <header class="section-head">
+        <p class="eyebrow">FAQ</p>
+        <h2>Questions, answered</h2>
+      </header>
+      <div class="faq">
+        <details open><summary>Do I need an Anthropic API key?</summary><p>No. Kursor uses the Claude Code CLI on your machine, signed in with your own Claude account (Pro, Max, Team or Enterprise) or Console key. Sign in once with <code>claude auth login</code>.</p></details>
+        <details><summary>What does it cost?</summary><p>Kursor is free and MIT licensed. Chat turns, inline edits and Tab completions are regular Claude Code requests under your plan. Tab completions use a fast model and are debounced; turn them off from the status bar if you'd rather not spend quota on them.</p></details>
+        <details><summary>Does Kursor send my code anywhere?</summary><p>Only to Claude Code, which sends it to Anthropic as any Claude Code session would. The extension has no server, no telemetry and no analytics. Workspaces in Restricted Mode are never read until you trust them.</p></details>
+        <details><summary>Can I keep using my VS Code extensions?</summary><p>Yes. Kursor is VSCodium with the Open VSX gallery, so most extensions install normally. Your existing VS Code settings are not touched; Kursor keeps its own profile.</p></details>
+        <details><summary>Is Tab as good as Cursor's?</summary><p>Not yet. Cursor trains a dedicated model for next-edit prediction; Kursor asks a general fast model for a short continuation, with a ~1 s pause and a ~2.5 s round trip. It is useful for boilerplate, not for keystroke-level prediction.</p></details>
+        <details><summary>How do updates work?</summary><p>Every release ships bundles for all platforms. Download the new one and run its installer, or <code>git pull</code> and re-run <code>product/install.sh</code> / <code>install.cmd</code>: the app directory is replaced, your settings and chats stay.</p></details>
+      </div>
     </div>
-    <div class="swatches">
-      <div class="swatch"><i style="background:#0f1014"></i><span><b>Ink</b>#0F1014</span></div>
-      <div class="swatch"><i style="background:#1a1d25"></i><span><b>Surface</b>#1A1D25</span></div>
-      <div class="swatch"><i style="background:#eef0f6"></i><span><b>Mist</b>#EEF0F6</span></div>
-      <div class="swatch"><i style="background:linear-gradient(135deg,#7c8cff,#b57cff)"></i><span><b>Violet → Orchid</b>#7C8CFF → #B57CFF</span></div>
-      <div class="swatch"><i style="background:linear-gradient(90deg,#5fd38a 50%,#ff6b78 50%)"></i><span><b>Keep / Undo</b>#5FD38A / #FF6B78</span></div>
-    </div>
-    <p class="fine" style="color:var(--muted);font-size:13px">Type: Inter for UI, your editor font for code. Please don't recolour the bracket, add shadows, or place the mark on the violet gradient.</p>
   </section>
 
-  <section id="faq">
-    <h2>FAQ</h2>
-    <details open><summary>Do I need an Anthropic API key?</summary><p>No. Kursor uses the Claude Code CLI on your machine, signed in with your own Claude account (Pro, Max, Team or Enterprise) or Console key. Sign in once with <code>claude auth login</code>.</p></details>
-    <details><summary>What does it cost?</summary><p>Kursor is free and MIT licensed. Chat turns, inline edits and Tab completions are regular Claude Code requests under your plan. Tab completions use a fast model and are debounced; turn them off from the status bar if you'd rather not spend quota on them.</p></details>
-    <details><summary>Does Kursor send my code anywhere?</summary><p>Only to Claude Code, which sends it to Anthropic as any Claude Code session would. The extension has no server, no telemetry and no analytics. Workspaces in Restricted Mode are never read until you trust them.</p></details>
-    <details><summary>Can I keep using my VS Code extensions?</summary><p>Yes. Kursor is VSCodium with the Open VSX gallery, so most extensions install normally. Your existing VS Code settings are not touched; Kursor keeps its own profile.</p></details>
-    <details><summary>Is Tab as good as Cursor's?</summary><p>Not yet. Cursor trains a dedicated model for next-edit prediction; Kursor asks a general fast model for a short continuation, with a ~1 s pause and a ~2.5 s round trip. It is useful for boilerplate, not for keystroke-level prediction.</p></details>
-    <details><summary>How do updates work?</summary><p>Every release ships bundles for all platforms. Download the new one and run its installer, or <code>git pull</code> and re-run <code>product/install.sh</code> / <code>install.cmd</code>: the app directory is replaced, your settings and chats stay.</p></details>
+  <section class="section" id="brand">
+    <div class="wrap">
+      <header class="section-head">
+        <p class="eyebrow">Brand</p>
+        <h2>A cursor and a bracket</h2>
+        <p class="sub">A text cursor and a code bracket make the K. The cursor is the only thing that carries colour. Assets are free to use when referring to Kursor; the full guide is in <a href="https://github.com/brucegrootgames/kursor/blob/main/docs/BRAND.md">docs/BRAND.md</a>.</p>
+      </header>
+      <div class="assets">
+        <div class="asset"><div class="box"><img src="brand/kursor-mark.svg" alt="Kursor mark on its tile" width="92" height="92"></div><b>Mark · tile</b>App icon, favicon, avatars<span class="dl"><a href="brand/kursor-mark.svg" download>SVG</a><a href="brand/kursor-mark-512.png" download>PNG 512</a></span></div>
+        <div class="asset"><div class="box"><svg viewBox="0 0 256 256" width="92" height="92" role="img" aria-label="Kursor glyph"><defs><linearGradient id="gbar" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8f9bff"/><stop offset="1" stop-color="#b57cff"/></linearGradient></defs><rect x="78" y="62" width="24" height="132" rx="10" fill="url(#gbar)"/><polyline points="176,70 110,128 176,186" fill="none" stroke="currentColor" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/></svg></div><b>Glyph</b>Any dark surface<span class="dl"><a href="brand/kursor-glyph.svg" download>SVG</a></span></div>
+        <div class="asset"><div class="box light"><svg viewBox="0 0 24 24" width="76" height="76" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Kursor mono mark"><line x1="8.3" y1="5.5" x2="8.3" y2="18.5"/><polyline points="16.6,6.3 10.3,12 16.6,17.7"/></svg></div><b>Mono</b>Any single colour<span class="dl"><a href="brand/kursor-mark-mono.svg" download>SVG</a></span></div>
+        <div class="asset"><div class="box"><img src="brand/kursor-wordmark.svg" alt="Kursor wordmark" width="210" height="60"></div><b>Wordmark</b>Headers, docs, social<span class="dl"><a href="brand/kursor-wordmark.svg" download>SVG</a><a href="brand/social-card.svg" download>Social card</a></span></div>
+      </div>
+      <div class="palette">
+        <div class="swatch"><i style="background:#0f1014"></i><div><b>Ink</b><code>#0F1014</code><br>Page and app background</div></div>
+        <div class="swatch"><i style="background:#1a1d25"></i><div><b>Surface</b><code>#1A1D25</code><br>Cards, panels, inputs</div></div>
+        <div class="swatch"><i style="background:#262a35"></i><div><b>Border</b><code>#262A35</code><br>Hairlines</div></div>
+        <div class="swatch"><i style="background:#eef0f6"></i><div><b>Mist</b><code>#EEF0F6</code><br>Primary text, the bracket</div></div>
+        <div class="swatch"><i style="background:#8b91a1"></i><div><b>Muted</b><code>#8B91A1</code><br>Secondary text</div></div>
+        <div class="swatch"><i style="background:#7c8cff"></i><div><b>Violet</b><code>#7C8CFF</code><br>Focus, links, buttons</div></div>
+        <div class="swatch"><i style="background:#b57cff"></i><div><b>Orchid</b><code>#B57CFF</code><br>Gradient end, editor cursor</div></div>
+        <div class="swatch"><i style="background:#5fd38a"></i><div><b>Keep</b><code>#5FD38A</code><br>Accepted, added</div></div>
+        <div class="swatch"><i style="background:#ff6b78"></i><div><b>Undo</b><code>#FF6B78</code><br>Rejected, removed</div></div>
+        <div class="swatch"><i style="background:#e8a33d"></i><div><b>Warn</b><code>#E8A33D</code><br>Needs approval</div></div>
+      </div>
+      <div class="brand-foot">
+        <div class="spec"><p class="aa">Inter 700, −2%</p><p>UI and website. Headlines 700 with −0.02 em tracking, body 400 / 500.</p><div class="gradient-strip" role="img" aria-label="Accent gradient from violet to orchid"></div><p style="margin-top:8px">Accent gradient: the headline highlight, the primary action and the cursor bar only.</p></div>
+        <div class="spec"><p class="aa mono">const k = 1;</p><p>Code uses your editor font (JetBrains Mono by default on Omarchy). Please don't recolour the bracket, add shadows, or place the mark on the violet gradient.</p></div>
+      </div>
+    </div>
   </section>
+
+  <div class="wrap">
+    <section class="cta" aria-labelledby="cta-title">
+      <h2 id="cta-title">Your editor, your Claude Code<span class="caret" aria-hidden="true"></span></h2>
+      <p>Free and open source for Linux, macOS and Windows. Bring the Claude Code CLI you already use.</p>
+      <div class="actions">
+        <a class="btn btn-primary" href="#install">Install Kursor</a>
+        <a class="btn" href="https://github.com/brucegrootgames/kursor">View on GitHub</a>
+      </div>
+    </section>
+  </div>
 </main>
 
-<footer>
-  <div class="wrap row">
-    <span>© Kursor contributors · MIT License · <a href="https://github.com/brucegrootgames/kursor">Source</a> · <a href="https://github.com/brucegrootgames/kursor/issues">Issues</a> · <a href="https://github.com/brucegrootgames/kursor/blob/main/CHANGELOG.md">Changelog</a></span>
-    <span>Built on <a href="https://vscodium.com">VSCodium</a> and the <a href="https://code.claude.com/docs/en/agent-sdk/overview">Claude Agent SDK</a>. Not affiliated with Anthropic or Anysphere.</span>
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer-row">
+      <a class="brand" href="#top"><img src="img/kursor.svg" alt="" width="24" height="24">Kursor</a>
+      <nav class="footer-links" aria-label="Project">
+        <a href="https://github.com/brucegrootgames/kursor">Source</a>
+        <a href="https://github.com/brucegrootgames/kursor/releases">Releases</a>
+        <a href="https://github.com/brucegrootgames/kursor/issues">Issues</a>
+        <a href="https://github.com/brucegrootgames/kursor/blob/main/CHANGELOG.md">Changelog</a>
+        <a href="https://github.com/brucegrootgames/kursor/blob/main/docs/BRAND.md">Brand guide</a>
+      </nav>
+    </div>
+    <p class="footer-legal">© Kursor contributors · MIT License · Built on <a href="https://vscodium.com">VSCodium</a> and the <a href="https://code.claude.com/docs/en/agent-sdk/overview">Claude Agent SDK</a>. Not affiliated with Anthropic or Anysphere.</p>
   </div>
 </footer>
 
 <script>
-  const tabs = document.querySelectorAll('.tabs [role=tab]');
-  const panels = { linux: 'tab-linux', mac: 'tab-mac', win: 'tab-win' };
-  function select(name) {
-    tabs.forEach((t) => t.setAttribute('aria-selected', String(t.dataset.tab === name)));
-    Object.entries(panels).forEach(([k, id]) => { const el = document.getElementById(id); if (k === name) el.setAttribute('data-active', ''); else el.removeAttribute('data-active'); });
+  // Install tabs: roving focus with the arrow keys; the visitor's OS is selected first.
+  const tabs = [...document.querySelectorAll('[role="tab"]')];
+  function select(tab, focus) {
+    for (const t of tabs) {
+      const on = t === tab;
+      t.setAttribute('aria-selected', String(on));
+      t.tabIndex = on ? 0 : -1;
+      document.getElementById(t.getAttribute('aria-controls')).hidden = !on;
+    }
+    if (focus) tab.focus();
   }
-  tabs.forEach((t) => t.addEventListener('click', () => select(t.dataset.tab)));
-  const ua = navigator.userAgent;
-  if (/Mac/.test(ua)) select('mac'); else if (/Win/.test(ua)) select('win');
+  tabs.forEach((t, i) => {
+    t.addEventListener('click', () => select(t));
+    t.addEventListener('keydown', (e) => {
+      if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+      e.preventDefault();
+      select(tabs[(i + (e.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length], true);
+    });
+  });
+  const os = /Mac/.test(navigator.userAgent) ? 'mac' : /Win/.test(navigator.userAgent) ? 'win' : 'linux';
+  select(tabs.find((t) => t.dataset.os === os));
+
+  // Copy the visible install commands.
+  const copy = document.querySelector('[data-copy]');
+  copy.addEventListener('click', async () => {
+    const code = document.querySelector('.panel:not([hidden]) code');
+    try {
+      await navigator.clipboard.writeText(code.innerText.trim() + '\n');
+      copy.dataset.done = '';
+      copy.lastElementChild.textContent = 'Copied';
+      setTimeout(() => { delete copy.dataset.done; copy.lastElementChild.textContent = 'Copy'; }, 1600);
+    } catch { copy.lastElementChild.textContent = 'Select and copy'; }
+  });
 </script>
 </body>
 </html>
