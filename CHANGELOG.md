@@ -12,6 +12,9 @@ builds the extension and one bundle per platform from that tag.
 - Kursor's own workbench look by default: VS Code's Modern UI with floating rounded panels, the Inter-first UI font, layout toggles in the title bar, smooth cursor blinking and caret animation, no minimap. New installs also fold the menu bar into one button.
 - Chat and Settings follow the brand: brand UI font, an inset composer with a single focus ring and the accent-gradient send button, a cursor-bar streaming caret, approval cards in amber, Kursor syntax colours in code blocks, no drop shadow on the logo. In the side bar the native title shows the chat title and the duplicate header is gone; the tab strip appears only with several chats.
 
+### Fixed
+- On a new profile the secondary side bar opened VS Code's disabled Chat container ("Drag a view here to display") instead of the Kursor chat.
+
 ## [0.1.1] - 2026-10-03
 
 ### Added

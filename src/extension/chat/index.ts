@@ -31,6 +31,18 @@ export function registerChat(context: vscode.ExtensionContext, deps: ChatDeps): 
     await view.reveal(focus);
   };
 
+  // A new profile opens VS Code's own Chat container in the secondary side bar, which Kursor disables
+  // (chat.disableAIFeatures), so the pane only says "Drag a view here to display". Show Kursor's chat there once;
+  // after that VS Code restores whatever layout the user leaves.
+  const FIRST_REVEAL_KEY = 'kursor.chat.firstRevealDone';
+  if (!context.globalState.get<boolean>(FIRST_REVEAL_KEY)) {
+    const timer = setTimeout(() => {
+      void context.globalState.update(FIRST_REVEAL_KEY, true);
+      if (!view.visible) void view.reveal(false);
+    }, 1500);
+    context.subscriptions.push({ dispose: () => clearTimeout(timer) });
+  }
+
   let pendingAttention = 0;
   manager.onPermissionAttention = (chat, request) => {
     if (manager.anyHostVisible()) return;
