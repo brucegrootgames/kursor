@@ -1,6 +1,8 @@
+<p align="center"><img src="brand/kursor-wordmark.svg" alt="Kursor" width="420"></p>
+
 # Kursor
 
-**Website:** https://brucegrootgames.github.io/kursor/ · **Releases:** https://github.com/brucegrootgames/kursor/releases · **Changelog:** [CHANGELOG.md](CHANGELOG.md) · **Release process:** [docs/RELEASING.md](docs/RELEASING.md)
+**Website:** https://brucegrootgames.github.io/kursor/ · **Releases:** https://github.com/brucegrootgames/kursor/releases · **Changelog:** [CHANGELOG.md](CHANGELOG.md) · **Release process:** [docs/RELEASING.md](docs/RELEASING.md) · **Brand:** [docs/BRAND.md](docs/BRAND.md)
 
 Cursor-style AI coding: a rebranded [VSCodium](https://vscodium.com) plus the **Kursor** extension — agent chat,
 Ctrl+K inline edits, Tab completions, terminal and commit helpers — all driven by the **Claude Code CLI that is already

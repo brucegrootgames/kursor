@@ -25,6 +25,7 @@ product/
 ├── defaults/argv.json       seeded ~/.kursor/argv.json (Linux: password-store gnome-libsecret; macOS/Windows get it without that key)
 ├── defaults/kursor-flags.conf  seeded ~/.config/kursor-flags.conf (Linux only)
 ├── icons/kursor-*.png       app icons 16…1024 px (kursor-256.png is also the extension icon); source of the ICNS/ICO
+├── brand/*.svg              letterpress watermarks + mark copied over resources/app/out/media at rebrand time (from ../brand)
 └── tools/keybindings-table.mjs  generates the README keybindings table from package.json
 ```
 

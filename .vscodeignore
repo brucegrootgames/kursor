@@ -13,3 +13,7 @@ esbuild.mjs
 docs/**
 scripts/**
 package-lock.json
+site/**
+brand/**
+.github/**
+CHANGELOG.md

@@ -12,5 +12,5 @@
     "noEmit": true,
     "types": []
   },
-  "include": ["./**/*.ts", "./**/*.tsx", "../shared/**/*.ts"]
+  "include": ["./**/*.ts", "./**/*.tsx", "../shared/**/*.ts", "../shared/**/*.tsx"]
 }

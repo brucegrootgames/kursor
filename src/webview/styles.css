@@ -423,8 +423,9 @@ kbd {
 /* ---------- empty state / sign-in ---------- */
 .empty { flex: 1 1 auto; display: flex; align-items: center; justify-content: center; overflow-y: auto; padding: 16px; }
 .empty-inner { display: flex; flex-direction: column; align-items: center; gap: 10px; max-width: 360px; text-align: center; color: var(--k-muted); }
-.logo { color: var(--k-fg); opacity: 0.85; }
-.empty-title { font-size: 16px; font-weight: 600; color: var(--k-fg); letter-spacing: 0.02em; }
+.logo { display: block; border-radius: 13px; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.28); }
+.connecting-mark { color: var(--k-fg); opacity: 0.9; }
+.empty-title { font-size: 16px; font-weight: 600; color: var(--k-fg); letter-spacing: 0.01em; margin-top: 2px; }
 .hints { display: flex; flex-direction: column; gap: 6px; font-size: 12px; }
 .hint-row { display: flex; align-items: center; justify-content: center; gap: 4px; }
 .signin { display: flex; flex-direction: column; gap: 8px; padding: 12px; border: 1px solid var(--k-border); border-radius: var(--k-radius); background: var(--k-card); text-align: left; color: var(--k-fg); width: 100%; }

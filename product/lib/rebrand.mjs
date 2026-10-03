@@ -81,6 +81,34 @@ export function patchPackageJson(file) {
   if (typeof p.main !== 'string') die(`package.json verification failed after patching (${file})`);
 }
 
+// ---- Workbench artwork (identical on every platform) ------------------------------------------
+// The empty-editor watermark (letterpress-*.svg) and the welcome-page icon (code-icon.svg) live in
+// resources/app/out/media. None of them is in product.json's `checksums`, so swapping them does not
+// trigger the "installation is corrupt" warning. The SVGs ship in product/brand/ (copied from the
+// repo's brand/ directory) so a release bundle does not depend on the repo checkout.
+const BRAND_DIR = path.join(PRODUCT_DIR, 'brand');
+const BRAND_MEDIA = [
+  ['letterpress-dark.svg', 'letterpress-dark.svg'],
+  ['letterpress-light.svg', 'letterpress-light.svg'],
+  ['letterpress-hcDark.svg', 'letterpress-hcDark.svg'],
+  ['letterpress-hcLight.svg', 'letterpress-hcLight.svg'],
+  ['kursor-mark.svg', 'code-icon.svg'],
+];
+export function patchWorkbenchMedia(appDir) {
+  const media = path.join(appDir, 'out', 'media');
+  if (!isDir(media)) { log.warn(`${media} not found — workbench artwork left as shipped (VSCodium layout changed?)`); return 0; }
+  let n = 0;
+  for (const [src, dst] of BRAND_MEDIA) {
+    const from = path.join(BRAND_DIR, src);
+    const to = path.join(media, dst);
+    if (!isFile(from)) die(`brand asset missing: ${from} — run from a complete checkout or bundle`);
+    if (!isFile(to)) continue; // only replace what VSCodium ships; never add files to out/media
+    fs.copyFileSync(from, to);
+    n++;
+  }
+  return n;
+}
+
 // Shell completions ship under the old command name.
 function patchCompletions(dir) {
   if (!isDir(dir)) return;
@@ -134,6 +162,7 @@ function rebrandLinux(root, info) {
 
   patchProductJson(path.join(app, 'product.json'));
   patchPackageJson(path.join(app, 'package.json'));
+  patchWorkbenchMedia(app);
 
   // Window/about icon used by Electron on Linux.
   fs.copyFileSync(path.join(PRODUCT_DIR, 'icons', 'kursor-1024.png'), path.join(app, 'resources', 'linux', 'code.png'));
@@ -193,6 +222,7 @@ function rebrandDarwin(extractDir, info) {
 
   patchProductJson(path.join(app, 'product.json'));
   patchPackageJson(path.join(app, 'package.json'));
+  patchWorkbenchMedia(app);
   patchCompletions(path.join(resources, 'completions'));
   writeMarker(markerOf('darwin', root), info);
   return root;
@@ -241,6 +271,7 @@ function rebrandWin32(root, info) {
 
   patchProductJson(path.join(app, 'product.json'));
   patchPackageJson(path.join(app, 'package.json'));
+  patchWorkbenchMedia(app);
   writeMarker(markerOf('win32', root), info);
   return root;
 }
@@ -249,6 +280,7 @@ function rebrandWin32(root, info) {
 //   (linux/win32: extractDir itself; darwin: extractDir/Kursor.app). `info` = { platform, arch, sha256 }.
 export function rebrand(platform, extractDir, info) {
   if (!isFile(path.join(PRODUCT_DIR, 'icons', 'kursor-1024.png'))) die('icon assets missing — run from a complete checkout or bundle');
+  if (!isFile(path.join(BRAND_DIR, 'kursor-mark.svg'))) die('brand assets missing (product/brand) — run from a complete checkout or bundle');
   const root = platform === 'linux' ? rebrandLinux(extractDir, info)
     : platform === 'darwin' ? rebrandDarwin(extractDir, info)
       : rebrandWin32(extractDir, info);
@@ -271,5 +303,10 @@ export function describeTree(platform, root) {
   }
   if (platform === 'win32') lines.push(`files         ${['Kursor.exe', 'Kursor.ico', 'bin\\kursor.cmd', 'bin\\kursor'].filter((f) => exists(path.join(root, ...f.split('\\')))).join(' ')}`);
   if (platform === 'linux') lines.push(`files         ${['kursor', 'bin/kursor', 'bin/kursor-tunnel'].filter((f) => exists(path.join(root, f))).join(' ')}`);
+  const branded = BRAND_MEDIA.filter(([src, dst]) => {
+    const f = path.join(app, 'out', 'media', dst);
+    return isFile(f) && fs.readFileSync(f, 'utf8') === fs.readFileSync(path.join(BRAND_DIR, src), 'utf8');
+  }).map(([, dst]) => dst);
+  lines.push(`artwork       ${branded.length ? branded.join(' ') : '(none replaced)'}`);
   return lines;
 }

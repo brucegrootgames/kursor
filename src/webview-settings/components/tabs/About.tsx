@@ -1,8 +1,17 @@
+import { KursorMark } from '../../../shared/Logo';
 import { pushToast, useStore } from '../../store';
 import { copyText, tildify } from '../../util';
 import { post } from '../../vscode';
 import { Button, LinkButton, Section, SettingRow } from '../controls';
-import { Icon } from '../Icon';
+
+const WEBSITE = 'https://brucegrootgames.github.io/kursor/';
+const REPO = 'https://github.com/brucegrootgames/kursor';
+const PROJECT_LINKS: { label: string; url: string; icon: string }[] = [
+  { label: 'Website', url: WEBSITE, icon: 'globe' },
+  { label: 'Repository', url: REPO, icon: 'github' },
+  { label: 'Changelog', url: `${REPO}/blob/main/CHANGELOG.md`, icon: 'history' },
+  { label: 'License', url: `${REPO}/blob/main/LICENSE`, icon: 'law' },
+];
 
 export function AboutTab() {
   const about = useStore((s) => s.state!.about);
@@ -20,15 +29,21 @@ export function AboutTab() {
     <>
       <Section title="About Kursor">
         <div className="card about-card">
-          <div className="about-logo" aria-hidden="true">
-            <Icon name="sparkle-filled" />
-          </div>
+          <KursorMark className="about-logo" size={64} />
           <div className="about-text">
             <div className="about-title">
-              Kursor <span className="muted">v{about.extensionVersion}</span>
+              <span>Kursor</span>
+              <span className="about-version muted">v{about.extensionVersion}</span>
             </div>
             <div className="about-sub">Cursor-style AI coding for {about.appName}: agent chat, Ctrl+K inline edits, Tab completions, terminal and commit helpers.</div>
-            <div className="about-sub muted">Powered by the Claude Code CLI installed on your machine — your own binary, your own login.</div>
+            <div className="about-sub muted">Powered by the Claude Code CLI on your machine. Not affiliated with Anthropic or Anysphere.</div>
+            <div className="about-links">
+              {PROJECT_LINKS.map((l) => (
+                <LinkButton key={l.url} icon={l.icon} onClick={() => post({ type: 'openUrl', url: l.url })} title={l.url}>
+                  {l.label}
+                </LinkButton>
+              ))}
+            </div>
           </div>
         </div>
 

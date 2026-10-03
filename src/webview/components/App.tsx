@@ -8,6 +8,7 @@ import { InputBox } from './InputBox';
 import { MessageList } from './MessageList';
 import { ReviewBar } from './ReviewBar';
 import { Toasts } from './Toasts';
+import { KursorGlyph } from '../../shared/Logo';
 import type { HostToWebview } from '../../shared/protocol';
 import { Icon } from './Icon';
 
@@ -83,8 +84,9 @@ export function App() {
   if (!app) {
     return (
       <div className="app connecting">
-        <Icon name="loading" spin />
+        <KursorGlyph className="connecting-mark" size={18} />
         <span>Connecting to Kursor…</span>
+        <Icon name="loading" spin />
       </div>
     );
   }

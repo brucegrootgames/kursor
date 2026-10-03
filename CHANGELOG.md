@@ -7,6 +7,9 @@ builds the extension and one bundle per platform from that tag.
 
 ## [Unreleased]
 
+### Added
+- Brand identity: new Kursor mark (text cursor + code bracket), wordmark, palette and type guide (`docs/BRAND.md`); applied to app icons, the chat empty state, the Settings About tab, the Kursor Dark accent colours, the editor watermark, and the website (fonts, favicons, social card, Brand section).
+
 ## [0.1.0] - 2026-10-03
 
 First public release.

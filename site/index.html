@@ -7,13 +7,22 @@
 <meta name="description" content="Kursor is an open-source, Cursor-style AI code editor: agent chat, Ctrl+K inline edits and Tab completions, driven by the Claude Code CLI already installed on your machine. Linux, macOS and Windows.">
 <meta property="og:title" content="Kursor">
 <meta property="og:description" content="A Cursor-style editor that runs on the Claude Code you already have.">
-<meta property="og:image" content="https://brucegrootgames.github.io/kursor/img/overview.png">
+<meta property="og:image" content="https://brucegrootgames.github.io/kursor/img/social-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<link rel="icon" type="image/svg+xml" href="img/kursor.svg">
 <link rel="icon" type="image/png" href="img/favicon.png">
+<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+<meta name="theme-color" content="#0f1014">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0f1014; --bg-2: #15171d; --card: #1a1d25; --border: #262a35; --fg: #e6e8ee; --muted: #8b91a1;
-    --accent: #7c8cff; --accent-2: #b57cff; --green: #5fd38a; --red: #ff6b78; --mono: ui-monospace, "JetBrains Mono", "Cascadia Code", Menlo, Consolas, monospace;
-    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, Ubuntu, "Helvetica Neue", Arial, sans-serif;
+    --bg: #0f1014; --bg-2: #15171d; --card: #1a1d25; --border: #262a35; --fg: #eef0f6; --muted: #8b91a1;
+    --accent: #7c8cff; --accent-2: #b57cff; --green: #5fd38a; --red: #ff6b78; --mono: "JetBrains Mono", ui-monospace, "Cascadia Code", Menlo, Consolas, monospace;
+    --sans: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu, "Helvetica Neue", Arial, sans-serif;
   }
   * { box-sizing: border-box; }
   html { scroll-behavior: smooth; }
@@ -73,6 +82,18 @@
   details { border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; margin-bottom: 8px; background: var(--card); }
   summary { cursor: pointer; font-weight: 600; }
   details p { color: var(--muted); font-size: 14.5px; margin: 8px 0 0; }
+  .swatches { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin: 18px 0; }
+  .swatch { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; background: var(--card); font-size: 12px; }
+  .swatch i { display: block; height: 54px; }
+  .swatch span { display: block; padding: 7px 10px; color: var(--muted); }
+  .swatch b { color: var(--fg); display: block; font-weight: 600; }
+  .assets { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .asset { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; text-align: center; font-size: 13px; color: var(--muted); }
+  .asset .box { height: 110px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; border-radius: 8px; background: var(--bg); }
+  .asset .box.light { background: #eef0f6; color: #0f1014; }
+  .asset img, .asset svg { max-height: 88px; }
+  .asset a { display: block; margin-top: 4px; }
+  @media (max-width: 860px) { .swatches { grid-template-columns: repeat(2, 1fr); } .assets { grid-template-columns: 1fr 1fr; } }
   footer { border-top: 1px solid var(--border); padding: 32px 0 48px; color: var(--muted); font-size: 13px; }
   footer .row { display: flex; flex-wrap: wrap; gap: 18px; justify-content: space-between; }
   @media (max-width: 860px) {
@@ -95,6 +116,7 @@
         <a href="#install">Install</a>
         <a href="#shortcuts">Shortcuts</a>
         <a href="#faq">FAQ</a>
+        <a href="#brand">Brand</a>
         <a class="btn" href="https://github.com/brucegrootgames/kursor">GitHub</a>
       </div>
     </nav>
@@ -222,6 +244,25 @@ npm install ; npm run package ; product\install.cmd</pre>
         <tr><td class="k"><kbd>Ctrl</kbd>+<kbd>⇧</kbd>+<kbd>J</kbd></td><td>Kursor Settings</td><td>anywhere</td></tr>
       </tbody>
     </table>
+  </section>
+
+  <section id="brand">
+    <h2>Brand</h2>
+    <p class="sub">A text cursor and a code bracket make the K. The cursor is the only thing that carries colour. Assets are free to use when referring to Kursor; the full guide is in <a href="https://github.com/brucegrootgames/kursor/blob/main/docs/BRAND.md">docs/BRAND.md</a>.</p>
+    <div class="assets">
+      <div class="asset"><div class="box"><img src="brand/kursor-mark.svg" alt="Kursor mark on tile" width="88" height="88"></div>Mark · tile<a href="brand/kursor-mark.svg" download>SVG</a><a href="brand/kursor-mark-512.png" download>PNG 512</a></div>
+      <div class="asset"><div class="box" style="color:#eef0f6"><svg viewBox="0 0 256 256" width="88" height="88" role="img" aria-label="Kursor glyph"><defs><linearGradient id="gbar" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8f9bff"/><stop offset="1" stop-color="#b57cff"/></linearGradient></defs><rect x="78" y="62" width="24" height="132" rx="10" fill="url(#gbar)"/><polyline points="176,70 110,128 176,186" fill="none" stroke="currentColor" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/></svg></div>Glyph · any surface<a href="brand/kursor-glyph.svg" download>SVG</a></div>
+      <div class="asset"><div class="box light"><svg viewBox="0 0 24 24" width="72" height="72" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="8.3" y1="5.5" x2="8.3" y2="18.5"/><polyline points="16.6,6.3 10.3,12 16.6,17.7"/></svg></div>Mono · any colour<a href="brand/kursor-mark-mono.svg" download>SVG</a></div>
+      <div class="asset"><div class="box"><img src="brand/kursor-wordmark.svg" alt="Kursor wordmark" width="220"></div>Wordmark<a href="brand/kursor-wordmark.svg" download>SVG</a><a href="brand/social-card.svg" download>Social card</a></div>
+    </div>
+    <div class="swatches">
+      <div class="swatch"><i style="background:#0f1014"></i><span><b>Ink</b>#0F1014</span></div>
+      <div class="swatch"><i style="background:#1a1d25"></i><span><b>Surface</b>#1A1D25</span></div>
+      <div class="swatch"><i style="background:#eef0f6"></i><span><b>Mist</b>#EEF0F6</span></div>
+      <div class="swatch"><i style="background:linear-gradient(135deg,#7c8cff,#b57cff)"></i><span><b>Violet → Orchid</b>#7C8CFF → #B57CFF</span></div>
+      <div class="swatch"><i style="background:linear-gradient(90deg,#5fd38a 50%,#ff6b78 50%)"></i><span><b>Keep / Undo</b>#5FD38A / #FF6B78</span></div>
+    </div>
+    <p class="fine" style="color:var(--muted);font-size:13px">Type: Inter for UI, your editor font for code. Please don't recolour the bracket, add shadows, or place the mark on the violet gradient.</p>
   </section>
 
   <section id="faq">

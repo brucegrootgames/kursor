@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <!-- Mark without the tile, for use on dark surfaces (chat empty state, letterpress) -->
+  <defs>
+    <linearGradient id="bar" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8f9bff"/>
+      <stop offset="1" stop-color="#b57cff"/>
+    </linearGradient>
+  </defs>
+  <rect x="78" y="62" width="24" height="132" rx="10" fill="url(#bar)"/>
+  <polyline points="176,70 110,128 176,186" fill="none" stroke="currentColor" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

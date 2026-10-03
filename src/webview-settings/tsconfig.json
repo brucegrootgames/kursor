@@ -1,4 +1,4 @@
 {
   "extends": "../webview/tsconfig.json",
-  "include": ["./**/*.ts", "./**/*.tsx", "../shared/**/*.ts"]
+  "include": ["./**/*.ts", "./**/*.tsx", "../shared/**/*.ts", "../shared/**/*.tsx"]
 }

@@ -1,15 +1,7 @@
+import { KursorMark } from '../../shared/Logo';
 import type { AppState } from '../../shared/protocol';
 import { post } from '../vscode';
 import { Icon } from './Icon';
-
-function Logo() {
-  return (
-    <svg className="logo" width="44" height="44" viewBox="0 0 44 44" aria-hidden="true">
-      <rect x="2" y="2" width="40" height="40" rx="10" fill="none" stroke="currentColor" strokeWidth="2" opacity="0.6" />
-      <path d="M14 11v22M16 22l12-11M16 22l13 11" fill="none" stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
 
 export function SignInPanel({ claude }: { claude: AppState['claude'] }) {
   const notFound = !claude.path || (claude.error && /not found|no such|enoent|resolve/i.test(claude.error));
@@ -61,7 +53,7 @@ export function EmptyState({ app }: { app: AppState }) {
   return (
     <div className="empty">
       <div className="empty-inner">
-        <Logo />
+        <KursorMark className="logo" size={56} />
         <div className="empty-title">Kursor</div>
         {needsAttention ? (
           <SignInPanel claude={claude} />

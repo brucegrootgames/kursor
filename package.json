@@ -897,20 +897,20 @@
         "id": "kursor.addedLineBackground",
         "description": "Background of lines added by Kursor edits.",
         "defaults": {
-          "dark": "#2ea04326",
-          "light": "#2ea04326",
-          "highContrast": "#2ea04340",
-          "highContrastLight": "#2ea04340"
+          "dark": "#5fd38a26",
+          "light": "#5fd38a26",
+          "highContrast": "#5fd38a40",
+          "highContrastLight": "#5fd38a40"
         }
       },
       {
         "id": "kursor.removedLineBackground",
         "description": "Background of lines removed by Kursor edits.",
         "defaults": {
-          "dark": "#f8514926",
-          "light": "#f8514926",
-          "highContrast": "#f8514940",
-          "highContrastLight": "#f8514940"
+          "dark": "#ff6b7826",
+          "light": "#ff6b7826",
+          "highContrast": "#ff6b7840",
+          "highContrastLight": "#ff6b7840"
         }
       }
     ]

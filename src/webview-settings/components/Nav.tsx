@@ -1,5 +1,6 @@
 /** Left navigation: an accessible vertical tab list with roving focus (arrow keys, Home/End). */
 import { useCallback, useEffect, useRef, type KeyboardEvent } from 'react';
+import { KursorGlyph } from '../../shared/Logo';
 import { SETTINGS_TABS, type SettingsTab } from '../../shared/settingsProtocol';
 import { cx } from '../util';
 import { Icon } from './Icon';
@@ -76,7 +77,7 @@ export function Nav({ active, onSelect }: { active: SettingsTab; onSelect: (tab:
     <nav className="nav" aria-label="Settings sections">
       <div className="nav-brand">
         <span className="nav-logo" aria-hidden="true">
-          <Icon name="sparkle-filled" />
+          <KursorGlyph size={18} />
         </span>
         <span className="nav-title">Kursor Settings</span>
       </div>

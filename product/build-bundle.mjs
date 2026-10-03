@@ -8,7 +8,7 @@
 //   Kursor-<platform>-<arch>-<version>/
 //     app/                 the rebranded editor (darwin: app/Kursor.app) — same code path as install.mjs --stage-only
 //     kursor.vsix          the extension
-//     install.sh|.cmd|.ps1, uninstall.*, install.mjs, uninstall.mjs, lib/, defaults/, icons/, omarchy/
+//     install.sh|.cmd|.ps1, uninstall.*, install.mjs, uninstall.mjs, lib/, defaults/, icons/, brand/, omarchy/
 //     INSTALL.txt
 //
 // install.mjs finds app/ and kursor.vsix next to itself and installs from them (no download). Archives are
@@ -24,7 +24,7 @@ import {
 } from './lib/common.mjs';
 
 const BUNDLE_FILES = ['install.mjs', 'uninstall.mjs', 'install.sh', 'uninstall.sh', 'install.ps1', 'install.cmd', 'uninstall.ps1',
-  'uninstall.cmd', 'README.md', 'lib', 'defaults', 'icons', 'omarchy'];
+  'uninstall.cmd', 'README.md', 'lib', 'defaults', 'icons', 'brand', 'omarchy'];
 
 function installText(platform, name) {
   const common = `Kursor ${VSCODIUM_VERSION} — ${name}
