@@ -37,6 +37,8 @@ export class WebviewHost implements WebviewHostLike, vscode.Disposable {
         if (!msg || typeof msg !== 'object' || typeof msg.type !== 'string') return;
         if (msg.type === 'ready') {
           this.ready = true;
+          this.clearWatchdog();
+          this.log.debug(`${kind} webview ready`);
           manager.syncHost(this);
           for (const m of this.queue.splice(0)) this.post(m);
           return;
@@ -74,7 +76,36 @@ export class WebviewHost implements WebviewHostLike, vscode.Disposable {
     );
   }
 
+  /**
+   * First-launch guard: on a brand-new profile the webview frame has been observed to load without ever
+   * running its script (blank pane, no `ready`). If the UI has not reported ready after `ms` while the
+   * view is visible, reload the HTML once. Harmless when the UI simply loads slowly.
+   */
+  armReadyWatchdog(reload: () => void, ms = 8000): void {
+    this.clearWatchdog();
+    this.watchdog = setTimeout(() => {
+      this.watchdog = undefined;
+      if (this.ready || !this.isVisible()) return;
+      this.log.warn(`${this.kind} webview did not report ready within ${ms} ms; reloading its HTML once`);
+      try {
+        reload();
+      } catch (err) {
+        this.log.error('webview reload failed', err);
+      }
+    }, ms);
+  }
+
+  private watchdog: ReturnType<typeof setTimeout> | undefined;
+
+  private clearWatchdog(): void {
+    if (this.watchdog) {
+      clearTimeout(this.watchdog);
+      this.watchdog = undefined;
+    }
+  }
+
   dispose(): void {
+    this.clearWatchdog();
     for (const d of this.disposables) d.dispose();
     this.queue.length = 0;
   }
@@ -115,6 +146,9 @@ export class ChatViewProvider implements vscode.WebviewViewProvider, vscode.Disp
     webviewView.title = 'Chat';
     this.host?.dispose();
     this.host = new WebviewHost('view', webviewView.webview, () => webviewView.visible, this.manager, this.onMessage, this.log);
+    this.host.armReadyWatchdog(() => {
+      webviewView.webview.html = chatHtml(webviewView.webview, this.extensionUri);
+    });
     const subs: vscode.Disposable[] = [
       webviewView.onDidChangeVisibility(() => {
         if (webviewView.visible) {
@@ -207,6 +241,9 @@ export class ChatPanelController implements vscode.Disposable {
     panel.webview.html = chatHtml(panel.webview, this.context.extensionUri);
     this.host?.dispose();
     this.host = new WebviewHost('panel', panel.webview, () => panel.visible, this.manager, this.onMessage, this.log);
+    this.host.armReadyWatchdog(() => {
+      panel.webview.html = chatHtml(panel.webview, this.context.extensionUri);
+    });
     panel.onDidDispose(() => {
       this.host?.dispose();
       this.host = undefined;

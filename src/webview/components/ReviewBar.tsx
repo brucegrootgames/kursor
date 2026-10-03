@@ -31,10 +31,10 @@ export function ReviewBar({ edits }: { edits: EditSummary[] }) {
           Review
         </button>
         <button type="button" className="btn small" onClick={() => post({ type: 'edits', action: 'undo' })} title="Revert all agent edits (Ctrl+Shift+Backspace)">
-          Undo All
+          Undo<span className="wide-only"> All</span>
         </button>
         <button type="button" className="btn small primary" onClick={() => post({ type: 'edits', action: 'keep' })} title="Accept all agent edits (Ctrl+Enter)">
-          Keep All
+          Keep<span className="wide-only"> All</span>
         </button>
       </div>
       {open && (

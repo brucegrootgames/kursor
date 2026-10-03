@@ -240,7 +240,11 @@ kbd {
 .tool-row.open .tool-head { background: var(--k-code-bg); border-radius: var(--k-radius) var(--k-radius) 0 0; }
 .tool-icon { font-size: 13px; }
 .tool-verb { white-space: nowrap; }
-.tool-subject { color: var(--k-fg); background: none; padding: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.tool-subject { color: var(--k-fg); background: none; padding: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; flex: 1 1 auto; }
+.tool-subject .path-dir { color: var(--k-muted); }
+/* Keep the file name readable before the stats/actions take the remaining width. */
+.tool-head .tool-subject { min-width: 48px; }
+.tool-head .spacer { flex: 0 1 8px; }
 .tool-subject.clickable:hover { text-decoration: underline; color: var(--k-link); }
 .tool-meta { color: var(--k-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 11px; max-width: 40%; }
 .tool-sub { font-size: 11px; opacity: 0.7; }
@@ -316,7 +320,12 @@ kbd {
 
 /* ---------- review bar ---------- */
 .review-bar { flex: 0 0 auto; margin: 0 10px 6px; border: 1px solid var(--k-border); border-radius: var(--k-radius); background: var(--k-card); font-size: 12px; }
-.review-head { display: flex; align-items: center; gap: 6px; padding: 4px 6px; }
+.review-head { display: flex; align-items: center; gap: 6px; padding: 4px 6px; flex-wrap: wrap; }
+.review-head .spacer { flex: 1 1 4px; }
+@media (max-width: 330px) {
+  .wide-only { display: none; }
+  .tool-head .edit-actions .link-btn:first-child { display: none; } /* "Review" is also in the row's menu/title; keep Undo/Keep */
+}
 .review-toggle { display: inline-flex; align-items: center; gap: 6px; height: 22px; padding: 0 4px; border-radius: 4px; }
 .review-toggle:hover { background: var(--k-hover); }
 .review-files { border-top: 1px solid var(--k-border); max-height: 180px; overflow: auto; padding: 4px 0; }

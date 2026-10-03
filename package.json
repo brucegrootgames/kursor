@@ -130,9 +130,9 @@
       "editor/title": [
         { "command": "kursor.inlineEdit.acceptAll", "when": "kursor.inlineDiffVisible && kursor.inlineDiffResource == resourcePath", "group": "navigation@1" },
         { "command": "kursor.inlineEdit.rejectAll", "when": "kursor.inlineDiffVisible && kursor.inlineDiffResource == resourcePath", "group": "navigation@2" },
-        { "command": "kursor.edits.keepFile", "when": "kursor.hasPendingEdits && resourceScheme == file && !kursor.inlineDiffVisible", "group": "navigation@3" },
-        { "command": "kursor.edits.undoFile", "when": "kursor.hasPendingEdits && resourceScheme == file && !kursor.inlineDiffVisible", "group": "navigation@4" },
-        { "command": "kursor.edits.reviewFile", "when": "kursor.hasPendingEdits && resourceScheme == file && !kursor.inlineDiffVisible", "group": "navigation@5" },
+        { "command": "kursor.edits.keepFile", "when": "kursor.hasPendingEdits && resourceScheme == file && resourcePath in kursor.pendingEditPaths && !kursor.inlineDiffVisible", "group": "navigation@3" },
+        { "command": "kursor.edits.undoFile", "when": "kursor.hasPendingEdits && resourceScheme == file && resourcePath in kursor.pendingEditPaths && !kursor.inlineDiffVisible", "group": "navigation@4" },
+        { "command": "kursor.edits.reviewFile", "when": "kursor.hasPendingEdits && resourceScheme == file && resourcePath in kursor.pendingEditPaths && !kursor.inlineDiffVisible", "group": "navigation@5" },
         { "command": "kursor.ide.acceptDiff", "when": "kursor.ide.viewingDiff && resourceScheme == kursor-ide-right", "group": "navigation@1" },
         { "command": "kursor.ide.rejectDiff", "when": "kursor.ide.viewingDiff && resourceScheme == kursor-ide-right", "group": "navigation@2" }
       ],

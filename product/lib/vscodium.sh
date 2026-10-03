@@ -98,6 +98,7 @@ kursor_rebrand() {
     | .nameLong = "Kursor"
     | .applicationName = "kursor"
     | .dataFolderName = ".kursor"
+    | .sharedDataFolderName = ".kursor-shared"
     | .urlProtocol = "kursor"
     | .serverApplicationName = "kursor-server"
     | .serverDataFolderName = ".kursor-server"

@@ -81,6 +81,8 @@ export function createEditTracker(context: vscode.ExtensionContext, deps: BaseDe
   const fire = (): void => {
     const n = files.size;
     void vscode.commands.executeCommand('setContext', 'kursor.hasPendingEdits', n > 0);
+    // Editor-title Keep/Undo/Review buttons use `resourcePath in kursor.pendingEditPaths`.
+    void vscode.commands.executeCommand('setContext', 'kursor.pendingEditPaths', [...files.keys()]);
     if (n > 0) {
       status.text = `$(diff-multiple) ${n} file${n === 1 ? '' : 's'} · Review`;
       status.tooltip = `Kursor edited ${n} file${n === 1 ? '' : 's'} — click to review (Keep All: Ctrl+Enter in chat)`;
